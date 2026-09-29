@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Subagent-Driven Development"
+  short_description: "Coordinate requested delegated implementation"
+  default_prompt: "Use $cortex-se:subagent-driven-development for this delegated change."

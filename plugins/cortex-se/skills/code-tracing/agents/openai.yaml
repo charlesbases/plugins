@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Code Tracing"
+  short_description: "Trace complete relevant paths from source evidence"
+  default_prompt: "Use $cortex-se:code-tracing to establish this code path."

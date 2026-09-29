@@ -1,0 +1,32 @@
+{
+  "name": "rning",
+  "interface": {
+    "displayName": "rning"
+  },
+  "plugins": [
+    {
+      "name": "cortex",
+      "source": {
+        "source": "local",
+        "path": "./plugins/cortex"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    },
+    {
+      "name": "cortex-se",
+      "source": {
+        "source": "local",
+        "path": "./plugins/cortex-se"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}

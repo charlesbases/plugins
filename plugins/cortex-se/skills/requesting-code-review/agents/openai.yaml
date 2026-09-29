@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Requesting Code Review"
+  short_description: "Review changes for concrete defects and risk"
+  default_prompt: "Use $cortex-se:requesting-code-review to review this change."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Systematic Debugging"
+  short_description: "Diagnose failures and correct proven causes"
+  default_prompt: "Use $cortex-se:systematic-debugging to investigate this failure."

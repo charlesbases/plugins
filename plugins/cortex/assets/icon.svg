@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">Cortex</title>
+  <desc id="description">An ECG trace with one sharp main peak, a small lead-in wave, and a rounded recovery wave.</desc>
+  <path d="M4 35H10Q14 25 18 35H24L27 39 31 13 35 47 39 35H42Q49 23 56 35H60" fill="none" stroke="#29D3A9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

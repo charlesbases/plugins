@@ -1,0 +1,4 @@
+interface:
+  display_name: "Brainstorming"
+  short_description: "Plan an engineering change with clarity"
+  default_prompt: "Use $brainstorming to design this engineering change before implementation."

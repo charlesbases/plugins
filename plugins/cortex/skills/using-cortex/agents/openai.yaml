@@ -1,0 +1,4 @@
+interface:
+  display_name: "Using Cortex"
+  short_description: "Route work through Cortex workflow skills"
+  default_prompt: "Use $using-cortex to route this engineering task."

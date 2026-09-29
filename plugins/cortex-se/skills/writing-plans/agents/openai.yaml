@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Writing Plans"
+  short_description: "Specify how the implementation will work"
+  default_prompt: "Use $cortex-se:writing-plans to explain how to implement this change."

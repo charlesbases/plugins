@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Code Standards"
+  short_description: "Apply project-grounded code quality rules"
+  default_prompt: "Use $cortex-se:code-standards to review this edited code."

@@ -1,0 +1,7 @@
+interface:
+  display_name: "Testing"
+  short_description: "Design and execute confirmed test points"
+  default_prompt: "Use $testing to self-test this confirmed change."
+
+policy:
+  allow_implicit_invocation: false

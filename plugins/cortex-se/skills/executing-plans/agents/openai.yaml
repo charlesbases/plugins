@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Executing Plans"
+  short_description: "Implement a scoped source-grounded plan"
+  default_prompt: "Use $cortex-se:executing-plans to implement this change."

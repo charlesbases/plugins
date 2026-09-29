@@ -1,0 +1,45 @@
+{
+  "description": "Cortex SE batch evidence checkpoints; no per-command observation.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
+            "commandWindows": "python \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
+            "timeout": 5,
+            "statusMessage": "Checking Cortex SE evidence"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
+            "commandWindows": "python \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
+            "timeout": 5,
+            "statusMessage": "Checking Cortex SE evidence"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
+            "commandWindows": "python \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
+            "timeout": 5,
+            "statusMessage": "Checking Cortex SE evidence"
+          }
+        ]
+      }
+    ]
+  }
+}

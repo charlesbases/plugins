@@ -1,0 +1,4 @@
+interface:
+  display_name: "Executing Plans"
+  short_description: "Execute approved implementation plans"
+  default_prompt: "Use $executing-plans to implement the confirmed plan."

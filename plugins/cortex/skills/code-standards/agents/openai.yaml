@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Standards"
+  short_description: "Apply focused code-quality constraints"
+  default_prompt: "Use $code-standards to review this generated code."

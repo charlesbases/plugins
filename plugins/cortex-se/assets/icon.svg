@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title description">
+  <title id="title">Cortex SE</title>
+  <desc id="description">Two ECG beats, each with a sharp main peak and smaller rounded waves.</desc>
+  <path d="M3 35H6Q8 29 10 35H13L15 39 18 14 21 47 24 35H26Q29 27 32 35H34Q36 29 38 35H41L43 39 46 14 49 47 52 35H54Q57 27 60 35H61" fill="none" stroke="#35B6F2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

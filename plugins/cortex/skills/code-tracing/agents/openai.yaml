@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Tracing"
+  short_description: "Trace code paths and source evidence"
+  default_prompt: "Use $code-tracing to analyze this code path."

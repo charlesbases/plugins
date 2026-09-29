@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Brainstorming"
+  short_description: "Resolve material design choices for a change"
+  default_prompt: "Use $cortex-se:brainstorming to resolve this design choice."

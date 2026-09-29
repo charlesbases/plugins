@@ -1,0 +1,4 @@
+interface:
+  display_name: "Writing Plans"
+  short_description: "Build complete proposals for one approval"
+  default_prompt: "Use $writing-plans to create the implementation plan."

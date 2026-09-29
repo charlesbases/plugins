@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cortex SE: Workflow"
+  short_description: "Route development through the streamlined workflow"
+  default_prompt: "Use $cortex-se:using-cortex to route this development task."
