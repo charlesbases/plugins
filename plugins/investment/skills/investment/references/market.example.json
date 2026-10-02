@@ -1,0 +1,173 @@
+{
+  "schema_version": 4,
+  "currency": "CNY",
+  "observed_at": "2030-01-02T00:00:00Z",
+  "terms_basis": "source_verified",
+  "prices": {
+    "000001": "1",
+    "000002": "1"
+  },
+  "price_dates": {
+    "000001": "2030-01-01",
+    "000002": "2030-01-01"
+  },
+  "currencies": {
+    "000001": "CNY",
+    "000002": "CNY"
+  },
+  "terms": [
+    {
+      "code": "000001",
+      "subscription_fee": "0",
+      "redemption_fee": "0",
+      "min_buy": "1",
+      "max_weight": 1,
+      "settlement_days": 2,
+      "buyable": true,
+      "sellable": true,
+      "observed_at": "2030-01-01T00:00:00Z",
+      "fee_contract": {
+        "subject": {
+          "code": "000001",
+          "share_class": "C",
+          "currency": "CNY",
+          "channel": "TT",
+          "investor_type": "retail"
+        },
+        "subscription": {
+          "kind": "percentage",
+          "rate": "0"
+        },
+        "redemption": {
+          "kind": "percentage",
+          "rate": "0"
+        },
+        "holding": {
+          "minimum_days": 0,
+          "day_basis": "calendar_days",
+          "start_inclusive": true,
+          "end_inclusive": false,
+          "end_event": "execution_date"
+        },
+        "trade_precision": {
+          "money_step": "0.01",
+          "share_step": "0.01",
+          "fee_rounding": "half_up",
+          "share_rounding": "down_refund"
+        },
+        "settlement": {
+          "lag_days": 2,
+          "day_basis": "calendar_days"
+        },
+        "acquisition_rule": {
+          "holding_start": "execution_date",
+          "ownership_start": "execution_date"
+        },
+        "minimum_redemption_shares": "0.01",
+        "minimum_remaining_shares": "0",
+        "min_buy": "1",
+        "max_buy": null,
+        "buyable": true,
+        "sellable": true,
+        "confirmation_max_calendar_days": 1
+      },
+      "fee_contract_hash": "ac8fb17e1db7fd726de9628fbc2a4d451a9ec39f11a20f24ed5ff7162f62bf26",
+      "fee_contract_ref": {
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "size": 0,
+        "chunks": []
+      },
+      "confirmed_execution_max_calendar_days": 1,
+      "execution_bound_source": {
+        "fee_contract_ref": {
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "size": 0,
+          "chunks": []
+        }
+      }
+    },
+    {
+      "code": "000002",
+      "subscription_fee": "0",
+      "redemption_fee": "0",
+      "min_buy": "1",
+      "max_weight": 1,
+      "settlement_days": 2,
+      "buyable": true,
+      "sellable": true,
+      "observed_at": "2030-01-01T00:00:00Z",
+      "fee_contract": {
+        "subject": {
+          "code": "000002",
+          "share_class": "C",
+          "currency": "CNY",
+          "channel": "TT",
+          "investor_type": "retail"
+        },
+        "subscription": {
+          "kind": "percentage",
+          "rate": "0"
+        },
+        "redemption": {
+          "kind": "percentage",
+          "rate": "0"
+        },
+        "holding": {
+          "minimum_days": 0,
+          "day_basis": "calendar_days",
+          "start_inclusive": true,
+          "end_inclusive": false,
+          "end_event": "execution_date"
+        },
+        "trade_precision": {
+          "money_step": "0.01",
+          "share_step": "0.01",
+          "fee_rounding": "half_up",
+          "share_rounding": "down_refund"
+        },
+        "settlement": {
+          "lag_days": 2,
+          "day_basis": "calendar_days"
+        },
+        "acquisition_rule": {
+          "holding_start": "execution_date",
+          "ownership_start": "execution_date"
+        },
+        "minimum_redemption_shares": "0.01",
+        "minimum_remaining_shares": "0",
+        "min_buy": "1",
+        "max_buy": null,
+        "buyable": true,
+        "sellable": true,
+        "confirmation_max_calendar_days": 1
+      },
+      "fee_contract_hash": "4650e8a953ab4e9a1e3600e6619aec91c11d80359e56f01473d62055f10578b9",
+      "fee_contract_ref": {
+        "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "size": 0,
+        "chunks": []
+      },
+      "confirmed_execution_max_calendar_days": 1,
+      "execution_bound_source": {
+        "fee_contract_ref": {
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "size": 0,
+          "chunks": []
+        }
+      }
+    }
+  ],
+  "source_hashes": {
+    "replace_with_authenticated_source": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "identities": {
+    "000001": {
+      "fund_group_id": "replace-with-source-group-000001",
+      "sector_exposures": null
+    },
+    "000002": {
+      "fund_group_id": "replace-with-source-group-000002",
+      "sector_exposures": null
+    }
+  }
+}

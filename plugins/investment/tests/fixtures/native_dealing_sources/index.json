@@ -1,0 +1,281 @@
+{
+  "ef_product": {
+    "raw_file": "ef_product.pdf",
+    "capture": {
+      "bytes": 866401,
+      "content_type": "application/pdf",
+      "encoding": null,
+      "final_url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260519/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%EF%BC%88%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300ETF%E8%81%94%E6%8E%A5A%EF%BC%89%E5%9F%BA%E9%87%91%E4%BA%A7%E5%93%81%E8%B5%84%E6%96%99%E6%A6%82%E8%A6%81%E6%9B%B4%E6%96%B0.pdf?from=person",
+      "http_status": 200,
+      "raw_sha256": "929d13115096fce2cb7c885b729d652c83c353cc28c498fa9c404f324d88ee57",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "issuer_efunds",
+      "requested_url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260519/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%EF%BC%88%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300ETF%E8%81%94%E6%8E%A5A%EF%BC%89%E5%9F%BA%E9%87%91%E4%BA%A7%E5%93%81%E8%B5%84%E6%96%99%E6%A6%82%E8%A6%81%E6%9B%B4%E6%96%B0.pdf?from=person",
+      "retrieved_at": "2026-10-06T22:43:30.180285+00:00",
+      "text_sha256": null,
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "issuer_efunds",
+    "raw_sha256": "929d13115096fce2cb7c885b729d652c83c353cc28c498fa9c404f324d88ee57",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "ef_prospectus": {
+    "raw_file": "ef_prospectus.pdf",
+    "capture": {
+      "bytes": 1716426,
+      "content_type": "application/pdf",
+      "encoding": null,
+      "final_url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260131/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+      "http_status": 200,
+      "raw_sha256": "b3fbbedf9b61bb034129a2f7d9b2c229fa504d9f3cef4f57a5b6c65dd869a825",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "issuer_efunds",
+      "requested_url": "https://cdn.efunds.com.cn/owch/data/bulletin/20260131/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%91%E6%9B%B4%E6%96%B0%E7%9A%84%E6%8B%9B%E5%8B%9F%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+      "retrieved_at": "2026-10-06T22:44:27.038489+00:00",
+      "text_sha256": null,
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "issuer_efunds",
+    "raw_sha256": "b3fbbedf9b61bb034129a2f7d9b2c229fa504d9f3cef4f57a5b6c65dd869a825",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "cmf_product_pdf": {
+    "raw_file": "cmf_product_pdf.pdf",
+    "capture": {
+      "bytes": 359159,
+      "content_type": "application/pdf",
+      "encoding": null,
+      "final_url": "https://static.cmfchina.com/fundarticle/20260316/20021042143105.pdf",
+      "http_status": 200,
+      "raw_sha256": "451775995860eb452008d7d30b6812236bbfdc3682013a3d2cb17b52fe892766",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "issuer_cmfchina",
+      "requested_url": "https://static.cmfchina.com/fundarticle/20260316/20021042143105.pdf",
+      "retrieved_at": "2026-10-06T22:47:01.940145+00:00",
+      "text_sha256": null,
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "issuer_cmfchina",
+    "raw_sha256": "451775995860eb452008d7d30b6812236bbfdc3682013a3d2cb17b52fe892766",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "cmf_prospectus": {
+    "raw_file": "cmf_prospectus.pdf",
+    "capture": {
+      "bytes": 796699,
+      "content_type": "application/pdf",
+      "encoding": null,
+      "final_url": "https://static.cmfchina.com/fundarticle/20260316/20021041047995.pdf",
+      "http_status": 200,
+      "raw_sha256": "de8ae7632af4bbdef95a415cd6ac8806f43584efa566f31fa9df685db86f28b8",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "issuer_cmfchina",
+      "requested_url": "https://static.cmfchina.com/fundarticle/20260316/20021041047995.pdf",
+      "retrieved_at": "2026-10-06T22:43:31.198006+00:00",
+      "text_sha256": null,
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "issuer_cmfchina",
+    "raw_sha256": "de8ae7632af4bbdef95a415cd6ac8806f43584efa566f31fa9df685db86f28b8",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "ef_platform": {
+    "raw_file": "ef_platform.html",
+    "capture": {
+      "bytes": 46190,
+      "content_type": "text/html",
+      "encoding": "utf-8",
+      "final_url": "https://fundf10.eastmoney.com/jjfl_110020.html",
+      "http_status": 200,
+      "raw_sha256": "2ea0023b1479db4ba6769d9aafe6df03cb5acad980aae23c8231a8cfb9a7c2a4",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "eastmoney_fees",
+      "requested_url": "https://fundf10.eastmoney.com/jjfl_110020.html",
+      "retrieved_at": "2026-10-06T22:43:30.886431+00:00",
+      "text_sha256": "2ea0023b1479db4ba6769d9aafe6df03cb5acad980aae23c8231a8cfb9a7c2a4",
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "eastmoney_fees",
+    "raw_sha256": "2ea0023b1479db4ba6769d9aafe6df03cb5acad980aae23c8231a8cfb9a7c2a4",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "cmf_platform": {
+    "raw_file": "cmf_platform.html",
+    "capture": {
+      "bytes": 46349,
+      "content_type": "text/html",
+      "encoding": "utf-8",
+      "final_url": "https://fundf10.eastmoney.com/jjfl_217018.html",
+      "http_status": 200,
+      "raw_sha256": "f7acd306f9c26c9af2d313384cc0cde9630dfa5719de8263167aaeb1c28c38eb",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "eastmoney_fees",
+      "requested_url": "https://fundf10.eastmoney.com/jjfl_217018.html",
+      "retrieved_at": "2026-10-06T22:43:31.162853+00:00",
+      "text_sha256": "f7acd306f9c26c9af2d313384cc0cde9630dfa5719de8263167aaeb1c28c38eb",
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "eastmoney_fees",
+    "raw_sha256": "f7acd306f9c26c9af2d313384cc0cde9630dfa5719de8263167aaeb1c28c38eb",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "cutoff": {
+    "raw_file": "cutoff.html",
+    "capture": {
+      "bytes": 40713,
+      "content_type": "text/html",
+      "encoding": "utf-8",
+      "final_url": "https://fundtest.eastmoney.com/help/question_342.html",
+      "http_status": 200,
+      "raw_sha256": "5bb0d59b2f5171680d5dec32e5d5d926dbc0210b087ae9debc6c830fe25e176b",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "eastmoney_help",
+      "requested_url": "https://fundtest.eastmoney.com/help/question_342.html",
+      "retrieved_at": "2026-10-06T22:43:31.179830+00:00",
+      "text_sha256": "5bb0d59b2f5171680d5dec32e5d5d926dbc0210b087ae9debc6c830fe25e176b",
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "eastmoney_help",
+    "raw_sha256": "5bb0d59b2f5171680d5dec32e5d5d926dbc0210b087ae9debc6c830fe25e176b",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "sse_rule": {
+    "raw_file": "sse_rule.html",
+    "capture": {
+      "bytes": 45558,
+      "content_type": "text/html",
+      "encoding": "utf-8",
+      "final_url": "https://one.sse.com.cn/onething/gptz/",
+      "http_status": 200,
+      "raw_sha256": "f5d95746ec6f8dc7d5c9f057b230ba56eae67dce05dbae06fe62a0bdad98f0db",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "sse_trading_calendar",
+      "requested_url": "https://one.sse.com.cn/onething/gptz/",
+      "retrieved_at": "2026-10-06T22:53:03.934232+00:00",
+      "text_sha256": "f5d95746ec6f8dc7d5c9f057b230ba56eae67dce05dbae06fe62a0bdad98f0db",
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "sse_trading_calendar",
+    "raw_sha256": "f5d95746ec6f8dc7d5c9f057b230ba56eae67dce05dbae06fe62a0bdad98f0db",
+    "registry_file": "registry-b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c.json",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "sse_annual": {
+    "raw_file": "sse_annual.html",
+    "capture": {
+      "bytes": 29251,
+      "content_type": "text/html",
+      "encoding": "utf-8",
+      "final_url": "https://www.sse.com.cn/disclosure/announcement/general/c/c_20251222_10802507.shtml",
+      "http_status": 200,
+      "raw_sha256": "4e260b815ce1309175ed994e6490a4ccd51b998a5f92bcdc41cec00fc6823dc7",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "sse_trading_calendar",
+      "requested_url": "https://www.sse.com.cn/disclosure/announcement/general/c/c_20251222_10802507.shtml",
+      "retrieved_at": "2026-10-06T22:53:03.832961+00:00",
+      "text_sha256": "4e260b815ce1309175ed994e6490a4ccd51b998a5f92bcdc41cec00fc6823dc7",
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "sse_trading_calendar",
+    "raw_sha256": "4e260b815ce1309175ed994e6490a4ccd51b998a5f92bcdc41cec00fc6823dc7",
+    "registry_file": "registry-b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c.json",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "szse_rule": {
+    "raw_file": "szse_rule.pdf",
+    "capture": {
+      "bytes": 282084,
+      "content_type": "application/pdf",
+      "encoding": null,
+      "final_url": "https://docs.static.szse.cn/www/lawrules/rule/trade/current/W020260424690713155663.pdf",
+      "http_status": 200,
+      "raw_sha256": "9b66f8b0db70f84a25ef1ccb4ee2351001724e408117552d75f6d8993483c586",
+      "redirect_chain": [],
+      "registry_hash": "b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c",
+      "registry_source_id": "szse_trading_calendar",
+      "requested_url": "https://docs.static.szse.cn/www/lawrules/rule/trade/current/W020260424690713155663.pdf",
+      "retrieved_at": "2026-10-06T22:53:03.768936+00:00",
+      "text_sha256": null,
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "szse_trading_calendar",
+    "raw_sha256": "9b66f8b0db70f84a25ef1ccb4ee2351001724e408117552d75f6d8993483c586",
+    "registry_file": "registry-b493f1922ccdba0604d629880b69f5a56ae228ffe7b6db3be92df8aa5d97f99c.json",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  },
+  "szse_annual": {
+    "raw_file": "szse_annual.html",
+    "capture": {
+      "bytes": 24892,
+      "content_type": "text/html",
+      "encoding": "utf-8",
+      "final_url": "https://www.szse.cn/disclosure/notice/t20251222_618087.html",
+      "http_status": 200,
+      "raw_sha256": "adfcdc1c285121a58ad3a55060a7125812d542cf9fdb92058aac1b1bc99c8243",
+      "redirect_chain": [],
+      "registry_hash": "865e86bd48c4625aa59e1fd189f492cd60efbe1a08f4a90b66f4b2b4b0b536a6",
+      "registry_source_id": "szse_trading_calendar",
+      "requested_url": "https://www.szse.cn/disclosure/notice/t20251222_618087.html",
+      "retrieved_at": "2026-10-06T23:12:08.822131+00:00",
+      "text_sha256": "adfcdc1c285121a58ad3a55060a7125812d542cf9fdb92058aac1b1bc99c8243",
+      "transport": "HTTPS_Windows_Schannel_certificate_validation",
+      "transport_details": {
+        "backend": "Schannel",
+        "curl_version": "curl 8.21.0 (x86_64-w64-mingw32) libcurl/8.21.0 Schannel zlib/1.3.2 brotli/1.2.0 zstd/1.5.7 libidn2/2.3.8 libpsl/0.21.5 libssh2/1.11.1 WinLDAP"
+      }
+    },
+    "source_id": "szse_trading_calendar",
+    "raw_sha256": "adfcdc1c285121a58ad3a55060a7125812d542cf9fdb92058aac1b1bc99c8243",
+    "registry_file": "registry-865e86bd48c4625aa59e1fd189f492cd60efbe1a08f4a90b66f4b2b4b0b536a6.json",
+    "provenance": "actual HTTPS original, unmodified raw capture; not a synthetic example"
+  }
+}

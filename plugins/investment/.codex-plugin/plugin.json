@@ -1,0 +1,21 @@
+{
+  "name": "investment",
+  "version": "0.0.1",
+  "description": "Investment research, fund comparison, and allocation recommendations using verifiable sources, confirmed holdings, and reproducible models.",
+  "author": { "name": "rning" },
+  "keywords": ["investment", "finance", "funds", "portfolio", "evidence", "skills"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Investment",
+    "shortDescription": "Fund research and allocation",
+    "longDescription": "Assess current holdings and new investment opportunities, verify news and fund information, and compare financial models and scenarios to explain allocation recommendations. Reports include news highlights and portfolio changes. Does not execute trades or guarantee returns.",
+    "developerName": "rning",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "defaultPrompt": [
+      "Use my actual holdings and current news to compare holding, increasing, reducing, or adding asset categories.",
+      "Compare these funds' costs, tracking quality, risks, and trading terms. Explain why you select or reject each one.",
+      "Review this investment plan's data, assumptions, calculations, and validation scope. Provide a reproducible analysis."
+    ]
+  }
+}

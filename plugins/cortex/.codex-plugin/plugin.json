@@ -28,8 +28,6 @@
       "Read",
       "Write"
     ],
-    "composerIcon": "./assets/icon.svg",
-    "logo": "./assets/icon.svg",
     "defaultPrompt": [
       "Help me shape this engineering change.",
       "Trace this code path before we modify it.",

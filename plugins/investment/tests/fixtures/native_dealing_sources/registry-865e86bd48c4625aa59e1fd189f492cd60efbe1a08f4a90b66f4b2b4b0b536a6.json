@@ -1,0 +1,746 @@
+{
+  "registry_id": "official-news-and-fund-data",
+  "schema_version": 1,
+  "sources": {
+    "cn_csrc": {
+      "allowed_hosts": [
+        "www.csrc.gov.cn"
+      ],
+      "article_pattern": "/content\\.shtml$",
+      "body_classes": [
+        "detail-news"
+      ],
+      "body_ids": [
+        "UCAP-CONTENT"
+      ],
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.csrc.gov.cn/csrc/c100028/common_xq_list.shtml"
+      ],
+      "encoding": "utf-8",
+      "listing_adapter": "csrc_json",
+      "listing_pattern": "^/searchList/[a-f0-9]{32}$",
+      "max_follow_links": 5,
+      "max_listing_pages": 3,
+      "media_types": [
+        "text/html",
+        "application/json"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/(csrc/|searchList/)",
+      "priority": 50,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.csrc.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_ndrc_interpretation": {
+      "allowed_hosts": [
+        "www.ndrc.gov.cn"
+      ],
+      "article_pattern": "/(?:t[0-9]+_[0-9]+\\.html|[^/]+\\.pdf)$",
+      "body_classes": [
+        "article_con"
+      ],
+      "collection_role": "official_article",
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.ndrc.gov.cn/xxgk/jd/jd/"
+      ],
+      "encoding": "utf-8",
+      "listing_adapter": "ndrc_static",
+      "listing_pattern": "/(?:index(?:_[0-9]+)?\\.html)?$",
+      "max_follow_links": 20,
+      "max_listing_pages": 3,
+      "media_types": [
+        "text/html",
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/xxgk/jd/jd/",
+      "pdf_attachments": true,
+      "priority": 17,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.ndrc.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_ndrc_news": {
+      "allowed_hosts": [
+        "www.ndrc.gov.cn"
+      ],
+      "article_pattern": "/(?:t[0-9]+_[0-9]+\\.html|[^/]+\\.pdf)$",
+      "body_classes": [
+        "article_con"
+      ],
+      "collection_role": "official_article",
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.ndrc.gov.cn/xwdt/xwfb/"
+      ],
+      "encoding": "utf-8",
+      "listing_adapter": "ndrc_static",
+      "listing_pattern": "/(?:index(?:_[0-9]+)?\\.html)?$",
+      "max_follow_links": 20,
+      "max_listing_pages": 3,
+      "media_types": [
+        "text/html",
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/xwdt/xwfb/",
+      "pdf_attachments": true,
+      "priority": 15,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.ndrc.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_ndrc_policy": {
+      "allowed_hosts": [
+        "www.ndrc.gov.cn"
+      ],
+      "article_pattern": "/(?:t[0-9]+_[0-9]+\\.html|[^/]+\\.pdf)$",
+      "body_classes": [
+        "article_con"
+      ],
+      "collection_role": "official_article",
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.ndrc.gov.cn/xxgk/zcfb/tz/",
+        "https://www.ndrc.gov.cn/xxgk/zcfb/fzggwl/"
+      ],
+      "encoding": "utf-8",
+      "listing_adapter": "ndrc_static",
+      "listing_pattern": "/(?:index(?:_[0-9]+)?\\.html)?$",
+      "max_follow_links": 20,
+      "max_listing_pages": 4,
+      "media_types": [
+        "text/html",
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/xxgk/zcfb/",
+      "pdf_attachments": true,
+      "priority": 16,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.ndrc.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_nhsa_policy": {
+      "allowed_hosts": [
+        "www.nhsa.gov.cn"
+      ],
+      "article_pattern": "/art_53_[0-9]+\\.html$",
+      "body_ids": [
+        "zoom"
+      ],
+      "collection_role": "official_article",
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.nhsa.gov.cn/col/col53/index.html"
+      ],
+      "encoding": "utf-8",
+      "listing_adapter": "nhsa_records",
+      "listing_pattern": "^/col/col53/index\\.html$",
+      "max_follow_links": 20,
+      "max_listing_pages": 1,
+      "media_types": [
+        "text/html"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/(?:col/col53/index\\.html|art/[0-9]{4}/[0-9]{1,2}/[0-9]{1,2}/art_53_[0-9]+\\.html)$",
+      "priority": 18,
+      "publication_formats": [
+        "%Y-%m-%d %H:%M"
+      ],
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.nhsa.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_pbc": {
+      "allowed_hosts": [
+        "www.pbc.gov.cn"
+      ],
+      "article_pattern": "/[0-9]{12,24}/index\\.html$",
+      "body_ids": [
+        "zoom"
+      ],
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.pbc.gov.cn/goutongjiaoliu/113456/113469/index.html"
+      ],
+      "encoding": "utf-8",
+      "max_follow_links": 5,
+      "media_types": [
+        "text/html"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/goutongjiaoliu/",
+      "priority": 10,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.pbc.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_state_council": {
+      "allowed_hosts": [
+        "www.gov.cn"
+      ],
+      "article_pattern": "/content_[0-9]+\\.htm$",
+      "body_ids": [
+        "UCAP-CONTENT"
+      ],
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.gov.cn/yaowen/liebiao/YAOWENLIEBIAO.json"
+      ],
+      "encoding": "utf-8",
+      "feed_path": "/yaowen/liebiao/YAOWENLIEBIAO.json",
+      "max_follow_links": 5,
+      "media_types": [
+        "text/html",
+        "application/json",
+        "text/plain"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/(yaowen|zhengce|lianbo)/",
+      "priority": 40,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cn_stats": {
+      "allowed_hosts": [
+        "www.stats.gov.cn"
+      ],
+      "article_pattern": "/t[0-9]+_[0-9]+\\.html$",
+      "body_classes": [
+        "trs_editor_view"
+      ],
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.stats.gov.cn/sj/zxfb/"
+      ],
+      "encoding": "utf-8",
+      "max_follow_links": 20,
+      "media_types": [
+        "text/html"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/sj/zxfb/",
+      "priority": 35,
+      "publication_formats": [
+        "%Y/%m/%d %H:%M"
+      ],
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.stats.gov.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cnindex_daily": {
+      "allowed_hosts": [
+        "hq.cnindex.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/json",
+        "text/plain"
+      ],
+      "path_pattern": "^/market/market/getIndexDailyDataWithDataFormat$",
+      "purpose": "quality_market",
+      "redirect_hosts": [
+        "hq.cnindex.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "cnindex_methodology": {
+      "allowed_hosts": [
+        "www.cnindex.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": null,
+      "media_types": [
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/docs/gz_[0-9]{6}(?:_e)?\\.pdf$",
+      "purpose": "benchmark_identity",
+      "redirect_hosts": [
+        "www.cnindex.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "csi_index_identity": {
+      "allowed_hosts": [
+        "oss-ch.csindex.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": null,
+      "media_types": [
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/static/html/csindex/public/uploads/indices/detail/files/(zh_CN|en)/[A-Za-z0-9]+factsheet(en)?\\.pdf$",
+      "purpose": "benchmark_identity",
+      "redirect_hosts": [
+        "oss-ch.csindex.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_actions": {
+      "allowed_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/fhsp_[0-9]{6}\\.html$",
+      "purpose": "corporate_actions",
+      "redirect_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_announcements_api": {
+      "allowed_hosts": [
+        "api.fund.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/json",
+        "text/plain"
+      ],
+      "path_pattern": "^/f10/JJGG$",
+      "purpose": "issuer_discovery",
+      "redirect_hosts": [
+        "api.fund.eastmoney.com"
+      ],
+      "referer": "https://fundf10.eastmoney.com/",
+      "referer_hosts": [
+        "fundf10.eastmoney.com"
+      ]
+    },
+    "eastmoney_announcements_page": {
+      "allowed_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/jjgg_[0-9]{6}(?:_[1-6])?\\.html$",
+      "purpose": "issuer_discovery",
+      "redirect_hosts": [
+        "fundf10.eastmoney.com"
+      ]
+    },
+    "eastmoney_announcements_script": {
+      "allowed_hosts": [
+        "j5.dfcfw.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/javascript",
+        "text/javascript",
+        "application/x-javascript",
+        "text/plain"
+      ],
+      "path_pattern": "^/sc/js/web/f10_min_[0-9]{8}\\.js$",
+      "purpose": "issuer_discovery",
+      "redirect_hosts": [
+        "j5.dfcfw.com"
+      ]
+    },
+    "eastmoney_catalog": {
+      "allowed_hosts": [
+        "fund.eastmoney.com"
+      ],
+      "default_urls": [
+        "https://fund.eastmoney.com/js/fundcode_search.js"
+      ],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/javascript",
+        "text/javascript",
+        "text/plain",
+        "application/x-javascript"
+      ],
+      "path_pattern": "^/js/fundcode_search\\.js$",
+      "purpose": "fund_directory",
+      "redirect_hosts": [
+        "fund.eastmoney.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_fees": {
+      "allowed_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/jjfl_[0-9]{6}\\.html$",
+      "purpose": "terms",
+      "redirect_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_help": {
+      "allowed_hosts": [
+        "fundtest.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/help/question_(342|243)\\.html$",
+      "purpose": "terms",
+      "redirect_hosts": [
+        "fundtest.eastmoney.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_index_daily": {
+      "adapter_id": "eastmoney_nonadjusted_index_daily_v2",
+      "allowed_hosts": [
+        "push2his.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/json",
+        "text/plain"
+      ],
+      "path_pattern": "^/api/qt/stock/kline/get$",
+      "purpose": "sector_market",
+      "redirect_hosts": [
+        "push2his.eastmoney.com"
+      ],
+      "return_definition": "price_return",
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_nav": {
+      "allowed_hosts": [
+        "fund.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/javascript",
+        "text/javascript",
+        "text/plain",
+        "application/x-javascript"
+      ],
+      "path_pattern": "^/pingzhongdata/[0-9]{6}\\.js$",
+      "purpose": "market",
+      "redirect_hosts": [
+        "fund.eastmoney.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eastmoney_profile": {
+      "allowed_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/jbgk_[0-9]{6}\\.html$",
+      "purpose": "fund_identity",
+      "redirect_hosts": [
+        "fundf10.eastmoney.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "eu_ecb": {
+      "allowed_hosts": [
+        "www.ecb.europa.eu"
+      ],
+      "article_pattern": "/press/(?:pr/date|key/date|govcdec/otherdec|inter/date|accounts)/[0-9]{4}/html/[^/]+\\.en\\.html$",
+      "body_ancestor_tags": [
+        "main"
+      ],
+      "body_classes": [
+        "section"
+      ],
+      "body_ids": [],
+      "collection_role": "official_article",
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.ecb.europa.eu/rss/press.html"
+      ],
+      "encoding": "utf-8",
+      "feed_format": "rss",
+      "max_follow_links": 20,
+      "max_listing_pages": 2,
+      "media_types": [
+        "text/html",
+        "application/rss+xml",
+        "application/xml",
+        "text/xml"
+      ],
+      "minimum_body_characters": 60,
+      "normalize_double_press_slash": true,
+      "path_pattern": "^/(press|rss)/",
+      "priority": 30,
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.ecb.europa.eu"
+      ],
+      "timezone": "Europe/Berlin"
+    },
+    "fred_series_csv": {
+      "adapter_id": "public_source_series_csv_v2",
+      "allowed_hosts": [
+        "fred.stlouisfed.org"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/csv",
+        "text/plain",
+        "application/csv",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/graph/fredgraph\\.csv$",
+      "purpose": "sector_market",
+      "redirect_hosts": [
+        "fred.stlouisfed.org"
+      ],
+      "timezone": "America/Chicago"
+    },
+    "fred_series_identity": {
+      "allowed_hosts": [
+        "fred.stlouisfed.org"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/series/[A-Z0-9]+$",
+      "purpose": "benchmark_identity",
+      "redirect_hosts": [
+        "fred.stlouisfed.org"
+      ],
+      "timezone": "America/Chicago"
+    },
+    "issuer_chinaamc": {
+      "allowed_hosts": [
+        "www.chinaamc.com",
+        "fund.chinaamc.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html",
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/(upload/|c/|fund/|portal/)",
+      "purpose": "issuer_document",
+      "redirect_hosts": [
+        "www.chinaamc.com",
+        "fund.chinaamc.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "issuer_cmfchina": {
+      "allowed_hosts": [
+        "www.cmfchina.com",
+        "static.cmfchina.com"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html",
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/(web/fundDetail/|fundarticle/)",
+      "purpose": "issuer_document",
+      "redirect_hosts": [
+        "www.cmfchina.com",
+        "static.cmfchina.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "issuer_cninfo": {
+      "allowed_hosts": [
+        "static.cninfo.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": null,
+      "media_types": [
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/finalpage/",
+      "purpose": "issuer_document",
+      "redirect_hosts": [
+        "static.cninfo.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "issuer_eastmoney_pdf": {
+      "allowed_hosts": [
+        "pdf.dfcfw.com"
+      ],
+      "default_urls": [],
+      "encoding": null,
+      "media_types": [
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/pdf/H2_AN[0-9]{18}_1\\.pdf$",
+      "purpose": "issuer_document",
+      "redirect_hosts": [
+        "pdf.dfcfw.com"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "issuer_efunds": {
+      "allowed_hosts": [
+        "cdn.efunds.com.cn",
+        "api.efunds.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/pdf",
+        "application/octet-stream",
+        "text/html"
+      ],
+      "path_pattern": "^/(owch/|xcowch/ui/content/show$)",
+      "purpose": "issuer_document",
+      "redirect_hosts": [
+        "cdn.efunds.com.cn",
+        "api.efunds.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "issuer_gffunds": {
+      "allowed_hosts": [
+        "www.gffunds.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "application/pdf",
+        "application/octet-stream",
+        "text/html"
+      ],
+      "path_pattern": "^/jjgg/",
+      "purpose": "issuer_document",
+      "redirect_hosts": [
+        "www.gffunds.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "sse_trading_calendar": {
+      "allowed_hosts": [
+        "www.sse.com.cn",
+        "one.sse.com.cn"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html"
+      ],
+      "path_pattern": "^/(disclosure/announcement/general/c/|lawandrules/sselawsrules2025/fund/trading/c/|onething/gptz/$)",
+      "purpose": "trading_calendar",
+      "redirect_hosts": [
+        "www.sse.com.cn",
+        "one.sse.com.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "szse_trading_calendar": {
+      "allowed_hosts": [
+        "investor.szse.cn",
+        "www.szse.cn",
+        "docs.static.szse.cn"
+      ],
+      "default_urls": [],
+      "encoding": "utf-8",
+      "media_types": [
+        "text/html",
+        "application/pdf",
+        "application/octet-stream"
+      ],
+      "path_pattern": "^/(?:disclosure/notice/general/|lawrules/rule/trade/|www/lawrules/rule/trade/current/|disclosure/notice/t20251222_618087\\.html$)",
+      "purpose": "trading_calendar",
+      "redirect_hosts": [
+        "investor.szse.cn",
+        "www.szse.cn",
+        "docs.static.szse.cn"
+      ],
+      "timezone": "Asia/Shanghai"
+    },
+    "us_fed": {
+      "allowed_hosts": [
+        "www.federalreserve.gov"
+      ],
+      "article_pattern": "/pressreleases/[A-Za-z]+[0-9]{8}[A-Za-z0-9]*\\.htm$",
+      "body_classes": [
+        "article__content"
+      ],
+      "body_ids": [
+        "article"
+      ],
+      "collection_role": "official_article",
+      "complete_explicit_url_scope": true,
+      "default_urls": [
+        "https://www.federalreserve.gov/newsevents/pressreleases.htm"
+      ],
+      "encoding": "utf-8",
+      "listing_pattern": "/pressreleases/[0-9]{4}(?:-press|-press-fomc|fomc)\\.htm$",
+      "max_follow_links": 20,
+      "max_listing_pages": 3,
+      "media_types": [
+        "text/html"
+      ],
+      "minimum_body_characters": 60,
+      "path_pattern": "^/(newsevents|monetarypolicy)/",
+      "priority": 20,
+      "publication_classes": [
+        "article__time"
+      ],
+      "publication_formats": [
+        "%B %d, %Y"
+      ],
+      "purpose": "news",
+      "redirect_hosts": [
+        "www.federalreserve.gov"
+      ],
+      "timezone": "America/New_York"
+    }
+  }
+}

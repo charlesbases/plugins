@@ -1,6 +1,6 @@
 # plugins
 
-`rning/plugins` 是 Codex 插件市场，市场名称为 `rning`。当前提供 Cortex 和 Cortex SE 两个工程开发流程插件。
+`rning/plugins` 是 Codex 插件市场，市场名称为 `rning`。当前提供 Cortex、Cortex SE 工程开发流程插件，以及 Investment 投资研究流程插件。
 
 ## 目录结构
 
@@ -14,11 +14,17 @@
     │   ├── hooks/
     │   ├── scripts/
     │   └── skills/
-    └── cortex-se/
+    ├── cortex-se/
         ├── .codex-plugin/plugin.json
         ├── hooks/
         ├── scripts/
         └── skills/
+    └── investment/
+        ├── .codex-plugin/plugin.json
+        └── skills/investment/
+            ├── SKILL.md
+            ├── agents/openai.yaml
+            └── references/
 ```
 
 插件说明和通用验证流程统一维护在本 README。市场配置中的来源路径相对于仓库根目录解析。
@@ -94,8 +100,8 @@ Cortex SE 使用 `cortex-se@rning`。重新安装会改变本机安装状态，�
 ### 修改本地源码后更新
 
 1. 明确改动范围，执行下文的通用插件验证流程。
-2. 更新实际修改插件的清单版本；Codex 兼容格式的本地迭代可使用 `plugin-creator` 的缓存标记辅助脚本，具体示例见“本地安装与版本核对”。
-3. 确认市场配置指向待验证的源码，再从本地市场重新安装并核对安装资源。`marketplace upgrade` 针对 Git 市场快照，不能替代本地源码的版本更新。
+2. 按已约定的版本策略处理清单；用户要求固定版本时不得自动递增版本或改缓存标记。
+3. 确认市场配置指向待验证的源码，再从本地市场重新安装并核对安装资源。`marketplace upgrade` 针对 Git 市场快照，不能代替本地源码与安装资源的内容核对。
 4. 在新会话中验证安装版的发现、触发及实际行为。
 5. 发布到 GitHub 时提交源码、版本及必要的市场配置，并推送仓库。其他设备再执行上述 GitHub 更新步骤。
 
@@ -191,9 +197,38 @@ Cortex SE 同样要求基于源码证据、明确实施路径并验证结果。�
 | [requesting-code-review](plugins/cortex-se/skills/requesting-code-review/SKILL.md) | 基于源码证据审查改动 |
 | [verification-before-completion](plugins/cortex-se/skills/verification-before-completion/SKILL.md) | 用当前验证证据报告结果和缺口 |
 
+## Investment
+
+Investment提供基金研究、实际账户事件、新闻来源/引用分析、Elastic Net收益预测、CVaR资金方案和前瞻试验。入口技能为 [investment](plugins/investment/skills/investment/SKILL.md)。
+
+唯一正式入口是安装目录内的 `scripts/investment.py run --root <root> --plan <plan> --request <request.json>`，请求使用schema_version=4。按“用户本金/风险确认 → 分析身份与免费新闻封存 → 行业 Elastic Net → 在线基金发现和披露暴露 → 基金联合 Elastic Net → 独立校准及原文报价 CVaR 优化 → 执行与发布验证”运行。每天按预期扣费收益重新评估；评价期限与计费持有日不触发定期卖出。插件版本保持0.0.1，交易由用户执行。
+
+- [统一流程与操作](plugins/investment/skills/investment/references/workflow.md)
+- [必须执行的阶段动作、证据与验证契约](plugins/investment/skills/investment/references/execution-contract.md)
+- [新闻采集、正文状态与引用分析](plugins/investment/skills/investment/references/news-research.md)
+- [基金准入与同类比较](plugins/investment/skills/investment/references/fund-selection.md)
+- [数据、拟合与验收边界](plugins/investment/skills/investment/references/training.md)
+- [内部市场准备和独立算术审计](plugins/investment/skills/investment/references/research-pipeline.md)
+- [策略数学、资金分配与执行](plugins/investment/skills/investment/references/allocation-method.md)
+- [财务计算](plugins/investment/skills/investment/references/financial-analysis.md)
+- [前瞻试验及证据资格](plugins/investment/skills/investment/references/trial-validation.md)
+- [规范报告](plugins/investment/skills/investment/references/reporting-and-records.md)与[事件/分卷存储](plugins/investment/skills/investment/references/storage.md)
+
+默认数据根为 `$HOME/.investment/`，按plan使用事务控制库、只读历史分卷及按时间分区的内容寻址对象；真实main与试验投影分开。没有实际账户记录时按首次理财处理，未知资料不默认零。相同请求及事件跨分卷幂等，改内容必须新身份/修订。
+
+来源注册表、逐跳HTTPS和最终URL、正文/线索状态、全局版本及引用核查有机器实现；窗口未完整核验时保留覆盖缺口。宿主仍需基于原文形成结构化判断，再news_assess封存；引用命中、TLS、摘要及签名时间均不证明新闻真实或预测正确。
+
+账本区分提交、部分成交、确认、取消、资金在途和到账。系统生成Context并调用唯一策略函数，以联合定价与收益模型比较当前动作，取整后复核逐批费用、资金与风险，重执行后绑定bundle并确定性生成“新闻要点”“持仓变化”。手续费逐项比较7/30/60/90计费持有日；真实成交与到账后重新优化，未完成订单不重叠发布。手改基金或金额不能仍称规范报告通过。
+
+两种日常策略都绑定新闻及动态天天基金候选；assisted_workflow额外绑定有限介入并重新验收。空研究库先确认实际资本和风险，再自动尝试真实数据采集、训练及样本外模型误差校准，缺证据时明确待核。当前条件模型校准与正式前瞻投资评价分开；收益优势与观察期间本金下限符合性分别评价，试验设计校准限定于声明的统计过程。发布仍需完成下方通用验证流程。
+
+公开入口对16类业务阶段、7类数字阶段及各operation结果执行独立validator。失败真实重做producer，每stage每round最多3次含首次，预算持久化且恢复不重置；下层耗尽后外围停止，最终发布复核独立最多3轮。来源/计算namespace隔离产物，真实金融事实沿用原ID防重复；不得改输入、threshold、seed或补零过关。partial明确scope、checks、required_actions及非trade_ready。
+
+发布前在事务外重核计算和报告，事务内检查状态CAS、租约、引用和proof锚，结果保留automatic_validation。已完成同ID只重验历史原scope并返回原report，不成为当前交易建议；每天及新事实后的分析用新ID。未来outcomes保持pending；自动验证不代表市场有效或full alpha verified，不消除既有科学证据缺口。
+
 ## 通用插件验证流程
 
-本节适用于本仓库的两个插件，也可作为其他插件的验证指南。在仓库根目录选择待验证插件后，进入该插件目录，再运行下面的组件校验示例：
+本节适用于本仓库插件，也可作为其他插件的验证指南。在仓库根目录选择待验证插件后，进入该插件目录，再运行下面的组件校验示例：
 
 ```bash
 cd plugins/cortex
@@ -258,7 +293,7 @@ git diff --cached --stat -- .
 - 所有声明的文件必须存在且可读。脚本所需的解释器、库、网络及认证条件应明确；模板占位符不能冒充完整配置。
 - 未声明或不支持的组件应标为不适用，不能要求每个插件都具有 Skills、MCP 或 Hooks。
 
-官方 `plugin-creator` 辅助校验器与通用 JSON Schema 校验并非同一覆盖范围。使用前确认当前工具支持的包格式；不能用兼容层通过的结果证明 portable 清单或公开发布审核也通过。
+官方 `plugin-creator` 的脚手架、字段参考与通用 JSON Schema 校验并非同一覆盖范围。使用前确认当前工具实际提供的文件及支持的包格式，不假定附带特定校验脚本；不能用兼容层通过的结果证明 portable 清单或公开发布审核也通过。
 
 ### 3. 执行适用的工具校验
 
@@ -271,14 +306,24 @@ plugin_skill_creator="$plugin_codex_dir/skills/.system/skill-creator"
 plugin_plugin_creator="$plugin_codex_dir/skills/.system/plugin-creator"
 ```
 
-**清单校验。** 根据格式选择入口。下面对 portable 格式只演示 JSON 语法检查：还必须使用匹配其 `$schema` 的 JSON Schema 校验器完成规范校验；未执行时应记录缺口。当前 `plugin-creator` 的本地辅助脚本以 `.codex-plugin/plugin.json` 为入口。
+**清单校验。** 根据格式选择入口。下面对 portable 格式只演示 JSON 语法检查：还必须使用匹配其 `$schema` 的 JSON Schema 校验器完成规范校验；未执行时应记录缺口。Codex 兼容格式按已安装本地 `plugin-creator` 的 `references/plugin-json-spec.md` 核对；远程同名插件与本地技能是不同组件，不能假定具有相同脚本。
+
+有适用的真实校验器时运行并记录版本和范围。没有附带校验脚本时，依据当前官方字段参考逐项核对名称/目录一致性、版本、字段类型、提示词条数与长度、相对路径及资源存在性，以及市场条目的来源、策略和类别。保留检查依据与结果，并完成后续真实宿主安装解析和资源核对；只有 JSON 语法通过或读取了参考文档都不能判定清单校验完成。
 
 ```bash
 if test -f "$plugin_root/plugin.json"; then
   PYTHONUTF8=1 python -m json.tool "$plugin_root/plugin.json" > /dev/null || exit 1
   printf '%s\n' 'JSON syntax passed; validate the declared portable schema separately.'
 elif test -f "$plugin_root/.codex-plugin/plugin.json"; then
-  PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
+  PYTHONUTF8=1 python -m json.tool "$plugin_root/.codex-plugin/plugin.json" > /dev/null || exit 1
+  if test -f "$plugin_plugin_creator/scripts/validate_plugin.py"; then
+    PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
+  elif test -f "$plugin_plugin_creator/references/plugin-json-spec.md"; then
+    printf '%s\n' 'JSON syntax passed; complete the documented field/path audit and native host parsing before marking the manifest passed.'
+  else
+    printf '%s\n' 'Install the official local plugin-creator skill or provide current compatibility-format specifications.' >&2
+    exit 1
+  fi
 else
   printf '%s\n' 'No supported plugin manifest found.' >&2
   exit 1
@@ -342,7 +387,7 @@ git diff --cached --check -- . || exit 1
 
 ### 6. 本地安装与版本核对（有副作用）
 
-新插件先按目标宿主支持的方式配置本地源码和 marketplace，再安装。修改既有插件时，先验证源码，再按其包格式和工具支持情况更新版本或缓存标记。版本更新和安装会改变文件及本地状态，只在相关操作已获授权时执行。
+新插件先按目标宿主支持的方式配置本地源码和 marketplace，再安装。修改既有插件时先验证源码，遵守用户约定的版本策略；固定版本时不自动递增版本或改缓存标记。安装和刷新会改变本地状态，只在相关操作已获授权时执行。
 
 Codex 本地 marketplace 安装示例：将名称替换为已经配置并校验过的实际名称，不复制某个具体插件的标识。
 
@@ -353,16 +398,14 @@ codex plugin add "${plugin_name}@${plugin_marketplace}"
 codex plugin list
 ```
 
-对于已有 Codex 兼容格式的本地插件，可以使用 `plugin-creator` 的辅助流程。下列命令是有副作用的示例，不属于只读结构校验；portable 包不能假设该兼容格式辅助脚本适用。
+读取已有市场的名称时，直接使用已校验的市场 JSON；不依赖假定存在的辅助脚本：
 
 ```bash
 plugin_marketplace_path="$(cd "$plugin_root/../.." && pwd)/.agents/plugins/marketplace.json"
-plugin_marketplace=$(PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/read_marketplace_name.py" --marketplace-path "$plugin_marketplace_path") || exit 1
-PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/update_plugin_cachebuster.py" "$plugin_root" || exit 1
-PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
+plugin_marketplace=$(PYTHONUTF8=1 python -c 'import json, sys; print(json.load(open(sys.argv[1], encoding="utf-8"))["name"])' "$plugin_marketplace_path") || exit 1
 ```
 
-上面的示例使用本仓库的市场配置位置；其他插件应按实际目录设置 `plugin_marketplace_path`。非默认 marketplace 应向辅助脚本提供其实际路径，并确认安装来源确实指向待验证源码。更新后重新检查清单及 diff，再执行已授权的安装；不要手工修改 marketplace 配置来掩盖来源不一致。
+上面的示例使用本仓库的市场配置位置；其他插件应按实际目录设置 `plugin_marketplace_path`。按第3阶段完成相应清单检查，并确认实际来源指向待验证源码，再执行已授权的宿主安装。固定版本的验证可使用单独测试来源；需要刷新自有临时测试安装时，通过宿主正式卸载、重装并核对文件内容，不手工覆盖缓存，也不影响用户既有安装。原有市场来源不符时须处理真实来源问题，不修改配置来掩盖差异。
 
 安装完成后核对：
 
