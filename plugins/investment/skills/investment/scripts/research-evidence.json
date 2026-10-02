@@ -1,0 +1,196 @@
+{
+  "schema_version": 1,
+  "scope": "Reviewed public-source anchor/correction registry; not a fund shortlist recommendation or training model",
+  "sources": {
+    "js2020": {
+      "url": "https://static.cninfo.com.cn/finalpage/2021-03-30/1209472604.PDF",
+      "expected_sha256": "177c19977b6baf2782c095b16c50bc440be654d18ff58540ec5db08ed53b67c7",
+      "kind": "pdf",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    },
+    "js2024": {
+      "url": "https://static.cninfo.com.cn/finalpage/2025-03-28/1222923761.PDF",
+      "expected_sha256": "58cc3ca0b5524efd301c9d95a058beba12f2245538b0a06dd4872f39669d9868",
+      "kind": "pdf",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    },
+    "ef2024": {
+      "url": "https://cdn.efunds.com.cn/owch/data/bulletin/20250331/%E6%98%93%E6%96%B9%E8%BE%BE%E6%B2%AA%E6%B7%B1300%E4%BA%A4%E6%98%93%E5%9E%8B%E5%BC%80%E6%94%BE%E5%BC%8F%E6%8C%87%E6%95%B0%E5%8F%91%E8%B5%B7%E5%BC%8F%E8%AF%81%E5%88%B8%E6%8A%95%E8%B5%84%E5%9F%BA%E9%87%91%E8%81%94%E6%8E%A5%E5%9F%BA%E9%87%912024%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A.pdf?from=person",
+      "expected_sha256": "2016c5557db57ea9ee4a8800194be4ffdc06e1b06bde3eaf2de1cf2ea2f1c422",
+      "kind": "pdf",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    },
+    "gf2024mid": {
+      "url": "https://www.gffunds.com.cn/jjgg/dqgg/202408/P020240830318828584949.pdf",
+      "expected_sha256": "f211f132c1b844ac80fca5d6c5fc354d8b063dc14eb39d4b49104b65444cb602",
+      "kind": "pdf",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    },
+    "gf2026q1": {
+      "url": "https://www.gffunds.com.cn/jjgg/dqgg/202604/P020260422300663357731.pdf",
+      "expected_sha256": "2cd13337a43416f3e04660817403a3c483e1d7c05730efb1ef875de4f99b2627",
+      "kind": "pdf",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    },
+    "gfdiv2024": {
+      "url": "https://www.gffunds.com.cn/jjgg/zdsj/202412/t20241224_403195.shtml",
+      "expected_sha256": "e74861556a5ba2e11f41369bef6198a32a03b9e459923bfc12275314641d8ccd",
+      "kind": "html",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    },
+    "js2025mid": {
+      "url": "https://static.cninfo.com.cn/finalpage/2025-08-29/1224604901.PDF",
+      "expected_sha256": "48b2b593bcdf5718f4539ece836514a03a8e9c085a09b7ca0202383160039304",
+      "kind": "pdf",
+      "reviewed_at": "2026-10-03",
+      "review_method": "Issuer report cells manually read and share-class/date/units checked; exact bytes archived and pinned"
+    }
+  },
+  "anchors": [
+    {
+      "code": "160706",
+      "date": "2022-12-31",
+      "nav": 0.9746,
+      "source_id": "js2024",
+      "location": "section 3.1.2, PDF page 10; exact report end date",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "160706",
+      "date": "2023-12-31",
+      "nav": 0.8851,
+      "source_id": "js2024",
+      "location": "section 3.1.2, PDF page 10; exact report end date",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "160706",
+      "date": "2024-12-31",
+      "nav": 1.03,
+      "source_id": "js2024",
+      "location": "section 3.1.2 PDF page 10, section 7.1 page 25",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "110020",
+      "date": "2022-12-31",
+      "nav": 1.4607,
+      "source_id": "ef2024",
+      "location": "section 3.1.2 PDF page 8; A column, exact report end date",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "110020",
+      "date": "2023-12-31",
+      "nav": 1.3339,
+      "source_id": "ef2024",
+      "location": "section 3.1.2 PDF page 8; A column, exact report end date",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "110020",
+      "date": "2024-12-31",
+      "nav": 1.5524,
+      "source_id": "ef2024",
+      "location": "section 3.1.2 PDF page 8; A column",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "270010",
+      "date": "2024-06-30",
+      "nav": 1.7996,
+      "source_id": "gf2024mid",
+      "location": "section 3.1.2 PDF page 7; exact report end date",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "270010",
+      "date": "2026-03-31",
+      "nav": 1.705,
+      "source_id": "gf2026q1",
+      "location": "section 3.1 PDF page 4; A=270010 in section 2.1 page 3",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    },
+    {
+      "code": "270010",
+      "date": "2024-12-18",
+      "nav": 1.7754,
+      "source_id": "gfdiv2024",
+      "location": "distribution benchmark NAV, A column",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share"
+    }
+  ],
+  "corrections": [
+    {
+      "code": "160706",
+      "date": "2020-04-02",
+      "distribution_per_share": 0.03,
+      "source_id": "js2020",
+      "location": "2020 annual report section 7.4.11 PDF page 48; 0.300 per 10 A shares",
+      "share_class": "A",
+      "venue": "off_exchange",
+      "unit": "CNY_per_share",
+      "cash_payment_date": "2020-04-07"
+    },
+    {
+      "code": "160706", "date": "2025-01-15", "distribution_per_share": 0.015,
+      "source_id": "js2025mid", "location": "2025 interim report section 6.4.11 PDF page 37; 0.150 per 10 A shares",
+      "share_class": "A", "venue": "off_exchange", "unit": "CNY_per_share", "cash_payment_date": "2025-01-17"
+    },
+    {
+      "code": "270010", "date": "2024-12-26", "distribution_per_share": 0.2841,
+      "source_id": "gfdiv2024", "location": "Official distribution notice; 2.841 per 10 A shares",
+      "share_class": "A", "venue": "off_exchange", "unit": "CNY_per_share", "cash_payment_date": "2024-12-27"
+    }
+  ],
+  "code_info": {
+    "110020": {
+      "fund_group_id": "efunds-csi300-feeder",
+      "share_class": "A",
+      "benchmark_id": "CSI300",
+      "company_id": "efunds",
+      "type": "passive_CSI300_ETF_feeder",
+      "identity_scope": "reviewed_current_candidate_not_historical_full_universe"
+    },
+    "160706": {
+      "fund_group_id": "jiashi-csi300-feeder",
+      "share_class": "A",
+      "benchmark_id": "CSI300",
+      "company_id": "jiashi",
+      "type": "passive_CSI300_ETF_feeder",
+      "identity_scope": "reviewed_current_candidate_not_historical_full_universe"
+    },
+    "270010": {
+      "fund_group_id": "gf-csi300-feeder",
+      "share_class": "A",
+      "benchmark_id": "CSI300",
+      "company_id": "gf",
+      "type": "passive_CSI300_ETF_feeder",
+      "identity_scope": "reviewed_current_candidate_not_historical_full_universe"
+    }
+  }
+}
