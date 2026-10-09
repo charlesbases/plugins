@@ -9,6 +9,7 @@ description: Specify how a behavior-changing implementation will work, or produc
 
 - Start from the user's requested outcome and any material design decisions already resolved. A clear implementation request needs no separate design approval. If a decision would change the outcome, contract, ownership, or scope, use `cortex-se:brainstorming` and ask for that decision before implementing it.
 - Read project instructions and use `cortex-se:code-tracing` to establish existing behavior, configuration, state, and the complete relevant call chain before making source-based plan claims. For new functionality with no existing path, establish its integration points and label the new chain as proposed.
+- Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) when accepting design input. Preserve the distinction between confirmed facts, explicit requirements, hypotheses, external evidence gaps, and proposed behavior throughout the plan.
 - For objections, new directions, narrowed designs, or changed meanings, require brainstorming's [Revision Evidence](../brainstorming/SKILL.md#revision-evidence) before presenting the updated plan. Include its source basis, feasibility, semantic comparison and impact without changing SE's confirmation policy.
 - A request for a plan only ends with the plan. Otherwise, complete the plan and continue to `cortex-se:executing-plans` without a separate plan confirmation or execution-mode question. Create a plan file only when requested.
 
@@ -22,9 +23,16 @@ For behavior-changing work, the plan must include:
 4. Relevant configuration, ownership, compatibility, and error-handling constraints, including behavior that must remain unchanged.
 5. An ordered implementation sequence where dependencies matter, plus targeted validation and the evidence expected from each check.
 
-A list such as "edit these files, add tests, run checks" is not an implementation plan. Map each step to the requested outcome or a proven prerequisite; omit unrelated cleanup.
+A list such as "edit these files, add tests, run checks" is not an implementation plan. Map each step to the explicit requirement or proven prerequisite, with the source and evidence status of its key premises; omit unrelated cleanup. A corrective step must identify the confirmed problem and why the modification is necessary. A new feature step must identify the explicit requirement without inventing an existing defect.
 
 Before the first behavior-changing write or delegated dispatch, present both the call-chain representation and a separate fenced pseudocode block grouped by changed file and responsible symbol. This is a concrete execution reference, not a confirmation request. Do not replace the pseudocode with prose, a file list, or the call-chain diagram, even for a small behavior change. If either representation is missing, complete the plan and then continue without waiting for another approval.
+
+## Check The Plan's Basis
+
+- Verify the key premises of each design decision, including whether existing mechanisms already satisfy the requirement. Check the mapping from requirement or confirmed problem to design decision to modification step, including each added observable state operation within a step.
+- Reject dependent operations or steps whose critical premises remain inferred or unresolved, whose necessity is unsupported, or whose strongest relevant counterexample has not been reconciled. Structural checkpoint success or a self-declared status does not resolve these gaps; conditional design discussion is not a complete how-to plan.
+- For a migration or rename that must preserve behavior, compare each changed observable assignment with the current path. A required protocol or field migration does not justify an additional state reset. Ambiguous descriptions of an existing action do not override a preservation constraint; preserve the current effect or resolve an explicit conflicting requirement before including that operation.
+- Return source gaps to `cortex-se:code-tracing` and genuine material user decisions to `cortex-se:brainstorming`. Continue authorized independent work; once the required premises and decisions are established, continue execution without a separate plan confirmation or execution-mode question.
 
 ## Call-Chain Form
 

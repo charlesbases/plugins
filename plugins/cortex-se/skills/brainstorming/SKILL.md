@@ -7,16 +7,17 @@ description: Resolve material design choices when a software request is open-end
 
 ## When To Use
 
-- Use this skill when the request leaves a material choice about observable behavior, boundary cases, contracts, compatibility, data ownership, persistence, or scope, or when the user asks for design work.
+- Use this skill when a material choice about observable behavior, boundary cases, contracts, compatibility, data ownership, persistence, or scope remains after [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification), or when the user asks for design work. An uninvestigated source fact is not itself a user decision.
 - Do not introduce a design approval gate for a clear development request. The user's instruction authorizes work within its stated scope. If the user asks only for a design, stop after presenting it.
 - Use `cortex-se:code-tracing` when current behavior or integration paths affect the decision. Base source claims on its [evidence contract](../code-tracing/references/evidence-contract.md).
 
 ## Design The Change
 
-1. State the requested outcome and relevant proven project context.
-2. Identify only unknowns that would change the user's observable result or implementation authority.
-3. Recommend an approach that explains behavior, boundaries, error handling, ownership, impact, and how success can be observed. Show alternatives and tradeoffs when the decision genuinely requires them.
-4. Consolidate related open choices into one clear decision request. Do not ask for separate approval of the subsequent implementation plan or execution mode.
+1. Recover the requested outcome, established constraints, and relevant current evidence. Apply Evidence And Clarification to both initial designs and revisions.
+2. Identify only unknowns that would change the user's observable result or implementation authority. Trace source-resolvable details before deciding that a necessary user question remains.
+3. Establish both a claimed problem and why existing mechanisms do not satisfy the required outcome before recommending a correction. An explicit new requirement can justify new behavior without an existing defect. Check key premises against state transitions, lifecycle timing, consumers, and the strongest relevant counterexample; a missing field or display requirement alone does not prove a missing capability or equivalent business states.
+4. Recommend an approach that explains behavior, boundaries, error handling, ownership, impact, and how success can be observed. Label new behavior as proposed; preserve unresolved premises as conditional discussion, not required implementation work. Show alternatives and tradeoffs when the decision genuinely requires them.
+5. Consolidate genuinely missing material user choices into one clear decision request. State the verified context, exact gap, and its impact; return source gaps to tracing. Do not ask for separate approval of the subsequent implementation plan or execution mode.
 
 Preserve explicit user constraints. Do not turn an adjacent observation into scope. Once the user resolves a material choice, use `cortex-se:writing-plans` when implementation is requested. If planning reveals a new material design decision, return here for that decision; scope-preserving details can be resolved during planning or execution.
 
