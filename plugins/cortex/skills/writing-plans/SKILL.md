@@ -10,6 +10,7 @@ description: Build one complete engineering proposal from requirements, design i
 - Follow the [single proposal workflow](../using-cortex/SKILL.md#workflow-state). Start from requirements, design input, and source evidence without a prior design approval.
 - Do not edit implementation files, generate patches, or execute proposed work. Create a plan file only when explicitly requested as a deliverable.
 - Use code-tracing for missing source proof and brainstorming for outcome-affecting unknowns or its Revision Evidence workflow. Resolve evidence and design questions before presenting a complete proposal.
+- Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) when accepting design input. Preserve the distinction between confirmed facts, explicit requirements, hypotheses, external evidence gaps, and proposed behavior throughout the proposal.
 - Preserve established constraints. Proposed behavior, dependencies, tests, artifacts, validation, and scope must map to an explicit requirement or proven prerequisite and remain pending until this complete proposal is approved.
 - Do not silently expand a local request into global rules, broad refactors, shared abstractions, batch updates, or adjacent changes.
 
@@ -25,7 +26,7 @@ description: Build one complete engineering proposal from requirements, design i
 
 For this skill, behavior-changing work includes changes to runtime output (including logs), state, control flow, or external effects.
 
-1. Review the requirements, design input, source evidence, and established constraints.
+1. Review the requirements, design input, source evidence, and established constraints. Verify the key premises of each design decision, including whether existing mechanisms already satisfy the requirement; return critical source gaps to tracing and genuine user decisions to brainstorming.
 2. Identify affected files or packages, responsible symbols, entry points, ownership boundaries, state dependencies, and configuration dependencies.
 3. Build an ordered task list with one coherent change per task. For behavior-changing work, build both an end-to-end code-level call chain and separate file-by-file pseudocode across the affected tasks; split only when files, dependencies, or ordering require it.
 4. Define exact implementation boundaries, behavior that must remain unchanged, and validation evidence for every task.
@@ -35,12 +36,13 @@ For this skill, behavior-changing work includes changes to runtime output (inclu
 
 For every task, specify:
 
-- The explicit requirement or proven prerequisite the task satisfies.
+- The explicit requirement or proven prerequisite the task satisfies, with the source and evidence status of its key premises. A corrective task must identify the confirmed problem and why the modification is necessary; a new feature task must identify the explicit requirement without inventing an existing defect.
 - Exact files or packages and affected symbols.
 - Required behavior and unchanged behavior.
 - Similar files, call sites, log points, adjacent paths, global rules, or shared abstractions that remain unchanged when they could be mistaken as included.
 - For behavior-changing work, this task's segment of the separate call chain and file-by-file pseudocode. Mark applicable additions, changes, and removals; trace the source-supported entry and dispatch through key calls and branches to the changed state, output, persistence, or external boundary. Label new symbols as proposals and omit incidental local details.
 - For a changed observable outcome, value, or state meaning, map the requested outcome and lifecycle point to the planned behavior or expression and expected result. If a narrowed proposal conflicts with that mapping, return to `cortex:brainstorming` rather than presenting it as equivalent.
+- For a migration or rename that must preserve behavior, compare each changed observable assignment with the current path. A required protocol or field migration does not justify an additional state reset. Ambiguous descriptions of an existing action do not override a preservation constraint; preserve the current effect or resolve an explicit conflicting requirement before including that operation.
 - Relevant configuration, contract, ownership, and error-handling constraints.
 - Dependencies on earlier tasks.
 - Proposed validation scope, exact commands when required, and expected evidence. For Go formatting, preserve the selected execution workflow's formatter-selection rule; do not hard-code `gofmt`. For unit tests, include the method-to-case mapping or skip decision required by Unit Test Selection below.
@@ -80,11 +82,12 @@ Do not use placeholders such as "add appropriate validation", "handle edge cases
 
 1. Map every explicit requirement to a task.
 2. Verify source context, design decisions, files, symbols, order, call chains, data flow, errors, ownership, validation, and constraints. Reject a file-and-action list that omits how the paths connect.
-3. Reject a behavior-changing proposal without both the selected code-level call-chain form and separate file-by-file pseudocode, or with a mismatched outcome, expression, value definition, or lifecycle point.
-4. For a revised direction, check its reread context, necessary chain, feasibility, semantic comparison, and impact. A previously valid receipt does not establish these conclusions by itself.
-5. Resolve unclear implementation decisions; return evidence gaps to code-tracing and design gaps to brainstorming. Keep proposals within the stated scope.
-6. State execution mode before confirmation: direct execution by default; user-requested SDD only for tasks satisfying that skill's requirements, with all recovery writes included.
-7. Present the complete current proposal. Wait for its single user confirmation, then execute it without separate design, plan, mode, or already-included test-scheme approval. A plan-only request produces the proposal and does not authorize execution.
+3. Check the mapping from requirement or confirmed problem to design decision to modification task, including each added observable state operation within a task. Reject dependent operations or tasks whose critical premises remain inferred or unresolved, whose necessity is unsupported, or whose strongest relevant counterexample has not been reconciled. Structural checkpoint success or a self-declared status does not resolve these gaps; conditional design discussion is not a complete implementation proposal.
+4. Reject a behavior-changing proposal without both the selected code-level call-chain form and separate file-by-file pseudocode, or with a mismatched outcome, expression, value definition, or lifecycle point.
+5. For a revised direction, check its reread context, necessary chain, feasibility, semantic comparison, and impact. A previously valid receipt does not establish these conclusions by itself.
+6. Resolve unclear implementation decisions; return evidence gaps to code-tracing and design gaps to brainstorming. Keep proposals within the stated scope.
+7. State execution mode before confirmation: direct execution by default; user-requested SDD only for tasks satisfying that skill's requirements, with all recovery writes included.
+8. Present the complete current proposal. Wait for its single user confirmation, then execute it without separate design, plan, mode, or already-included test-scheme approval. A plan-only request produces the proposal and does not authorize execution.
 
 ## Scope
 

@@ -33,7 +33,7 @@ description: Route engineering tasks to the required Cortex workflow skills and 
 
 | Current state for this scope | Next action |
 | --- | --- |
-| Outcome-affecting input is unresolved | Use brainstorming to ask the necessary specific question. |
+| Required user input remains unresolved after evidence triage | Follow Evidence And Clarification, then use brainstorming to ask the necessary specific question. |
 | No complete current proposal exists | Analyze and gather source evidence, then use writing-plans to present it. |
 | The complete current proposal is presented but unapproved | Discuss, revise, or wait for its confirmation; do not implement. |
 | The complete current proposal is approved | Execute its approved scope and validation without another confirmation. |
@@ -42,6 +42,16 @@ description: Route engineering tasks to the required Cortex workflow skills and 
 - Skill re-entry and task recovery preserve an applicable approval. Recover the actual proposal, approving instruction, remaining work, mode, and active testing baseline before resuming. Ask only for genuinely missing approval context; do not infer it from an approval flag or existing edits.
 - An SDD implementer receives the approved proposal revision, task scope, and validation authority in its brief. Return missing facts or new decisions to the controller; do not request independent user approval.
 - Keep state in task context unless the approved proposal authorizes persistent records. Routing alone does not authorize recovery files.
+
+## Evidence And Clarification
+
+- Before raising a question, reporting a problem, or proposing a change, recover explicit requirements, established constraints, and relevant current evidence. Distinguish confirmed source facts, user requirements, hypotheses, external or runtime facts, and proposed new designs; use this distinction to guide decisions without adding a mandatory report template.
+- For source-resolvable uncertainty, use `cortex:code-tracing` on the bounded path needed for the claim. Reuse fresh evidence where it proves that claim. An unread implementation, search miss, missing field, or unverified caller is an evidence gap, not an established defect or a decision to delegate to the user. If authorized tracing cannot close the gap, identify the specific missing path or unavailable evidence.
+- Preserve evidence status through analysis, design, and planning. Inferred or unresolved claims may guide investigation or explicitly conditional design discussion, but cannot become confirmed problems or implementation bases. A method's existence does not prove its runtime invocation; a structural checkpoint or a self-declared `confirmed` status does not prove semantic correctness.
+- Distinguish whether a problem exists from whether a proposed modification is necessary. Before calling a change required, check the current contract, existing mechanisms, and strongest relevant counterexample within the requested scope. A new design choice must be identified as proposed, with its constraints and observable meaning, rather than described as current behavior or a proven correction.
+- An explicit new requirement can justify new behavior without proving an existing defect. Preserve known behavior outside that requirement; do not invent a problem or add an optional behavior change to make a proposal appear necessary.
+- Ask only for remaining outcome-affecting input that requires user intent, access, or external or runtime evidence unavailable within the authorized scope. State the verified context, exact gap, and its effect on the decision. Necessary external information may be requested in parallel with independent tracing; continue work that does not depend on the reply. Do not ask the user to choose among causes or behaviors that available source or established context can determine.
+- A critical unresolved premise blocks the dependent implementation task from a complete proposal. Continue independent analysis and return source gaps to tracing or genuine decision gaps to clarification; do not silently resolve either by assumption.
 
 ## Proposal Revision
 
@@ -55,7 +65,7 @@ description: Route engineering tasks to the required Cortex workflow skills and 
 ## Divergence Control
 
 - Before the first scoped investigation, classify the request as `Precision`, `Exploration`, or `Ambiguous`. Use `Precision` when the user specifies a target and outcome; use `Exploration` when the user asks to diagnose, compare, design, or choose among alternatives.
-- For an `Ambiguous` request, ask one minimal clarifying question when the classification would change the user-visible outcome; otherwise use `Precision`.
+- For an `Ambiguous` request, recover available requirements and context under Evidence And Clarification before asking one minimal question when the remaining classification would change the user-visible outcome; otherwise use `Precision`.
 - When invoking another Cortex skill, include the active mode. A skill that does not receive one must derive it from the user request.
 - Only an explicit user requirement or a proven prerequisite may justify investigation or a proposed task. Writes, tests, and validation must remain within the approved proposal or explicit diagnostic authority. A material tradeoff requires a specific question or proposal decision, never silent scope expansion.
 - Treat related findings as observations, not scope. Do not investigate, plan, or fix an observation. Do not surface it in the final response unless it blocks the requested outcome, is an allowed out-of-scope risk, or the user confirms the expansion.

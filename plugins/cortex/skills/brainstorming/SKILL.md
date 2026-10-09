@@ -15,12 +15,14 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Requirement And Design Analysis
 
+- Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) to questions and design premises in both initial designs and revisions.
 - Preserve established interface, configuration-format, and scope decisions. Implementation convenience or a missing dependency does not justify changing them.
-- Treat an unclear target, location, affected path, output, persistence, validation scope, or temporary-versus-permanent behavior as a necessary question when choosing a default would change the visible outcome.
-- Map each proposed change to an explicit requirement or proven prerequisite. Check source-based proposals under the [batch evidence contract](../code-tracing/references/evidence-contract.md); a checkpoint cannot establish user approval or semantic correctness.
+- Treat an unclear target, location, affected path, output, persistence, validation scope, or temporary-versus-permanent behavior as an evidence gap first. Recover established context and trace source-resolvable details before deciding whether a necessary user question remains.
+- Map each proposed change to an explicit requirement or proven prerequisite. For a claimed correction, establish both the current problem and why existing mechanisms do not satisfy the required outcome; for new behavior, identify the user requirement and proposed design. Check source-based proposals under the [batch evidence contract](../code-tracing/references/evidence-contract.md); a checkpoint cannot establish user approval or semantic correctness.
+- Check key design premises against state transitions, lifecycle timing, consumers, and the strongest relevant counterexample before recommending a change. A missing field or display requirement alone does not prove a missing capability or equivalent business states. Preserve unresolved premises as conditional discussion, not required implementation work.
 - Explain interpreted scope when it can be misread. Default to the smallest repository-owned change that satisfies the requirement; unrelated cleanup or expansion does not enter the proposal without explicit user scope.
 - Use the invoking skill's mode. Otherwise an explicit target and outcome is `Precision`; diagnosis, comparison, design, or choice is `Exploration`. Ask about classification only when it changes the visible outcome.
-- Classify potential actions as `Required`, `Blocker`, or `Observation`. Include only Required actions, turn a Blocker into the necessary question, and do not investigate an Observation.
+- Classify potential actions as `Required`, `Blocker`, or `Observation`. Include only Required actions; return a source-resolvable Blocker to tracing and turn a genuinely missing user input into the necessary question under Evidence And Clarification. Do not investigate an Observation.
 - State proven facts and identify unknown inputs, boundary behavior, compatibility, contracts, error handling, ownership, and validation.
 - In Precision, recommend the smallest valid change; surface a material tradeoff as a specific question needed for the proposal. In Exploration, compare approaches only when requested or needed for the decision.
 - Form design input with impact, constraints, boundary and error behavior, and validation. Hand it to writing-plans without a generic design-confirmation question.

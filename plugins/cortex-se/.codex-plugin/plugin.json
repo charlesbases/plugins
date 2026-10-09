@@ -1,6 +1,6 @@
 {
   "name": "cortex-se",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A streamlined, source-grounded software development workflow for coding agents.",
   "author": {
     "name": "rning"

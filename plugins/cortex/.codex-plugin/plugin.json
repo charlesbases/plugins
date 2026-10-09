@@ -1,6 +1,6 @@
 {
   "name": "cortex",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A disciplined software engineering workflow for coding agents: brainstorming, code tracing, planning, code standards, debugging, code review, and verification.",
   "author": {
     "name": "rning"

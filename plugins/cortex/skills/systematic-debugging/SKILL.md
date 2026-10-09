@@ -17,7 +17,7 @@ description: Diagnose observed failures and prove their root causes before propo
 ## Investigation
 
 1. Record observed behavior, expected behavior, environment, impact, reproduction steps, and available failure evidence.
-2. Separate confirmed facts, inferences, and unknowns; ask for missing symptom, expectation, or boundary information when required.
+2. Recover existing requirements and evidence, then separate confirmed facts, inferences, and unknowns under [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification). Trace source-resolvable questions; request necessary external or runtime information in parallel when source cannot establish it, stating the verified context, precise gap, and diagnostic impact.
 3. Identify the candidate boundary where expected and actual behavior diverge.
 4. Use `cortex:code-tracing` to prove or reject every repository-owned path needed for the root-cause conclusion.
 5. Compare failing and proven working paths when a comparable repository example exists.
@@ -27,6 +27,7 @@ description: Diagnose observed failures and prove their root causes before propo
 ## Hypothesis Discipline
 
 - State one specific hypothesis at a time with the evidence it predicts.
+- Keep hypotheses separate from confirmed problem statements and fixes. An untested candidate is a direction for investigation, not proof of a defect or the necessity of a modification.
 - Gather the smallest observation that proves or rejects that hypothesis.
 - Record rejected hypotheses and continue investigation; do not infer a different cause from a failed speculative fix.
 - Do not treat a nil-pointer panic as a request for a nil check. Trace why the value became nil and why the calling path allowed it.
@@ -36,6 +37,7 @@ description: Diagnose observed failures and prove their root causes before propo
 ## Diagnosis Completion
 
 - Before calling a cause confirmed, connect the observed symptom to the relevant entry, preconditions, state transition, and failure boundary. If runtime identity, configuration, or timing is not established, preserve that uncertainty even when source permits the scenario.
+- Distinguish a proven local method effect from its runtime invocation and from the cause of the observed failure. A cleanup method or lifecycle declaration alone does not establish that the failing path reaches it; an unproven link remains an evidence gap throughout the fix handoff.
 - A proposed correction must be reachable on the observed failure path and remove the proven cause. Correct code that runs only after an unproven transition is not a demonstrated fix for a failure before that transition.
 - Check the diagnosis under the [batch evidence contract](../code-tracing/references/evidence-contract.md). Do not promote a plausible cause, a successful compilation, or a later apology into proof of the original diagnosis.
 
@@ -44,7 +46,7 @@ description: Diagnose observed failures and prove their root causes before propo
 - Classify each candidate as a confirmed root cause, inferred cause, or unresolved cause.
 - Return every independent confirmed root cause and unresolved boundary in one response.
 - Add a later root-cause conclusion only when evidence or requirements changed, and identify that new evidence.
-- Do not propose a fix for inferred or unresolved causes; state the evidence required to continue.
+- Do not propose a fix for inferred or unresolved causes. Read available claim-relevant source before requesting more information; identify the specific missing path or unavailable external evidence required to continue.
 
 
 ## Fix Handoff
