@@ -1,0 +1,25 @@
+{
+  "schema_id": "investment_business_contract_freeze_v1",
+  "revision": 1,
+  "status": "definition_frozen_before_contract_based_stage_design",
+  "frozen_at": "2026-10-11T10:04:06.565353+00:00",
+  "files": {
+    "business-chain.protocol.json": {
+      "sha256": "9d086fa006f417d1d25cfa457a34dea8405e885b8f1204d831719b255d72cb72",
+      "size": 18210
+    },
+    "chain-contracts.md": {
+      "sha256": "349eebebc6ebd7336e6a3247f1151e6c7f24d8c4646322f9aabdd2f7997e7b51",
+      "size": 25092
+    },
+    "scientific-contracts.md": {
+      "sha256": "eefc023b9287fbb68653afcd35f146de3c27b958f2521705f7d22f9b7f3239e3",
+      "size": 12867
+    }
+  },
+  "prior_code_status": "prototype_not_contract_validated",
+  "definition_review": "root_and_independent_contract_and_root_cause_review_complete",
+  "implementation_validation": "not_started_for_frozen_revision",
+  "real_host_acceptance": "not_started_for_frozen_revision",
+  "change_policy": "new_explicit_protocol_revision_required; never_relax_requirements_for_tests"
+}

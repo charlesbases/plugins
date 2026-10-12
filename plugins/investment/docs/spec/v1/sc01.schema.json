@@ -1,0 +1,1147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:investment:spec:v1:sc01",
+  "title": "SC01 鍩洪噾浜ゆ槗璁板綍濂戠害",
+  "oneOf": [
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/SourceRecord"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/TransactionFacts"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/TaskScope"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/TransactionContext"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/BusinessObjects"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/ParameterSet"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/Method"
+    }
+  ],
+  "$defs": {
+    "OptionalHash": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "OptionalText": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "Opening": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start_at",
+        "positions",
+        "coverage"
+      ],
+      "properties": {
+        "start_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "positions": {
+          "const": "confirmed_empty"
+        },
+        "coverage": {
+          "const": "recorded_transactions_since_start"
+        }
+      }
+    },
+    "Confirmation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "actual_at",
+        "basis"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "pending",
+            "confirmed",
+            "cancelled",
+            "failed"
+          ]
+        },
+        "actual_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        },
+        "basis": {
+          "enum": [
+            "user_reported",
+            "expected_due",
+            "not_applicable"
+          ]
+        }
+      }
+    },
+    "Settlement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "actual_at",
+        "basis"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "not_applicable",
+            "pending",
+            "settled"
+          ]
+        },
+        "actual_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        },
+        "basis": {
+          "enum": [
+            "user_reported",
+            "expected_due",
+            "not_applicable"
+          ]
+        }
+      }
+    },
+    "Trade": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trade_id",
+        "instrument_id",
+        "side",
+        "amount",
+        "confirmed_shares",
+        "requested_shares",
+        "fee_amount",
+        "trade_at",
+        "holding_start",
+        "expected_at",
+        "confirmation",
+        "settlement",
+        "last_arrival_reply"
+      ],
+      "properties": {
+        "trade_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "instrument_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "side": {
+          "enum": [
+            "buy",
+            "sell"
+          ]
+        },
+        "amount": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalAmount"
+        },
+        "confirmed_shares": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalShare"
+        },
+        "requested_shares": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalShare"
+        },
+        "fee_amount": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalAmount"
+        },
+        "trade_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        },
+        "holding_start": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        },
+        "expected_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        },
+        "confirmation": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Confirmation"
+        },
+        "settlement": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Settlement"
+        },
+        "last_arrival_reply": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalArrivalReply"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "side": {
+                "const": "buy"
+              },
+              "confirmation": {
+                "properties": {
+                  "state": {
+                    "enum": [
+                      "pending",
+                      "confirmed"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "holding_start": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "known",
+                      "unknown"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Mutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "change_id",
+        "mode",
+        "expected_trade_hash",
+        "correction_reason",
+        "trade"
+      ],
+      "properties": {
+        "change_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "mode": {
+          "enum": [
+            "create",
+            "update",
+            "correct"
+          ]
+        },
+        "expected_trade_hash": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalHash"
+        },
+        "correction_reason": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalText"
+        },
+        "trade": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/TradeInput"
+        }
+      }
+    },
+    "Changes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc01#/$defs/Mutation"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "SourceRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id",
+        "source_type",
+        "operation",
+        "account_id",
+        "confirmed_at",
+        "transaction_as_of",
+        "platform",
+        "currency",
+        "opening",
+        "changes",
+        "arrival_replies",
+        "base_generation"
+      ],
+      "properties": {
+        "record_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "source_type": {
+          "enum": [
+            "user_confirmation",
+            "synthetic_fixture"
+          ]
+        },
+        "operation": {
+          "enum": [
+            "initialize",
+            "refresh"
+          ]
+        },
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "confirmed_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "transaction_as_of": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "platform": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "currency": {
+          "const": "CNY"
+        },
+        "opening": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Opening"
+        },
+        "changes": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Changes"
+        },
+        "arrival_replies": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/ArrivalReplies"
+        },
+        "base_generation": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        }
+      }
+    },
+    "TransactionFacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_record_ref",
+        "base_generation"
+      ],
+      "properties": {
+        "source_record_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "base_generation": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        }
+      }
+    },
+    "TaskScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope_id",
+        "account_id",
+        "operation",
+        "transaction_as_of_target",
+        "account_information_cutoff_at",
+        "purpose",
+        "requested_uses"
+      ],
+      "properties": {
+        "scope_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "operation": {
+          "enum": [
+            "initialize",
+            "refresh"
+          ]
+        },
+        "account_information_cutoff_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "purpose": {
+          "enum": [
+            "account_review",
+            "fixture_validation"
+          ]
+        },
+        "requested_uses": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "current_account_review",
+              "reporting"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "transaction_as_of_target": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        }
+      }
+    },
+    "Position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "instrument_id",
+        "confirmed_shares",
+        "trade_ids",
+        "coverage"
+      ],
+      "properties": {
+        "instrument_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "confirmed_shares": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalShare"
+        },
+        "trade_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 1,
+          "maxItems": 100000
+        },
+        "coverage": {
+          "const": "recorded_transactions_since_start"
+        }
+      }
+    },
+    "Pending": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trade_id",
+        "instrument_id",
+        "side",
+        "pending_phase",
+        "expected_at"
+      ],
+      "properties": {
+        "trade_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "instrument_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "side": {
+          "enum": [
+            "buy",
+            "sell"
+          ]
+        },
+        "pending_phase": {
+          "enum": [
+            "confirmation",
+            "settlement"
+          ]
+        },
+        "expected_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        }
+      }
+    },
+    "Trades": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc01#/$defs/Trade"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "Positions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc01#/$defs/Position"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "PendingTransactions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc01#/$defs/Pending"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "BusinessObjects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trades",
+        "positions",
+        "pending_transactions"
+      ],
+      "properties": {
+        "trades": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Trades"
+        },
+        "positions": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Positions"
+        },
+        "pending_transactions": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/PendingTransactions"
+        }
+      }
+    },
+    "TransactionContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "account_id",
+        "generation",
+        "ledger_digest",
+        "transaction_as_of",
+        "known_as_of",
+        "execution_cutoff_at",
+        "platform",
+        "currency",
+        "opening",
+        "source_authority",
+        "trade_count",
+        "trades_ref",
+        "positions_ref",
+        "pending_transactions_ref",
+        "missing_facts"
+      ],
+      "properties": {
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "generation": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        },
+        "ledger_digest": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "transaction_as_of": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "known_as_of": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "execution_cutoff_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "currency": {
+          "const": "CNY"
+        },
+        "opening": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Opening"
+        },
+        "source_authority": {
+          "enum": [
+            "user_confirmation",
+            "synthetic_fixture"
+          ]
+        },
+        "trade_count": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        },
+        "trades_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "positions_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "pending_transactions_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "missing_facts": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Gap"
+          }
+        }
+      }
+    },
+    "ParameterSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "stage_id",
+        "parameters"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "stage_id": {
+          "const": "SC01"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ParameterSpec"
+          },
+          "minItems": 4,
+          "maxItems": 4,
+          "uniqueItems": true
+        }
+      }
+    },
+    "Method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "method_id",
+        "method_version",
+        "producer_id",
+        "validator_id",
+        "rule_set",
+        "operation_modes",
+        "arithmetic",
+        "unknown_policy",
+        "arrival_policy",
+        "record_unit"
+      ],
+      "properties": {
+        "method_id": {
+          "const": "sc01-confirmed-trades"
+        },
+        "method_version": {
+          "const": "v1"
+        },
+        "producer_id": {
+          "const": "sc01-producer-v1"
+        },
+        "validator_id": {
+          "const": "sc01-validator-v1"
+        },
+        "rule_set": {
+          "const": "investment.sc01.rules"
+        },
+        "operation_modes": {
+          "const": [
+            "initialize",
+            "refresh"
+          ]
+        },
+        "arithmetic": {
+          "const": "exact_decimal"
+        },
+        "unknown_policy": {
+          "const": "preserve_and_restrict_uses"
+        },
+        "arrival_policy": {
+          "const": "explicit_reply_then_expected_due"
+        },
+        "record_unit": {
+          "const": "whole_trade"
+        }
+      }
+    },
+    "OptionalTime": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "$ref": "urn:investment:spec:v1:common#/$defs/RawTime"
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "OptionalMoney": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "$ref": "urn:investment:spec:v1:common#/$defs/NonnegativeDecimal"
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "ExplicitArrivalReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "result",
+        "reported_at"
+      ],
+      "properties": {
+        "result": {
+          "enum": [
+            "completed",
+            "not_completed"
+          ]
+        },
+        "reported_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        }
+      }
+    },
+    "OptionalArrivalReply": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "$ref": "urn:investment:spec:v1:sc01#/$defs/ExplicitArrivalReply"
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "ArrivalReply": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trade_id",
+        "result",
+        "reported_at",
+        "new_expected_at"
+      ],
+      "properties": {
+        "trade_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "result": {
+          "enum": [
+            "completed",
+            "not_completed",
+            "no_reply"
+          ]
+        },
+        "reported_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalInstant"
+        },
+        "new_expected_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        }
+      }
+    },
+    "ArrivalReplies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rows"
+      ],
+      "properties": {
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc01#/$defs/ArrivalReply"
+          },
+          "maxItems": 100000
+        }
+      }
+    },
+    "TradeInput": {
+      "$ref": "urn:investment:spec:v1:sc01#/$defs/Trade"
+    },
+    "ArrivalQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "trade_id",
+        "instrument_id",
+        "kind",
+        "expected_at"
+      ],
+      "properties": {
+        "trade_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "instrument_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "kind": {
+          "enum": [
+            "buy_confirmation",
+            "sell_settlement"
+          ]
+        },
+        "expected_at": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/OptionalTime"
+        }
+      }
+    },
+    "ArrivalPreparation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "stage_id",
+        "account_id",
+        "prepared_at",
+        "questions",
+        "base_generation"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "stage_id": {
+          "const": "SC01"
+        },
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "prepared_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc01#/$defs/ArrivalQuestion"
+          },
+          "maxItems": 100000
+        },
+        "base_generation": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,904 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:investment:spec:v1:runs",
+  "title": "子链尝试、强校验失败及每日清理的 v1 数据约束",
+  "oneOf": [
+    {
+      "$ref": "urn:investment:spec:v1:runs#/$defs/InputCheck"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:runs#/$defs/Failure"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:runs#/$defs/FailureSummary"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:runs#/$defs/DailyManifest"
+    },
+    {
+      "$ref": "urn:investment:spec:v1:runs#/$defs/ProtocolRejection"
+    }
+  ],
+  "$defs": {
+    "Phase": {
+      "enum": [
+        "input_check",
+        "production",
+        "output_check",
+        "commit",
+        "finished"
+      ]
+    },
+    "FailureCategory": {
+      "enum": [
+        "input_schema",
+        "input_reference",
+        "input_semantic",
+        "production",
+        "output_schema",
+        "output_reference",
+        "output_semantic",
+        "independent_validation",
+        "cas_conflict",
+        "storage",
+        "runtime_io"
+      ]
+    },
+    "ReasonCode": {
+      "enum": [
+        "invalid_json",
+        "schema_violation",
+        "unregistered_schema",
+        "invalid_reference",
+        "hash_mismatch",
+        "identity_mismatch",
+        "date_order",
+        "source_mismatch",
+        "duplicate_key",
+        "business_invariant",
+        "missing_evidence",
+        "use_not_allowed",
+        "producer_exception",
+        "validator_exception",
+        "parent_changed",
+        "write_failed",
+        "io_failed",
+        "checks_incomplete"
+      ]
+    },
+    "OptionalPointer": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "string",
+              "pattern": "^(?:/(?:[^~/]|~[01])*)*$",
+              "maxLength": 4096
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "InputCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "check_id",
+        "validator_id",
+        "validator_version",
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "attempt_no",
+        "validated_at",
+        "input_refs",
+        "checks",
+        "overall_verdict"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "check_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "validator_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "validator_version": {
+          "const": "v1"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "stage_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/StageID"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "attempt_no": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "validated_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "input_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Reference"
+          },
+          "minItems": 1,
+          "maxItems": 100000
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Check"
+          },
+          "minItems": 1,
+          "maxItems": 100000
+        },
+        "overall_verdict": {
+          "enum": [
+            "passed",
+            "failed"
+          ]
+        }
+      }
+    },
+    "Failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "failure_id",
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "attempt_no",
+        "phase",
+        "detected_at",
+        "category",
+        "rule_id",
+        "reason_code",
+        "object_ref",
+        "json_pointer",
+        "reason",
+        "evidence_refs",
+        "affected_uses",
+        "owner",
+        "gaps"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "failure_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "stage_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/StageID"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "attempt_no": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "phase": {
+          "enum": [
+            "input_check",
+            "production",
+            "output_check",
+            "commit"
+          ]
+        },
+        "detected_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "category": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/FailureCategory"
+        },
+        "rule_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "reason_code": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/ReasonCode"
+        },
+        "object_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "json_pointer": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/OptionalPointer"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "evidence_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        },
+        "affected_uses": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Use"
+          },
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true
+        },
+        "owner": {
+          "enum": [
+            "controller",
+            "producer",
+            "validator",
+            "storage",
+            "user"
+          ]
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Gap"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "FailureSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "status",
+        "attempt_count",
+        "failure_refs",
+        "terminated_at",
+        "next_chain_allowed",
+        "termination_code"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "stage_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/StageID"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "status": {
+          "const": "failed"
+        },
+        "attempt_count": {
+          "const": 3,
+          "type": "integer"
+        },
+        "failure_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "terminated_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "next_chain_allowed": {
+          "const": false
+        },
+        "termination_code": {
+          "const": "attempts_exhausted"
+        }
+      }
+    },
+    "FileRole": {
+      "enum": [
+        "frozen_input",
+        "source_record",
+        "parameters",
+        "method",
+        "scope",
+        "input_check",
+        "candidate",
+        "validation",
+        "sealed_output",
+        "failure",
+        "execution",
+        "staged_object",
+        "terminal_failure",
+        "log"
+      ]
+    },
+    "FileEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "relative_path",
+        "media_type",
+        "sha256",
+        "byte_size",
+        "purpose_code"
+      ],
+      "properties": {
+        "role": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/FileRole"
+        },
+        "relative_path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^[A-Za-z0-9_-]+/(?:attempt-0[123]/)?[A-Za-z0-9_.-]+$"
+        },
+        "media_type": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/MediaType"
+        },
+        "sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "byte_size": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        },
+        "purpose_code": {
+          "enum": [
+            "frozen_context",
+            "input_gate",
+            "output_gate",
+            "business_handoff",
+            "failure_explanation",
+            "temporary_computation"
+          ]
+        }
+      }
+    },
+    "Retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "blockers",
+        "persistent_refs",
+        "evaluated_at"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "retain",
+            "eligible",
+            "cleaned"
+          ]
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "attempt_unfinished",
+              "validation_unfinished",
+              "commit_unfinished",
+              "active_downstream_use",
+              "pending_user_fact",
+              "pending_order_reconciliation",
+              "required_reference_not_persisted"
+            ]
+          },
+          "minItems": 0,
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "persistent_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        },
+        "evaluated_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalInstant"
+        }
+      }
+    },
+    "Attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_no",
+        "directory",
+        "state",
+        "phase",
+        "started_at",
+        "finished_at",
+        "input_check_ref",
+        "candidate_ref",
+        "output_validation_ref",
+        "sealed_ref",
+        "execution_record_ref",
+        "failure_ref",
+        "files"
+      ],
+      "properties": {
+        "attempt_no": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "directory": {
+          "enum": [
+            "attempt-01",
+            "attempt-02",
+            "attempt-03"
+          ]
+        },
+        "state": {
+          "enum": [
+            "registered",
+            "running",
+            "passed",
+            "failed"
+          ]
+        },
+        "phase": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/Phase"
+        },
+        "started_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalInstant"
+        },
+        "finished_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalInstant"
+        },
+        "input_check_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "candidate_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "output_validation_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "sealed_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "execution_record_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "failure_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:runs#/$defs/FileEntry"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "OptionalAttempt": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 3
+            },
+            "status": {
+              "const": "known"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "status",
+            "reason"
+          ],
+          "properties": {
+            "value": {
+              "type": "null"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048
+            }
+          }
+        }
+      ]
+    },
+    "Invocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "invocation_id",
+        "account_id",
+        "created_at",
+        "finished_at",
+        "frozen_input_ref",
+        "parameters_ref",
+        "method_ref",
+        "processing_state",
+        "validation_state",
+        "attempts",
+        "selected_attempt",
+        "sealed_output_ref",
+        "next_chain_allowed",
+        "terminal_failure_ref",
+        "files",
+        "retention",
+        "baseline_ref",
+        "expected_generation"
+      ],
+      "properties": {
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalID"
+        },
+        "created_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "finished_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalInstant"
+        },
+        "frozen_input_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "parameters_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "method_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "processing_state": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ProcessingState"
+        },
+        "validation_state": {
+          "enum": [
+            "not_evaluated",
+            "checking",
+            "passed",
+            "exhausted"
+          ]
+        },
+        "attempts": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:runs#/$defs/Attempt"
+          },
+          "minItems": 0,
+          "maxItems": 3
+        },
+        "selected_attempt": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/OptionalAttempt"
+        },
+        "sealed_output_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "next_chain_allowed": {
+          "type": "boolean"
+        },
+        "terminal_failure_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:runs#/$defs/FileEntry"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        },
+        "retention": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/Retention"
+        },
+        "baseline_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "expected_generation": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        }
+      }
+    },
+    "DailyManifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "stage_id",
+        "execution_date",
+        "timezone",
+        "updated_at",
+        "invocations"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1,
+          "type": "integer"
+        },
+        "stage_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/StageID"
+        },
+        "execution_date": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ExecutionDate"
+        },
+        "timezone": {
+          "const": "Asia/Shanghai"
+        },
+        "updated_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "invocations": {
+          "type": "array",
+          "items": {
+            "$ref": "urn:investment:spec:v1:runs#/$defs/Invocation"
+          },
+          "minItems": 0,
+          "maxItems": 100000
+        }
+      }
+    },
+    "ProtocolRejection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "rejection_id",
+        "stage_id",
+        "run_id",
+        "invocation_id",
+        "detected_at",
+        "rule_id",
+        "object_ref",
+        "json_pointer",
+        "reason_code",
+        "reason",
+        "owner",
+        "action"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "integer",
+          "const": 1
+        },
+        "rejection_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "stage_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/StageID"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalID"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalID"
+        },
+        "detected_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "rule_id": {
+          "enum": [
+            "T01",
+            "T02",
+            "T03",
+            "T04",
+            "S01",
+            "S02"
+          ]
+        },
+        "object_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/OptionalArtifact"
+        },
+        "json_pointer": {
+          "$ref": "urn:investment:spec:v1:runs#/$defs/OptionalPointer"
+        },
+        "reason_code": {
+          "enum": [
+            "invalid_attempt_state",
+            "invalid_manifest",
+            "retention_blocked",
+            "invalid_cleanup_state"
+          ]
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "owner": {
+          "enum": [
+            "controller",
+            "storage"
+          ]
+        },
+        "action": {
+          "enum": [
+            "refuse_control_mutation",
+            "refuse_cleanup"
+          ]
+        }
+      }
+    },
+    "RunResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "status",
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "attempt_no",
+        "next_chain_allowed",
+        "sealed_output_ref",
+        "allowed_uses"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": 1
+        },
+        "status": {
+          "const": "completed"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "stage_id": {
+          "const": "SC01"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "attempt_no": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "next_chain_allowed": {
+          "const": true
+        },
+        "sealed_output_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "allowed_uses": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Use"
+          }
+        }
+      }
+    }
+  }
+}

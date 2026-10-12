@@ -1,0 +1,4 @@
+interface:
+  display_name: "Investment"
+  short_description: "核实新闻、比较基金与持仓方案，提供有依据且可复算的投资建议"
+  default_prompt: "使用 $investment 核实市场信息和我的实际持仓，比较可行方案并解释操作金额。"

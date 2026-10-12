@@ -1,0 +1,451 @@
+{
+  "schema_id": "investment_business_chain_protocol_v1",
+  "schema_version": 1,
+  "envelope_schema_id": "investment_business_chain_v1",
+  "currency": "CNY",
+  "platform": "TT",
+  "scope": "definitions_before_stage_design_and_implementation",
+  "stage_order": [
+    "account",
+    "news_collection",
+    "news_assessment",
+    "fund_universe",
+    "fund_sources",
+    "model",
+    "recommendation",
+    "report"
+  ],
+  "common": {
+    "business_input": "strict:exact_business_complete_predecessor_envelope; explicit_observation:exact_validated_partial_predecessor; account:null",
+    "control_context": [
+      "data_root",
+      "plan",
+      "chain_id",
+      "protocol_sha256",
+      "implementation_identity",
+      "previous_output_ref"
+    ],
+    "output_envelope_required": [
+      "schema_id",
+      "schema_version",
+      "chain_id",
+      "stage",
+      "status",
+      "stage_complete",
+      "investment_goal_achieved",
+      "account_ref",
+      "account_hash",
+      "input_output_hash",
+      "output_hash",
+      "payload",
+      "source_refs",
+      "operation_receipts",
+      "qualification_receipts",
+      "qualifications",
+      "processing_complete",
+      "lineage_refs",
+      "protocol_sha256",
+      "implementation_identity"
+    ],
+    "statuses": [
+      "complete",
+      "awaiting_user",
+      "awaiting_analysis",
+      "needs_evidence",
+      "failed"
+    ],
+    "qualifications": [
+      "source_integrity",
+      "fact_qualification",
+      "point_in_time",
+      "predictive_validation",
+      "comparison_scope",
+      "recommendation_qualification",
+      "trade_ready"
+    ],
+    "decimal_representation": "exact_decimal_string",
+    "missing_fact_representation": "null_with_reason_not_zero",
+    "immutable_reference": "sha256_size_and_content_addressed_path_or_chunks",
+    "upstream_identity": "sha256_of_entire_predecessor_envelope",
+    "account_propagation": "unchanged_first_stage_account_context_and_full_snapshot_reference",
+    "scientific_claims": "independent_current_input_bound_evidence_required_not_producer_self_declaration",
+    "stage_complete_is_goal_complete": false,
+    "automatic_trade_execution": false,
+    "processing_complete": "technical_processing_finished_with_valid_output_or_explicit_failure_not_business_success",
+    "stage_complete": "this_stage_business_postcondition_independently_satisfied_not_merely_processing_finished",
+    "lineage_refs": "ordered_exact_CAS_refs_of_every_upstream_envelope_in_this_chain; authenticated_by_scheduler",
+    "scientific_definition": {
+      "reference": "scientific-contracts.md",
+      "binding": "version_and_content_SHA256",
+      "parameter_sources": "theory_definition_user_risk_source_contract_or_explicit_internal_preregistration",
+      "no_market_guarantee": true,
+      "version": "investment_scientific_contracts_v1",
+      "sha256": "eefc023b9287fbb68653afcd35f146de3c27b958f2521705f7d22f9b7f3239e3"
+    },
+    "qualification_receipt_binding_fields": [
+      "chain_id",
+      "stage",
+      "account_ref",
+      "account_hash",
+      "input_output_hash",
+      "output_hash",
+      "protocol_sha256",
+      "implementation_identity",
+      "validator_id",
+      "validator_scope",
+      "source_ref"
+    ],
+    "qualification_authorities": {
+      "source_integrity": "accepted_source_and_CAS_independent_validation_gate",
+      "fact_qualification": "independent_original_quote_entity_unit_time_fact_inference_and_economic_evidence_gate; no_universal_truth_claim",
+      "point_in_time": "independent_historical_availability_and_mature_label_gate",
+      "predictive_validation": "independent_chronological_selection_freeze_and_held_out_calibration_gate",
+      "comparison_scope": "independent_complete_original_peer_and_source_eligibility_scope_gate",
+      "recommendation_qualification": "independent_current_account_fee_cash_risk_precision_and_policy_gate",
+      "trade_ready": "never_granted_by_this_research_plugin"
+    },
+    "adapter_call": {
+      "control_context": "immutable scheduler supplied root/plan/chain/protocol/implementation and exact predecessor CAS reference; not financial business input",
+      "business_input": "account:null; others:exact predecessor envelope",
+      "output": "typed envelope and actual evidence refs; independent scheduler verifier seals acceptance"
+    }
+  },
+  "stages": {
+    "account": {
+      "input_stage": null,
+      "business_input": null,
+      "output_container": "account_context",
+      "required_output_fields": [
+        "currency",
+        "platform",
+        "principal",
+        "loss_tolerance",
+        "cash",
+        "holdings"
+      ],
+      "payload_required_fields": [
+        "account_context",
+        "missing_fields",
+        "questions",
+        "engine_context"
+      ],
+      "reads": "one_consistent_current_account_capital_risk_and_plan_snapshot",
+      "questions": "only_missing_necessary_account_facts_no_strategy_or_algorithm_questionnaire",
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: necessary_facts_confirmed_and_snapshot_bound; unknown_cost_or_historical_return_does_not_create_a_fake_value",
+      "business_postcondition": "necessary_account_facts_confirmed_and_full_snapshot_consistent",
+      "full_snapshot_fields": [
+        "actual_lots",
+        "orders",
+        "receivables",
+        "pending_subscriptions",
+        "cash_rights",
+        "capital_lineage",
+        "risk_lineage",
+        "plan_records"
+      ]
+    },
+    "news_collection": {
+      "input_stage": "account",
+      "output_container": "news_material",
+      "required_output_fields": [
+        "window_start",
+        "cutoff_at",
+        "documents",
+        "coverage"
+      ],
+      "document_required_fields": [
+        "document_id",
+        "source_ref",
+        "source_id",
+        "url",
+        "title",
+        "published_at",
+        "retrieved_at"
+      ],
+      "coverage_required_fields": [
+        "domestic_source_ids",
+        "international_source_ids",
+        "pending_source_ids",
+        "global_coverage_known",
+        "source_scope_complete"
+      ],
+      "universe": "dynamic_recent_domestic_and_international_news_no_fixed_publisher_article_or_industry_whitelist",
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: current_original_collection_and_unprocessed_complement_sealed_with_truthful_coverage; engineering_budget_does_not_prove_majority_coverage",
+      "business_postcondition": "current_originals_source_integrity_and_declared_broad_dynamic_research_scope_validated; no_budget_sample_as_majority_proof"
+    },
+    "news_assessment": {
+      "input_stage": "news_collection",
+      "output_container": "assessed_news",
+      "required_output_fields": [
+        "material_hash",
+        "industry_links"
+      ],
+      "industry_link_required_fields": [
+        "industry_id",
+        "mechanism",
+        "document_ids",
+        "facts",
+        "counterevidence",
+        "uncertainties",
+        "direction",
+        "time_horizon",
+        "economic_observations_ref"
+      ],
+      "host_work": "read_current_originals_and_submit_source_grounded_analysis_as_internal_work_not_extra_user_input",
+      "no_keyword_forecast": true,
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: all_assessed_links_bind_current_originals_or_explicit_justified_no_material_impact; unresolved_links_remain_unknown",
+      "business_postcondition": "supported_facts_and_industry_mechanisms_originally_bound_with_direction_horizon_counterevidence_and_explicit_uncertainty"
+    },
+    "fund_universe": {
+      "input_stage": "news_assessment",
+      "output_container": "frozen_universe",
+      "required_output_fields": [
+        "currency",
+        "platform",
+        "catalog_codes",
+        "catalog_ref",
+        "holding_codes",
+        "candidate_codes",
+        "unknown_codes",
+        "excluded_codes",
+        "peer_groups"
+      ],
+      "peer_required_fields": [
+        "group_id",
+        "industry_ids",
+        "member_codes",
+        "membership_complete",
+        "source_refs"
+      ],
+      "no_fixed_fund_whitelist_or_top_N": true,
+      "missing_catalog": "needs_evidence_with_unavailable_reason_never_synthetic_catalog",
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: current_full_TT_catalog_and_source_defined_industry_peer_denominators_sealed; all_actual_holdings_preserved",
+      "business_postcondition": "current_full_TT_catalog_all_affected_industries_and_original_peer_denominators_validated_and_current_holdings_preserved"
+    },
+    "fund_sources": {
+      "input_stage": "fund_universe",
+      "output_container": "source_bundle",
+      "required_output_fields": [
+        "holding_codes",
+        "candidate_codes",
+        "qualified_codes",
+        "unknown_codes",
+        "excluded_codes",
+        "by_code",
+        "cash",
+        "evaluation_at",
+        "historical_availability_refs",
+        "dealing_terms_refs"
+      ],
+      "evidence_domain": [
+        "legal_identity",
+        "TT_availability",
+        "CNY_execution_currency",
+        "original_NAV_and_cash_rights",
+        "applicable_fees_and_dealing_precision",
+        "historical_availability",
+        "asset_exposure"
+      ],
+      "qualified_meaning": "source_eligible_under_declared_source_rules_not_yet_predictively_qualified",
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: every_held_or_peer_subject_has_explicit_source_disposition_and_original_references; unknown_is_not_unavailable_or_scientifically_compared",
+      "business_postcondition": "all_current_risk_and_required_comparison_inputs_eligible_or_independently_excluded_with_complete_scope; unresolved_material_sources_do_not_pass"
+    },
+    "model": {
+      "input_stage": "fund_sources",
+      "output_container": "model_result",
+      "required_output_fields": [
+        "holding_codes",
+        "candidate_codes",
+        "unknown_codes",
+        "excluded_codes",
+        "compared_codes",
+        "cash_compared",
+        "method",
+        "execution_status",
+        "model_fit_executed",
+        "comparison_gaps",
+        "evidence_refs"
+      ],
+      "execution_statuses": [
+        "not_run",
+        "insufficient_data",
+        "unqualified",
+        "qualified",
+        "failed"
+      ],
+      "evidence_reference_fields": [
+        "method_result_ref",
+        "bundle_ref",
+        "calculation_ref",
+        "readiness_ref",
+        "family_results_ref",
+        "selection_ref"
+      ],
+      "method_basis": [
+        "strict_point_in_time_inputs",
+        "mature_labels",
+        "Elastic_Net",
+        "chronological_training_only_selection",
+        "complete_source_eligible_peer_comparison",
+        "net_wealth_after_actual_costs",
+        "CNY_cash_baseline",
+        "CVaR",
+        "independent_calibration_after_winner_freeze"
+      ],
+      "qualification": "qualified_requires_independent_bound_model_and_comparison_proofs; declared_method_fields_are_not_executed_results",
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: actual_evaluation_or_evidence_insufficiency_result_sealed; compared_codes_and_cash_compared_only_from_actual_calculation",
+      "business_postcondition": "actual_model_cash_and_peer_comparison_meets_source_PIT_maturity_and_independent_predictive_calibration_requirements",
+      "comparison_scope": "all_original_peers_preserved; every_uncompared_member_has_independent_eligibility_exclusion_or_nonmateriality_proof_otherwise_best_claim_limited_to_compared_subset"
+    },
+    "recommendation": {
+      "input_stage": "model",
+      "output_container": "recommendations",
+      "required_output_fields": [
+        "holding_codes",
+        "candidate_codes",
+        "model_hash",
+        "scope",
+        "actions"
+      ],
+      "action_required_fields": [
+        "code",
+        "action",
+        "reason",
+        "amount_CNY",
+        "shares",
+        "fees_CNY",
+        "evidence_refs",
+        "qualification"
+      ],
+      "actions": [
+        "increase",
+        "reduce",
+        "hold"
+      ],
+      "adjustment_requires": "actual_model_ranking_and_calibration_fees_cash_risk_and_rounding_proofs_not_news_direction_alone",
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: every_current_holding_has_explicit_advice; scientifically_supported_new_funds_only; unqualified_amounts_remain_null_with_reason",
+      "business_postcondition": "actual_current_H_and_selected_Q_advice_meets_verified_model_fee_cash_risk_and_precision_requirements"
+    },
+    "report": {
+      "input_stage": "recommendation",
+      "output_container": "report",
+      "required_output_fields": [
+        "conclusion",
+        "recommendations_hash",
+        "model_hash",
+        "coverage",
+        "goal_achieved",
+        "report_markdown",
+        "limitations"
+      ],
+      "expected_conclusion": "Chinese_current_news_to_industry_to_peer_fund_comparison_to_current_portfolio_adjustments_with_sources_and_CNY_amounts",
+      "goal_requires": "actual_broad_source_research_independent_scientific_comparison_and_qualified_current_portfolio_advice",
+      "observation_is_full_goal_pass": false,
+      "processing_postcondition": "actual_valid_output_or_explicit_bound_diagnostic_sealed; successful_output_domain: final_readable_conclusion_matches_exact_validated_current_chain; missing_evidence_is_visible",
+      "business_postcondition": "readable_Chinese_conclusion_matches_exact_validated_chain_and_truthfully_states_goal_status"
+    }
+  },
+  "scheduler": {
+    "role": "only_owner_of_stage_order_exact_input_handoff_validation_journal_resume_and_final_goal_gate",
+    "input_gate": [
+      "schema_and_types",
+      "predecessor_stage_and_chain_id",
+      "entire_predecessor_hash",
+      "actual_CAS_bytes",
+      "account_snapshot_unchanged",
+      "implementation_and_protocol_identity"
+    ],
+    "output_gate": [
+      "declared_stage_output_contract",
+      "current_input_and_account_binding",
+      "actual_CAS_bytes",
+      "independent_operation_acceptance",
+      "scientific_qualification_scope",
+      "no_invented_financial_values"
+    ],
+    "durability": "write_inflight_before_call_then_seal_output_and_validation_receipt_before_next_stage",
+    "resume": "same_chain_exact_sealed_outputs_and_original_operation_ids; never_reset_source_or_validation_budgets",
+    "new_invocation": "new_chain_id_fresh_current_news_and_existing_confirmed_account",
+    "failure": "record_stage_input_reference_rule_path_reason_and_actual_attempt; no_silent_skip_or_latest_substitution",
+    "awaiting_user": "only_true_missing_necessary_account_facts",
+    "awaiting_analysis": "host_internal_analysis_task_continue_current_invocation_without_user_model_questionnaire",
+    "technical_gap": "host_resolves_source_or_engine_gaps_with_existing_budgets; unresolved_gaps_remain_explicit_and_never_full_goal_pass",
+    "requested_goal_default": "investment_recommendation",
+    "input_DTO": {
+      "required_fields": [
+        "requested_goal",
+        "chain_id",
+        "control_context",
+        "business_input"
+      ],
+      "business_input": null,
+      "control_context": [
+        "data_root",
+        "plan",
+        "chain_id",
+        "protocol_sha256",
+        "implementation_identity",
+        "previous_output_ref"
+      ],
+      "host_internal_submission": "current_news_assessment_bound_to_current_material_not_user_questionnaire"
+    },
+    "output_DTO": {
+      "required_fields": [
+        "requested_goal",
+        "chain_id",
+        "status",
+        "delivery_mode",
+        "current_stage",
+        "chain_outputs",
+        "last_good_output_ref",
+        "failed_boundary",
+        "goal_evidence"
+      ],
+      "statuses": [
+        "goal_achieved",
+        "goal_unmet",
+        "awaiting_user",
+        "awaiting_analysis",
+        "failed"
+      ],
+      "delivery_modes": [
+        "qualified_recommendation",
+        "observation",
+        "pending"
+      ]
+    },
+    "failure_DTO": {
+      "required_fields": [
+        "stage",
+        "phase",
+        "rule_path",
+        "input_ref",
+        "reason",
+        "attempt",
+        "retryable",
+        "required_actions"
+      ],
+      "phases": [
+        "input_validation",
+        "execution",
+        "output_validation",
+        "independent_qualification",
+        "publication"
+      ]
+    },
+    "partial_handoff": "validated_partial_artifacts_only_in_explicit_observation_delivery; stage_complete_remains_false_and_investment_goal_remains_unmet; never_skip_required_account_or_host_analysis",
+    "qualification_authentication": "actual_completed_gate_operation_receipt_accepted_attempt_atomic_commit_current_binding_and_CAS_bytes; reject_self_declared_independent_boolean_or_code_hash_only",
+    "final_goal_gate": "all_business_postconditions_and_required_independent_qualifications_met; observations_and_auxiliary_tests_never_count_as_full_goal_pass"
+  },
+  "validation_order": [
+    "freeze_input_output_definitions",
+    "design_stages_and_scheduler_from_definitions",
+    "implement",
+    "all_stage_positive_negative_and_binding_tests_pass",
+    "scheduler_handoff_and_resume_tests_pass",
+    "latest_supported_install_in_fresh_isolation",
+    "normal_first_invocation_with_necessary_account_facts_only",
+    "normal_repeat_invocation_without_extra_hints",
+    "repair_then_new_fresh_isolated_first_and_repeat"
+  ]
+}

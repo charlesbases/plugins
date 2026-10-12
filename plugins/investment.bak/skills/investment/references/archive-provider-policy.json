@@ -1,0 +1,43 @@
+{
+  "schema_id": "investment_archive_provider_policy_v1",
+  "provider_id": "commoncrawl",
+  "qualification_scope": "authenticated_provider_archived_response_version_only",
+  "numeric_qualification": false,
+  "historical_review_qualification": false,
+  "inventory_url": "https://index.commoncrawl.org/collinfo.json",
+  "index_host": "index.commoncrawl.org",
+  "data_host": "data.commoncrawl.org",
+  "collection_pattern": "^CC-MAIN-[0-9]{4}-[0-9]{2}$",
+  "filename_pattern": "^crawl-data/CC-MAIN-[0-9]{4}-[0-9]{2}/segments/[0-9.]+/warc/CC-MAIN-[0-9]{14}-[0-9]{14}-[0-9]{5}\\.warc\\.gz$",
+  "max_inventory_bytes": 262144,
+  "max_index_bytes": 2097152,
+  "max_compressed_range_bytes": 2097152,
+  "max_uncompressed_record_bytes": 16777216,
+  "source_registry": {
+    "schema_version": 1,
+    "sources": {
+      "archive_cc_inventory": {
+        "purpose": "archive",
+        "allowed_hosts": ["index.commoncrawl.org"],
+        "redirect_hosts": [],
+        "path_pattern": "^/collinfo\\.json$",
+        "encoding": "utf-8",
+        "media_types": ["application/json"]
+      },
+      "archive_cc_index": {
+        "purpose": "archive",
+        "allowed_hosts": ["index.commoncrawl.org"],
+        "redirect_hosts": [],
+        "path_pattern": "^/CC-MAIN-[0-9]{4}-[0-9]{2}-index$",
+        "encoding": "utf-8",
+        "media_types": ["text/x-ndjson", "application/x-ndjson", "application/json", "text/plain"]
+      },
+      "archive_cc_warc_range": {
+        "purpose": "archive",
+        "allowed_hosts": ["data.commoncrawl.org"],
+        "redirect_hosts": [],
+        "path_pattern": "^/crawl-data/CC-MAIN-[0-9]{4}-[0-9]{2}/segments/[0-9.]+/warc/CC-MAIN-[0-9]{14}-[0-9]{14}-[0-9]{5}\\.warc\\.gz$"
+      }
+    }
+  }
+}
