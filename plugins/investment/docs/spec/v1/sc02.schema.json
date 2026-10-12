@@ -1,0 +1,3283 @@
+{
+  "$defs": {
+    "Attempt": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_no": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "candidate_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "capture_log_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "failure_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "finished_at": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalInstant"
+        },
+        "processing_state": {
+          "enum": [
+            "running",
+            "completed",
+            "failed"
+          ]
+        },
+        "receipt_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "started_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        }
+      },
+      "required": [
+        "attempt_no",
+        "processing_state",
+        "started_at",
+        "finished_at",
+        "capture_log_ref",
+        "candidate_ref",
+        "receipt_ref",
+        "failure_ref"
+      ],
+      "type": "object"
+    },
+    "BodyArtifact": {
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "else": {
+            "properties": {
+              "body_locator": {
+                "minLength": 1
+              }
+            }
+          },
+          "if": {
+            "properties": {
+              "format": {
+                "const": "json_record"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "body_locator": {
+                "const": ""
+              }
+            }
+          }
+        }
+      ],
+      "properties": {
+        "body_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "capture_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "format": {
+          "enum": [
+            "html_text",
+            "xml_text",
+            "json_record"
+          ]
+        },
+        "native_media_type": {
+          "enum": [
+            "text/html",
+            "application/xml",
+            "application/json",
+            "application/geo+json"
+          ]
+        },
+        "profile_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "source_time": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalText"
+        },
+        "text": {
+          "maxLength": 33554432,
+          "minLength": 1,
+          "type": "string"
+        },
+        "time_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "title": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "type": "string"
+        },
+        "title_locator": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "capture_ref",
+        "profile_ref",
+        "format",
+        "title",
+        "text",
+        "source_time",
+        "title_locator",
+        "body_locator",
+        "time_locator",
+        "native_media_type"
+      ],
+      "type": "object"
+    },
+    "Capture": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "capture_state": {
+          "enum": [
+            "complete",
+            "partial",
+            "failed"
+          ]
+        },
+        "error": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalCaptureError"
+        },
+        "final_url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        },
+        "http_status": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalStatus"
+        },
+        "method": {
+          "const": "GET"
+        },
+        "origin": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/CaptureOrigin"
+        },
+        "parent_capture_id": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalID"
+        },
+        "purpose": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/FetchPurpose"
+        },
+        "redirect_target": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalURL"
+        },
+        "request_headers": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/Header"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "request_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "request_started_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "requested_url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        },
+        "response_byte_size": {
+          "maximum": 16777216,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "response_bytes_base64": {
+          "contentEncoding": "base64",
+          "maxLength": 22369624,
+          "type": "string"
+        },
+        "response_finished_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "response_headers": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/Header"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "response_sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "sequence_no": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "capture_id",
+        "request_id",
+        "source_id",
+        "sequence_no",
+        "parent_capture_id",
+        "purpose",
+        "method",
+        "requested_url",
+        "final_url",
+        "request_headers",
+        "response_headers",
+        "http_status",
+        "redirect_target",
+        "request_started_at",
+        "response_finished_at",
+        "capture_state",
+        "origin",
+        "response_bytes_base64",
+        "response_sha256",
+        "response_byte_size",
+        "error"
+      ],
+      "type": "object"
+    },
+    "CaptureError": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "timeout",
+            "network",
+            "http_status",
+            "redirect_limit",
+            "response_byte_limit",
+            "cancelled",
+            "decode_error"
+          ]
+        },
+        "message": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "message"
+      ],
+      "type": "object"
+    },
+    "CaptureLog": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_no": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "captures": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "closed_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "request_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "state": {
+          "const": "frozen"
+        }
+      },
+      "required": [
+        "request_id",
+        "run_id",
+        "invocation_id",
+        "attempt_no",
+        "state",
+        "captures",
+        "closed_at"
+      ],
+      "type": "object"
+    },
+    "CaptureOrigin": {
+      "enum": [
+        "live",
+        "synthetic"
+      ]
+    },
+    "CollectorConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/Manifest"
+        },
+        "manifest_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "profile": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/ExtractionProfile"
+        },
+        "profile_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "source_id",
+        "manifest_ref",
+        "profile_ref",
+        "manifest",
+        "profile"
+      ],
+      "type": "object"
+    },
+    "CollectorRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "entrypoints": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "information_cutoff_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "limits": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/Limits"
+        },
+        "request_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "window": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/NewsWindow"
+        }
+      },
+      "required": [
+        "request_id",
+        "source_id",
+        "entrypoints",
+        "window",
+        "information_cutoff_at",
+        "limits"
+      ],
+      "type": "object"
+    },
+    "CollectorResult": {
+      "additionalProperties": false,
+      "properties": {
+        "coverage": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/CoverageRow"
+        },
+        "documents": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/DocumentRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "errors": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/SourceError"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "opportunities": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/OpportunityRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "pending_items": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/PendingRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "request_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "partial",
+            "failed",
+            "unsupported"
+          ]
+        }
+      },
+      "required": [
+        "request_id",
+        "source_id",
+        "status",
+        "documents",
+        "opportunities",
+        "pending_items",
+        "coverage",
+        "errors"
+      ],
+      "type": "object"
+    },
+    "CoverageRow": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_ids": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "configured_entrypoints": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "document_ids": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "errors": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/SourceError"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "listing_state": {
+          "enum": [
+            "exhausted_exposed",
+            "verified_window_boundary",
+            "budget_stop",
+            "error",
+            "unknown"
+          ]
+        },
+        "opportunity_ids": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "pending_ids": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "reason": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "partial",
+            "failed",
+            "unsupported"
+          ]
+        },
+        "visited_entrypoints": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "window_coverage": {
+          "enum": [
+            "complete",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "source_id",
+        "status",
+        "listing_state",
+        "window_coverage",
+        "configured_entrypoints",
+        "visited_entrypoints",
+        "capture_ids",
+        "opportunity_ids",
+        "document_ids",
+        "pending_ids",
+        "errors",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "CoverageTable": {
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/CoverageRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "DailyManifest": {
+      "additionalProperties": false,
+      "properties": {
+        "execution_date": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ExecutionDate"
+        },
+        "invocations": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/Invocation"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "stage_id": {
+          "const": "SC02"
+        },
+        "timezone": {
+          "const": "Asia/Shanghai"
+        }
+      },
+      "required": [
+        "schema_version",
+        "stage_id",
+        "execution_date",
+        "timezone",
+        "invocations"
+      ],
+      "type": "object"
+    },
+    "DecisionClock": {
+      "additionalProperties": false,
+      "properties": {
+        "clock_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "decision_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "information_cutoff_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        }
+      },
+      "required": [
+        "clock_id",
+        "decision_at",
+        "information_cutoff_at"
+      ],
+      "type": "object"
+    },
+    "DiscoveryLocator": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "locator": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "capture_ref",
+        "locator"
+      ],
+      "type": "object"
+    },
+    "Disposition": {
+      "enum": [
+        "captured",
+        "excluded_outside_window",
+        "excluded_kind",
+        "duplicate_version",
+        "pending_fetch",
+        "pending_parse",
+        "failed_fetch"
+      ]
+    },
+    "DocumentRow": {
+      "additionalProperties": false,
+      "properties": {
+        "availability_basis": {
+          "enum": [
+            "observed_response",
+            "unknown_before_cutoff"
+          ]
+        },
+        "available_time": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/TimeEvidence"
+        },
+        "body_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "capture_status": {
+          "const": "complete"
+        },
+        "document_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "final_url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        },
+        "material_kind": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/MaterialKind"
+        },
+        "published_time": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/TimeEvidence"
+        },
+        "publisher_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "raw_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "requested_url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        },
+        "retrieved_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "title": {
+          "maxLength": 8192,
+          "minLength": 1,
+          "type": "string"
+        },
+        "version_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "window_membership": {
+          "enum": [
+            "within",
+            "uncertain"
+          ]
+        },
+        "window_time": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/TimeEvidence"
+        },
+        "window_time_role": {
+          "enum": [
+            "published",
+            "event_occurrence",
+            "filing_accepted",
+            "unknown"
+          ]
+        }
+      },
+      "required": [
+        "document_id",
+        "version_id",
+        "publisher_id",
+        "source_id",
+        "title",
+        "material_kind",
+        "requested_url",
+        "final_url",
+        "raw_ref",
+        "body_ref",
+        "published_time",
+        "window_time",
+        "window_time_role",
+        "window_membership",
+        "available_time",
+        "retrieved_at",
+        "availability_basis",
+        "capture_status"
+      ],
+      "type": "object"
+    },
+    "DocumentRule": {
+      "additionalProperties": false,
+      "properties": {
+        "body_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "html",
+            "xml",
+            "json",
+            "unresolved"
+          ]
+        },
+        "material_kind": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/MaterialKind"
+        },
+        "time_format": {
+          "enum": [
+            "rfc3339",
+            "date_ymd",
+            "date_dmy",
+            "date_mdy",
+            "english_date",
+            "epoch_ms",
+            "unknown"
+          ]
+        },
+        "time_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "time_role": {
+          "enum": [
+            "published",
+            "event_occurrence",
+            "filing_accepted",
+            "unknown"
+          ]
+        },
+        "timezone": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalText"
+        },
+        "title_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "url_pattern": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "url_pattern",
+        "format",
+        "title_locator",
+        "body_locator",
+        "time_locator",
+        "time_format",
+        "timezone",
+        "time_role",
+        "material_kind"
+      ],
+      "type": "object"
+    },
+    "DocumentsTable": {
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/DocumentRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "EntryFollowRule": {
+      "additionalProperties": false,
+      "properties": {
+        "link_prefix": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "locator": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "locator_kind": {
+          "enum": [
+            "xpath",
+            "regex"
+          ]
+        },
+        "purpose": {
+          "enum": [
+            "listing",
+            "data"
+          ]
+        },
+        "url_pattern": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "url_pattern",
+        "locator_kind",
+        "locator",
+        "link_prefix",
+        "purpose"
+      ],
+      "type": "object"
+    },
+    "EvidenceCorpus": {
+      "additionalProperties": false,
+      "properties": {
+        "corpus_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "coverage_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "documents_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "extraction_spec_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "opportunity_inventory_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "pending_items_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "retrieval_attempts_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/DatasetRef"
+        },
+        "source_scope_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "window_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        }
+      },
+      "required": [
+        "corpus_id",
+        "window_ref",
+        "source_scope_ref",
+        "documents_ref",
+        "retrieval_attempts_ref",
+        "opportunity_inventory_ref",
+        "pending_items_ref",
+        "extraction_spec_ref",
+        "coverage_ref"
+      ],
+      "type": "object"
+    },
+    "ExtractionProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_state": {
+          "enum": [
+            "calibrated",
+            "unresolved"
+          ]
+        },
+        "charset": {
+          "enum": [
+            "utf-8",
+            "gb18030"
+          ]
+        },
+        "document_rules": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/DocumentRule"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "entry_follow_rules": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/EntryFollowRule"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "limitations": {
+          "items": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "listing_rules": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/ListingRule"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "normalization": {
+          "const": "sc02-text-v1"
+        },
+        "profile_version": {
+          "const": "v1"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "whole_window_proof": {
+          "oneOf": [
+            {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "const": ""
+                },
+                "status": {
+                  "const": "known"
+                },
+                "value": {
+                  "$ref": "urn:investment:spec:v1:sc02#/$defs/WindowProofRule"
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "reason"
+              ],
+              "type": "object"
+            },
+            {
+              "additionalProperties": false,
+              "properties": {
+                "reason": {
+                  "maxLength": 4096,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "status": {
+                  "const": "unknown"
+                },
+                "value": {
+                  "type": "null"
+                }
+              },
+              "required": [
+                "status",
+                "value",
+                "reason"
+              ],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "required": [
+        "source_id",
+        "profile_version",
+        "normalization",
+        "charset",
+        "calibration_state",
+        "entry_follow_rules",
+        "listing_rules",
+        "document_rules",
+        "whole_window_proof",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "ExtractionRow": {
+      "additionalProperties": false,
+      "properties": {
+        "calibration_state": {
+          "enum": [
+            "calibrated",
+            "unresolved",
+            "missing"
+          ]
+        },
+        "manifest_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "profile_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "source_id",
+        "manifest_ref",
+        "profile_ref",
+        "calibration_state"
+      ],
+      "type": "object"
+    },
+    "ExtractionSpecTable": {
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/ExtractionRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "Failure": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_no": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "candidate_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "code": {
+          "enum": [
+            "schema_violation",
+            "invalid_reference",
+            "identity_mismatch",
+            "unsupported_output",
+            "missing_evidence",
+            "resource_limit",
+            "use_not_allowed",
+            "execution_failed"
+          ]
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "failed_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "input_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "phase": {
+          "enum": [
+            "input",
+            "collection",
+            "validation",
+            "seal"
+          ]
+        },
+        "pointer": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "reason": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "retryable": {
+          "type": "boolean"
+        },
+        "rule_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "stage_id": {
+          "const": "SC02"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "attempt_no",
+        "failed_at",
+        "phase",
+        "rule_id",
+        "code",
+        "pointer",
+        "reason",
+        "input_ref",
+        "candidate_ref",
+        "evidence_refs",
+        "retryable"
+      ],
+      "type": "object"
+    },
+    "FailureSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt_count": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "attempt_failure_refs": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "downstream_allowed": {
+          "const": false
+        },
+        "finished_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "stage_id": {
+          "const": "SC02"
+        },
+        "status": {
+          "const": "failed"
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "status",
+        "attempt_count",
+        "attempt_failure_refs",
+        "finished_at",
+        "downstream_allowed"
+      ],
+      "type": "object"
+    },
+    "FetchPurpose": {
+      "enum": [
+        "entry",
+        "listing",
+        "document",
+        "data"
+      ]
+    },
+    "Header": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 1024,
+          "minLength": 1,
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 16384,
+          "minLength": 0,
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "type": "object"
+    },
+    "Invocation": {
+      "additionalProperties": false,
+      "properties": {
+        "attempts": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/Attempt"
+          },
+          "minItems": 0,
+          "type": "array"
+        },
+        "description": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "failure_summary_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "finished_at": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalInstant"
+        },
+        "frozen_input_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "method_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "parameters_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "processing_state": {
+          "enum": [
+            "pending",
+            "running",
+            "completed",
+            "failed"
+          ]
+        },
+        "profile_bindings": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/ProfileBinding"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "retention": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/Retention"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "sealed_output_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "started_at": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalInstant"
+        }
+      },
+      "required": [
+        "run_id",
+        "invocation_id",
+        "description",
+        "frozen_input_ref",
+        "parameters_ref",
+        "method_ref",
+        "profile_bindings",
+        "processing_state",
+        "started_at",
+        "finished_at",
+        "attempts",
+        "sealed_output_ref",
+        "failure_summary_ref",
+        "retention"
+      ],
+      "type": "object"
+    },
+    "Limits": {
+      "additionalProperties": false,
+      "properties": {
+        "decoded_byte_limit": {
+          "maximum": 33554432,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "document_budget": {
+          "maximum": 10000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "global_concurrency": {
+          "maximum": 64,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "page_budget": {
+          "maximum": 10000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "per_source_concurrency": {
+          "maximum": 16,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "redirect_budget": {
+          "maximum": 10,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "request_budget": {
+          "maximum": 100000,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "response_byte_limit": {
+          "maximum": 16777216,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "timeout_ms": {
+          "maximum": 300000,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "required": [
+        "global_concurrency",
+        "per_source_concurrency",
+        "timeout_ms",
+        "response_byte_limit",
+        "decoded_byte_limit",
+        "request_budget",
+        "page_budget",
+        "document_budget",
+        "redirect_budget"
+      ],
+      "type": "object"
+    },
+    "ListingRule": {
+      "additionalProperties": false,
+      "properties": {
+        "exhaustion_policy": {
+          "enum": [
+            "latest_only",
+            "paginated_unknown",
+            "finite_exposed",
+            "unknown"
+          ]
+        },
+        "format": {
+          "enum": [
+            "html",
+            "rss",
+            "atom",
+            "odata",
+            "geojson",
+            "unresolved"
+          ]
+        },
+        "items_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "link_prefix": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "material_kind": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/MaterialKind"
+        },
+        "next_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "time_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "time_role": {
+          "enum": [
+            "published",
+            "event_occurrence",
+            "filing_accepted",
+            "unknown"
+          ]
+        },
+        "title_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "url_locator": {
+          "maxLength": 4096,
+          "minLength": 0,
+          "type": "string"
+        },
+        "url_pattern": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "url_pattern",
+        "format",
+        "items_locator",
+        "url_locator",
+        "title_locator",
+        "time_locator",
+        "next_locator",
+        "link_prefix",
+        "material_kind",
+        "time_role",
+        "exhaustion_policy"
+      ],
+      "type": "object"
+    },
+    "Manifest": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_hosts": {
+          "items": {
+            "maxLength": 253,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "calibration_state": {
+          "enum": [
+            "calibrated",
+            "unresolved"
+          ]
+        },
+        "callable": {
+          "const": "collect"
+        },
+        "entrypoints": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "evidence": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/ProfileEvidence"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "interface_version": {
+          "const": "sc02.collect.v1"
+        },
+        "limitations": {
+          "items": {
+            "maxLength": 2048,
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "material_kinds": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/MaterialKind"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "module": {
+          "const": "collect.py"
+        },
+        "plugin_version": {
+          "const": "v1"
+        },
+        "profile_sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "publisher_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "publisher_name": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "source_id",
+        "plugin_version",
+        "publisher_id",
+        "publisher_name",
+        "entrypoints",
+        "allowed_hosts",
+        "material_kinds",
+        "interface_version",
+        "module",
+        "callable",
+        "calibration_state",
+        "profile_sha256",
+        "evidence",
+        "limitations"
+      ],
+      "type": "object"
+    },
+    "MaterialKind": {
+      "enum": [
+        "article",
+        "official_release",
+        "regulatory_filing",
+        "event_record"
+      ]
+    },
+    "Method": {
+      "additionalProperties": false,
+      "properties": {
+        "availability_policy": {
+          "const": "observed_response_no_backdating"
+        },
+        "coverage_policy": {
+          "const": "configured_entries_not_global"
+        },
+        "interface_version": {
+          "const": "sc02.collect.v1"
+        },
+        "max_attempts": {
+          "const": 3
+        },
+        "method_id": {
+          "const": "sc02-source-capture"
+        },
+        "method_version": {
+          "const": "v1"
+        },
+        "normalization": {
+          "const": "sc02-text-v1"
+        },
+        "producer_id": {
+          "const": "sc02-producer-v1"
+        },
+        "provenance_model": {
+          "const": "W3C-PROV-DM"
+        },
+        "rule_set": {
+          "const": "investment.sc02.rules"
+        },
+        "rules": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "unknown_policy": {
+          "const": "preserve_and_restrict_uses"
+        },
+        "validator_id": {
+          "const": "sc02-validator-v1"
+        }
+      },
+      "required": [
+        "method_id",
+        "method_version",
+        "producer_id",
+        "validator_id",
+        "rule_set",
+        "interface_version",
+        "normalization",
+        "unknown_policy",
+        "availability_policy",
+        "coverage_policy",
+        "max_attempts",
+        "provenance_model",
+        "rules"
+      ],
+      "type": "object"
+    },
+    "NetworkOrigin": {
+      "enum": [
+        "live",
+        "simulated"
+      ]
+    },
+    "NewsWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "end_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "start_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "window_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        }
+      },
+      "required": [
+        "window_id",
+        "start_at",
+        "end_at"
+      ],
+      "type": "object"
+    },
+    "OpportunityInventoryTable": {
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/OpportunityRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "OpportunityRow": {
+      "additionalProperties": false,
+      "properties": {
+        "discovered_in": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/DiscoveryLocator"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "disposition": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/Disposition"
+        },
+        "document_ids": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "listed_time": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalText"
+        },
+        "listed_title": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalText"
+        },
+        "material_kind": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/MaterialKind"
+        },
+        "opportunity_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "reason": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        }
+      },
+      "required": [
+        "opportunity_id",
+        "source_id",
+        "url",
+        "material_kind",
+        "discovered_in",
+        "listed_title",
+        "listed_time",
+        "disposition",
+        "document_ids",
+        "reason"
+      ],
+      "type": "object"
+    },
+    "OptionalCaptureError": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "urn:investment:spec:v1:sc02#/$defs/CaptureError"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OptionalID": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OptionalInstant": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OptionalRef": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OptionalStatus": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OptionalText": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "maxLength": 4096,
+              "minLength": 1,
+              "type": "string"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "OptionalURL": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "Parameters": {
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "enum": [
+            "formal",
+            "test"
+          ]
+        },
+        "network_origin": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/NetworkOrigin"
+        },
+        "parameter_set_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "plugins_dir": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "user_agent": {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "parameter_set_id",
+        "mode",
+        "network_origin",
+        "plugins_dir",
+        "user_agent"
+      ],
+      "type": "object"
+    },
+    "PendingItemsTable": {
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/PendingRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "PendingRow": {
+      "additionalProperties": false,
+      "properties": {
+        "affected_uses": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Use"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "opportunity_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "pending_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "reason_code": {
+          "enum": [
+            "pending_fetch",
+            "pending_parse",
+            "failed_fetch"
+          ]
+        },
+        "required_evidence": {
+          "enum": [
+            "source_response",
+            "supported_layout"
+          ]
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "pending_id",
+        "source_id",
+        "opportunity_id",
+        "reason_code",
+        "required_evidence",
+        "affected_uses"
+      ],
+      "type": "object"
+    },
+    "ProfileBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "profile_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "source_id",
+        "manifest_ref",
+        "profile_ref"
+      ],
+      "type": "object"
+    },
+    "ProfileEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_state": {
+          "enum": [
+            "complete",
+            "partial",
+            "failed"
+          ]
+        },
+        "captured_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "http_status": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalStatus"
+        },
+        "observation": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "response_byte_size": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Count"
+        },
+        "response_sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "role": {
+          "enum": [
+            "entry",
+            "listing",
+            "material",
+            "access_failure"
+          ]
+        },
+        "url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        }
+      },
+      "required": [
+        "url",
+        "captured_at",
+        "capture_state",
+        "http_status",
+        "response_sha256",
+        "response_byte_size",
+        "role",
+        "observation"
+      ],
+      "type": "object"
+    },
+    "QueryProtocol": {
+      "additionalProperties": false,
+      "properties": {
+        "discovery_policy": {
+          "const": "configured_entries"
+        },
+        "limits": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/Limits"
+        },
+        "protocol_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        }
+      },
+      "required": [
+        "protocol_id",
+        "discovery_policy",
+        "limits"
+      ],
+      "type": "object"
+    },
+    "Registry": {
+      "additionalProperties": false,
+      "properties": {
+        "enabled_stages": {
+          "const": [
+            "SC02"
+          ]
+        },
+        "producer_id": {
+          "const": "sc02-producer-v1"
+        },
+        "rule_set": {
+          "const": "investment.sc02.rules"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "schemas": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/SchemaEntry"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "tables": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/TableEntry"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "validator_id": {
+          "const": "sc02-validator-v1"
+        }
+      },
+      "required": [
+        "schema_version",
+        "schemas",
+        "tables",
+        "enabled_stages",
+        "producer_id",
+        "validator_id",
+        "rule_set"
+      ],
+      "type": "object"
+    },
+    "Retention": {
+      "additionalProperties": false,
+      "properties": {
+        "reason": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "required_by": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "state": {
+          "enum": [
+            "in_use",
+            "releasable",
+            "cleaned"
+          ]
+        }
+      },
+      "required": [
+        "state",
+        "reason",
+        "required_by"
+      ],
+      "type": "object"
+    },
+    "RetrievalAttemptsTable": {
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/RetrievalRow"
+          },
+          "minItems": 0,
+          "type": "array"
+        }
+      },
+      "required": [
+        "rows"
+      ],
+      "type": "object"
+    },
+    "RetrievalRow": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "capture_ref": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+        },
+        "capture_state": {
+          "enum": [
+            "complete",
+            "partial",
+            "failed"
+          ]
+        },
+        "final_url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        },
+        "origin": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/CaptureOrigin"
+        },
+        "purpose": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/FetchPurpose"
+        },
+        "request_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "request_started_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "requested_url": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+        },
+        "response_finished_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "sequence_no": {
+          "maximum": 9007199254740991,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "capture_id",
+        "request_id",
+        "source_id",
+        "sequence_no",
+        "purpose",
+        "capture_ref",
+        "requested_url",
+        "final_url",
+        "request_started_at",
+        "response_finished_at",
+        "capture_state",
+        "origin"
+      ],
+      "type": "object"
+    },
+    "RunResult": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_uses": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/Use"
+          },
+          "minItems": 0,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "attempt_count": {
+          "maximum": 3,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "failure_summary_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "goal_status": {
+          "enum": [
+            "achieved",
+            "unmet"
+          ]
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "sealed_output_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef"
+        },
+        "stage_id": {
+          "const": "SC02"
+        },
+        "status": {
+          "enum": [
+            "sealed",
+            "failed"
+          ]
+        }
+      },
+      "required": [
+        "run_id",
+        "stage_id",
+        "invocation_id",
+        "status",
+        "attempt_count",
+        "sealed_output_ref",
+        "failure_summary_ref",
+        "goal_status",
+        "allowed_uses"
+      ],
+      "type": "object"
+    },
+    "SchemaEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "media_type": {
+          "const": "application/json"
+        },
+        "schema_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1
+        },
+        "target": {
+          "pattern": "^urn:investment:spec:v1:(sc02|common)#/\\$defs/[A-Za-z]+$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "schema_id",
+        "schema_version",
+        "media_type",
+        "target"
+      ],
+      "type": "object"
+    },
+    "SourceEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "entrypoints": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/URL"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "material_kinds": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/MaterialKind"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "source_id",
+        "entrypoints",
+        "material_kinds"
+      ],
+      "type": "object"
+    },
+    "SourceError": {
+      "additionalProperties": false,
+      "properties": {
+        "capture_id": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalID"
+        },
+        "code": {
+          "enum": [
+            "unsupported_source",
+            "unresolved_profile",
+            "request_failed",
+            "layout_unknown",
+            "budget_stop",
+            "coverage_unknown"
+          ]
+        },
+        "message": {
+          "maxLength": 2048,
+          "minLength": 1,
+          "type": "string"
+        },
+        "source_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        }
+      },
+      "required": [
+        "source_id",
+        "code",
+        "capture_id",
+        "message"
+      ],
+      "type": "object"
+    },
+    "SourceScope": {
+      "additionalProperties": false,
+      "properties": {
+        "entries": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/SourceEntry"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "scope_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        }
+      },
+      "required": [
+        "scope_id",
+        "entries"
+      ],
+      "type": "object"
+    },
+    "TableEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "null_policy": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ColumnNullPolicy"
+        },
+        "order_by": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "primary_key": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+          },
+          "minItems": 1,
+          "type": "array",
+          "uniqueItems": true
+        },
+        "row_schema_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "schema_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        "units": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ColumnUnits"
+        }
+      },
+      "required": [
+        "schema_id",
+        "row_schema_id",
+        "primary_key",
+        "units",
+        "null_policy",
+        "order_by"
+      ],
+      "type": "object"
+    },
+    "TimeEvidence": {
+      "oneOf": [
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "const": ""
+            },
+            "status": {
+              "const": "known"
+            },
+            "value": {
+              "additionalProperties": false,
+              "properties": {
+                "basis_ref": {
+                  "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
+                },
+                "lower_bound": {
+                  "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+                },
+                "precision": {
+                  "enum": [
+                    "instant",
+                    "date",
+                    "month",
+                    "quarter",
+                    "year",
+                    "interval"
+                  ]
+                },
+                "timezone": {
+                  "maxLength": 128,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "upper_bound": {
+                  "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+                }
+              },
+              "required": [
+                "lower_bound",
+                "upper_bound",
+                "precision",
+                "timezone",
+                "basis_ref"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "unknown"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        },
+        {
+          "additionalProperties": false,
+          "properties": {
+            "reason": {
+              "maxLength": 2048,
+              "minLength": 1,
+              "type": "string"
+            },
+            "status": {
+              "const": "not_applicable"
+            },
+            "value": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "status",
+            "value",
+            "reason"
+          ],
+          "type": "object"
+        }
+      ]
+    },
+    "URL": {
+      "format": "uri",
+      "maxLength": 4096,
+      "pattern": "^https?://[^\\s#]+(?:#[^\\s]*)?$",
+      "type": "string"
+    },
+    "UnitCase": {
+      "additionalProperties": false,
+      "properties": {
+        "actual": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "candidate_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "known"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "value": {
+                    "properties": {
+                      "schema_id": {
+                        "const": "investment.candidate_output"
+                      },
+                      "media_type": {
+                        "const": "application/json"
+                      },
+                      "byte_size": {
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "not_applicable"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "reason": {
+                    "const": "candidate_not_produced"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "reason": {
+                    "not": {
+                      "enum": [
+                        "input_not_created",
+                        "candidate_not_produced",
+                        "validation_not_run"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "case_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "entry": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "expected": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "input_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "known"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "value": {
+                    "properties": {
+                      "schema_id": {
+                        "const": "investment.stage_input"
+                      },
+                      "media_type": {
+                        "const": "application/json"
+                      },
+                      "byte_size": {
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "not_applicable"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "reason": {
+                    "const": "input_not_created"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "reason": {
+                    "not": {
+                      "enum": [
+                        "input_not_created",
+                        "candidate_not_produced",
+                        "validation_not_run"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "receipt_ref": {
+          "$ref": "urn:investment:spec:v1:sc02#/$defs/OptionalRef",
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "known"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "value": {
+                    "properties": {
+                      "schema_id": {
+                        "const": "investment.validation_receipt"
+                      },
+                      "media_type": {
+                        "const": "application/json"
+                      },
+                      "byte_size": {
+                        "minimum": 1
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "not_applicable"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "reason": {
+                    "const": "validation_not_run"
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "status": {
+                    "const": "unknown"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "reason": {
+                    "not": {
+                      "enum": [
+                        "input_not_created",
+                        "candidate_not_produced",
+                        "validation_not_run"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "trigger": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "case_id",
+        "trigger",
+        "entry",
+        "expected",
+        "actual",
+        "passed",
+        "input_ref",
+        "candidate_ref",
+        "receipt_ref"
+      ],
+      "type": "object"
+    },
+    "UnitReport": {
+      "additionalProperties": false,
+      "properties": {
+        "cases": {
+          "items": {
+            "$ref": "urn:investment:spec:v1:sc02#/$defs/UnitCase"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "execution_succeeded": {
+          "type": "boolean"
+        },
+        "finished_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "goal_satisfied": {
+          "type": "boolean"
+        },
+        "origin": {
+          "const": "synthetic"
+        },
+        "output_valid": {
+          "type": "boolean"
+        },
+        "report_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "root": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "started_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        }
+      },
+      "required": [
+        "report_id",
+        "origin",
+        "root",
+        "started_at",
+        "finished_at",
+        "cases",
+        "execution_succeeded",
+        "output_valid",
+        "goal_satisfied"
+      ],
+      "type": "object",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "output_valid": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "cases": {
+                "items": {
+                  "properties": {
+                    "input_ref": {
+                      "properties": {
+                        "status": {
+                          "const": "known"
+                        }
+                      }
+                    },
+                    "candidate_ref": {
+                      "properties": {
+                        "status": {
+                          "const": "known"
+                        }
+                      }
+                    },
+                    "receipt_ref": {
+                      "properties": {
+                        "status": {
+                          "const": "known"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "goal_satisfied": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "execution_succeeded": {
+                "const": true
+              },
+              "output_valid": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "WindowProofRule": {
+      "additionalProperties": false,
+      "properties": {
+        "complete_locator": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "end_locator": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "html",
+            "json"
+          ]
+        },
+        "start_locator": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        },
+        "url_pattern": {
+          "maxLength": 4096,
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "url_pattern",
+        "format",
+        "start_locator",
+        "end_locator",
+        "complete_locator"
+      ],
+      "type": "object"
+    }
+  },
+  "$id": "urn:investment:spec:v1:sc02",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SC02 strong source capture contracts v1"
+}

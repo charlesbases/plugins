@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:investment:spec:v1:storage",
+  "$defs": {
+    "CommitStamp": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "run_id",
+        "invocation_id",
+        "execution_date",
+        "attempt_no",
+        "input_sha256",
+        "candidate_sha256",
+        "receipt_sha256",
+        "sealed_at",
+        "finalized"
+      ],
+      "properties": {
+        "run_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "invocation_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "execution_date": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ExecutionDate"
+        },
+        "attempt_no": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "input_sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "candidate_sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "receipt_sha256": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "sealed_at": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/UTCInstant"
+        },
+        "finalized": {
+          "type": "boolean"
+        }
+      }
+    },
+    "LedgerMeta": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "account_id",
+        "platform",
+        "currency",
+        "opening",
+        "source_authority",
+        "generation",
+        "ledger_digest",
+        "known_as_of",
+        "transaction_as_of",
+        "last_commit"
+      ],
+      "properties": {
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        },
+        "currency": {
+          "const": "CNY"
+        },
+        "opening": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Opening"
+        },
+        "source_authority": {
+          "enum": [
+            "user_confirmation",
+            "synthetic_fixture"
+          ]
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "ledger_digest": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Hash"
+        },
+        "known_as_of": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "transaction_as_of": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/Instant"
+        },
+        "last_commit": {
+          "$ref": "urn:investment:spec:v1:storage#/$defs/CommitStamp"
+        }
+      }
+    },
+    "TradeRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "account_id",
+        "trade_id",
+        "trade_json"
+      ],
+      "properties": {
+        "account_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/PathID"
+        },
+        "trade_id": {
+          "$ref": "urn:investment:spec:v1:common#/$defs/ID"
+        },
+        "trade_json": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 10485760
+        }
+      }
+    },
+    "LedgerBaseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "meta",
+        "trades"
+      ],
+      "properties": {
+        "meta": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "urn:investment:spec:v1:storage#/$defs/LedgerMeta"
+            }
+          ]
+        },
+        "trades": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/Trades"
+        }
+      }
+    },
+    "StagedTransactions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context",
+        "source_record",
+        "business_objects"
+      ],
+      "properties": {
+        "context": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/TransactionContext"
+        },
+        "source_record": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/SourceRecord"
+        },
+        "business_objects": {
+          "$ref": "urn:investment:spec:v1:sc01#/$defs/BusinessObjects"
+        }
+      }
+    }
+  }
+}

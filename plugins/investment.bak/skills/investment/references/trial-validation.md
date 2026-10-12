@@ -1,0 +1,74 @@
+# 前瞻试验、统一账本与投资有效性
+
+## 范围和入口
+
+正式前瞻试验复用当前StrategySpec、strategy、execution和ledger，按实际确认事件滚动产生下一次当前动作，不另建一套持仓或收益计算器。daily_review的原样本外模型误差校准与这里的前瞻评价、试验设计模拟分别记录。正式调用仍为investment.py run；请求operation为trial_calibrate、trial_register、trial_decision、trial_outcome或trial_evaluate。
+
+| operation | payload |
+|---|---|
+| trial_calibrate、trial_register | {protocol} |
+| trial_decision | {trial_id,date,decision_id,cashflows,distributions,evidence_refs} |
+| trial_outcome | {trial_id,date,market_id,strategy_event_ids,evidence_refs} |
+| trial_evaluate | {trial_id} |
+
+协议当前schema4见 [trial-protocol.example.json](trial-protocol.example.json)。示例的未来日期、基金、金额门槛、族大小、N=31及主期限仅为接口展示；strategy.spec.trade_policy.registration为illustrative，不能当科学最低样本量、普通交易批准或可直接登记的真实证据。族调整后声明的精度与计算预算也可能不足。正式运行须依据真实来源与研究设计声明窗口、经济门槛和比较族，并替换系统生成的账户/市场/证据引用及实际TSA信任资料。
+
+## 冻结协议
+
+协议字段为schema_version、trial_id、name、start_at、end_at、timezone、schedule、initial、strategy、benchmark、horizon_days、tail_probability、risk_state、validation_policy、calibration_config、trust、evidence_refs、observation_mode及assumption_scope。
+
+initial包含account_id、account_hash、as_of、market_id、date，绑定系统已归约账户和核验市场。两套试验投影从同一已核验状态开始；试验账户标识为trial:<id>:strategy和trial:<id>:benchmark，真实main不被试验修改。
+
+strategy为actor_identity和完整spec；冻结的是universe_policy、筛选与约束规则，而非固定基金名单。每次decision封存实际universe、基金身份引用及候选证据，新增代码可以在不改变登记政策hash的前提下进入后续观察；基准持仓和固定基准标的独立保留市场覆盖。数值/辅助流程的新闻及人工介入规则属于同一StrategySpec；trade_policy.family事前登记比较族及其推断范围，不能在看见结果后挑选更有利策略或缩小比较族。基准必须采用spec.benchmark={rule:fixed_weights,weights,cash_weight,rebalance_dates}；各基金权重和现金权重之和严格为1。benchmark只记录description和rationale，订单由execution.compile_benchmark根据基准自己的账户、市场和费用计算。首期实际分配，即使初始账户全部现金也能比较；之后按事前指定决策日再平衡。卖出未到账资金作为后续条件，不能当作当下买入资金。两套账本执行相同的费用、舍入、确认和到账规则。费用诊断年龄由各产品源费档及最低持有期边界自动生成，无需用户填写赎回天数；内部H只定义评价窗，不限制持有期。实际费用按每批来源起止规则、实际price_date及合同要求的明确actual_redemption_confirmed_at核算。未知确认终点保留原报fee/net并列补核，不从known_at或recorded_at推算。
+
+risk_state必须来自risk_profile.resolve，登记校验其本金、风险偏好、有效窗口、账户和市场绑定。B为已确认投入本金加后续外部净资金流，F=B×(1-r)，可用风险预算为V-F；试验初始B不重设为当前权益，因此已有亏损继续计入。初始时和每个登记估值点保存本金、权益、下限及是否越限，结果复查重新从原始账本计算。风险比例变更会使当前固定配置试验停止接收新决策，需要保留该阶段并登记新阶段；已有本金和亏损不重置。临时风险设置的试验终点必须早于设置到期或下一次生效边界。
+
+登记和每次加载均使用verify.code_identity冻结全部当前脚本、JSON配置和依赖清单，决策来源摘要必须完全一致。
+
+schedule每期包含date、decision_deadline、execution_at、valuation_at、outcome_not_before、outcome_deadline。必须满足decision_deadline < execution_at <= valuation_at，且本期execution_at必须晚于上期valuation_at；execution_at是两方案共同的经济成交规则，valuation_at仅为比较权益时点。时区、观察日与估值时刻必须一致，决策早于估值，结果在预定窗口取得签名，end_at覆盖全部期限。不能看结果后延长窗口、换基准或只保留成功日期。
+
+## 决策与账户事实
+
+登记须在start_at之前完成真实外部时间锚定。trial_decision引用已经通过统一入口验收的decision_id，核验账户、策略、市场、来源及系统时间。cashflows为open/close，distributions每项严格为code、ex_date、record_at、per_share、pay_at、income_mode；必须事前封存。结果核对上一观察日（首期为初始日）之后至本观察日的完整公司行动集合，权益以登记时点的已确认权属份额计算，在除息经济时点记应收；不能根据除息日当前持仓反推登记权益。cash模式才模拟现金支付；实际再投资按原始receipt的份额、净额、费用和日期入账。缺少明确再投价格/费用/确认规则时，模拟返回insufficient_evidence，不套普通申购或假设免手续费。资料未覆盖整个期间、遗漏中间除息事件或声明与来源不符时拒绝观察；来源无法确认支付日时返回insufficient_evidence，不推测到期日。
+
+documented_rule_simulation使用当前execution的明确规则生成虚拟账本事件；user_confirmed_execution由Store跨分段扫描账户归属、初始序号与知识截点范围内的全部已知事实，strategy_event_ids仅为核对提示，不能选择有利子集。每条源事实保留原始ID、摘要和试验投影ID对应关系；实际资金流只入账一次，基准按相同金额和经济时点镜像一次，并用基准自身持仓的独立资金流时点估值单位化，不能照抄策略的估值资产列表。transfer修订按知识截点重放；已经封存的观察被新的真实修订影响时，保留原证据并判定该期完整性不足。已知分红及支付不能由调用者省略，有权益而确认不全时不生成最终观察；终点评估还会复查是否出现遗漏的迟到事实。两者都通过相同ledger归约和估值，不接受用户直接填最终收益/单位净值代替推导。
+
+部分成交事实可以持久化，但买单真实暴露或份额仍未确认时不发布下一笔量化决策，也不生成最终观察；新闻、账户监控和事实录入继续。迟到事实可完成原slot；错过后续decision_deadline则固定日程不完整，不能补签或延长观察窗口。现金/份额占用、申购待确认、赎回应收、分红及到账沿用 [storage.md](storage.md)。迟到的确认允许按经济时间重建，历史决策依旧按当时已知截点复核；不能把后来证据注入过去判断。
+
+每次模拟必须先从已审计nav_ref取execution_at所属交易日净值，并按该时点重建可用资金和份额，然后才生成成交；随后归约成交至估值之间的分红、支付、外部现金流与赎回到账。最终复验逐条核对模拟成交的预登记时点及独立经济日净值。估值日之后才到账的资金不参与此前成交。真实成交经济日必须符合所属封存订单的execution_at日期，确认到达可以更晚；偏离日期保留原始事实及trial_scope_violation，试验标记invalid_evidence并停止新决策，不删除或改写真实交易来匹配协议。
+
+结果使用估值时点与已知时点双截点重建两账本，每项价格保留独立price_dates/currencies；两边均须performance_exact才从同资金流单位净值形成收益差。真实成交明确持有起始和权属确认日期，与净值归属日期分离。实际gross、fee、debit/net及结算差异保留并进入对账，不能按预测报价拒绝真实确认。确认成交按effective_at归属日从独立审计的nav_ref核验净值，迟到确认不以当前观察日价格代替；缺对应日期原始净值时返回insufficient_evidence。对应期间净值、分红和执行证据必须核验；人工或文件确认的真实性仍属于明确的来源边界，不宣称直接连接券商。
+
+## 时间锚定与提交
+
+trial_evidence按RFC3161请求和复核签名摘要、nonce、策略OID、证书链、时间精度及截点。trust须配置真实服务HTTP(S)端点、CA和其摘要、实际policy_oid及必要精度/签名者约束。仅传摘要等协议字段，HTTP也不放松签名验证；不猜服务参数、不导入抓到的未知证书。
+
+登记、外部发送进度及真实request/response对象先持久化，业务提交由唯一编排器在Store事务中完成。失败重试复用匹配的外部证据，不因不知道是否提交成功而重复生成另一份业务记录。评估在库存检查之前捕获实际账户、风险、计划和scope violation版本，最终CAS拒绝计算期间新增的迟到事实。owner/generation及续租覆盖全部业务写入；TSA固定TSQ和每次响应先以不可变工件保存，generation私有目录避免失主覆盖新回执。允许远端重复抓取/签名，正式业务结果只采纳一次。事件序号和链摘要统一在Store事务内提交，原文、证书及签名证据保存在Artifacts。
+
+本地哈希证明内容绑定，签名证明指定信任下的存在时点；二者不证明正文真实、账户真实性、不存在隐藏试验或目录所有者从未整体替换记录。当前证书吊销检查能力须按返回结果说明。
+
+固定TSQ身份按字节核对，不按对象的月份目录判断。有效签名已落盘但业务状态尚未提交时，新世代只读重验旧attempt回执，允许在截止后恢复已经满足截止要求的签名；不会在截止后重新发请求或改写旧工作目录。未满足结果成熟时间下界的回执不标记正式就绪，可在窗口内取得后续合法时间锚。
+
+最终复验按每笔订单原所属slot的市场记录核对历史成交；基金退出后续动态名单不会丢失其过去的价格证据。真实资金流估值也逐代码/经济日期对照独立NAV库存；缺失或矛盾时不产生正式收益观察，不修改原始现金事实。
+
+## 统计与设计校准
+
+正式评价事前冻结一个主收益比较、独立基准、金额风险约束和固定终点；观察期内不得按结果更换主指标或停止日期。N为精确登记日期数，calibration_config.sample_size和dates必须与协议完全一致。validation_policy规定净收益优势门槛、置信度、区间精度、观察间隔、时序块长敏感性与Bootstrap计算预算；trade_policy.family声明的多候选比较范围进入调整后的推断。未登记的其他策略、试验和事后选择不因单个区间通过而取得正式支持。
+
+evaluate_advantage对两账本同资金流、同时间及费用后的真实成对观察收益差进行时序块Bootstrap；弱平稳、弱相关、有限方差是推断前提。当前动作校准则从原始source_oos重算预测乐观误差，再调整当前净优势，两者的样本、估计对象和下界口径不能互换。今天生成的候选情景不是历史已实现收益，不能冒充前瞻主指标或策略绩效置信区间。
+
+calibration.py仅检查该收益检验在已声明过程下的误支持率、功效和覆盖率。其独立真值为平稳对称双状态Markov链：Z取±1，初始等概率，下一期保留当前符号的概率为(1+rho)/2；X=mu+sZ。因而E[X]=mu、Var(X)=s²、相关系数为rho的k次方。零假设边界mu等于净优势门槛，正对照mu等于门槛加advantage_effect。该有界模拟用于检验声明统计程序的性质，不能替代真实基金数据、当前动作的原样本外误差校准、真实市场收益或组合风险证明。
+
+config精确字段为sample_size、dates、replications、seed、scenarios（每项rho、paired_return_sd）、advantage_effect、target_power、size_tolerance、confidence_level、max_total_bootstrap_repetitions、max_total_bootstrap_observations。必须在运行前声明全部情景与计算上限，预算不足时返回明确不足。参数及样本量须有目标精度、实际数据和资源依据；30个模型原点或示例31个观察都不是投资合格门槛，示例数值仅说明接口。
+
+每个情景运行边界与正对照两种实际检验；缺失区间计为非覆盖。用精确二项区间量化模拟误差，对4×scenario_count项诊断采用Bonferroni分配。边界误支持概率区间上端必须不超过1-c+size_tolerance，正对照支持概率区间下端必须至少target_power，两种覆盖概率区间下端都必须至少c-size_tolerance；所有要求成立才标记设计校准qualified。它仅适用于声明的模拟过程，不代表市场投资有效。
+
+理论与计算依据：[RFC3161](https://www.rfc-editor.org/rfc/rfc3161)、[arch时序Bootstrap](https://arch.readthedocs.io/en/latest/bootstrap/bootstrap.html)、[精确二项区间](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats._result_classes.BinomTestResult.proportion_ci.html)。上述模拟均值和自相关由明确转移概率直接推导；引用方法或通过合成检验不能替代市场适用性证据。
+
+## 状态与报告
+
+registered、recorded、observation_recorded表示操作事实，不是投资合格。awaiting_confirmation表示仍有未完成确认；固定终点前为awaiting_observations。链路、时点或完整性失败为invalid_evidence；设计/样本/精度不足为insufficient_evidence；区间跨界为inconclusive。
+
+收益优势结论由advantage及return_advantage_supported单独报告。risk.status只能表示observed_compliant或observed_breach，限定初始时点与预先登记的估值点；该事实审计既不覆盖观察间隔内的最低市值，也不推断未来亏损概率。若任何估值点越过本金下限，总状态为observed_risk_breach，即使收益统计表现良好也必须报告越限。
+
+qualified_for_registered_scope和live_prediction_allowed保持false：收益差检验和观察期本金合规本身不构成已验证的未来联合收益与风险承诺。必须同时呈现原始样本范围、主指标、独立基准、比较族修正、费用、风险阶段、设计校准和两项结果；使用者据此判断已取得的证据，而不是从单一通过标签推断盈利保证。

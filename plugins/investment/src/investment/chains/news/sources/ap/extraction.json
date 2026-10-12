@@ -1,0 +1,1 @@
+{"calibration_state":"unresolved","charset":"utf-8","document_rules":[],"entry_follow_rules":[],"limitations":["实际入口请求HTTP403，访问未解决；无已校准正文或分页规则。","禁止将挑战页、有限访问或未支持解析当作空窗口或成功覆盖。"],"listing_rules":[],"normalization":"sc02-text-v1","profile_version":"v1","source_id":"ap","whole_window_proof":{"reason":"window_completeness_not_evidenced","status":"unknown","value":null}}

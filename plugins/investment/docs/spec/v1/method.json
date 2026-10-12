@@ -1,0 +1,1 @@
+{"arithmetic":"exact_decimal","arrival_policy":"explicit_reply_then_expected_due","method_id":"sc01-confirmed-trades","method_version":"v1","operation_modes":["initialize","refresh"],"producer_id":"sc01-producer-v1","record_unit":"whole_trade","rule_set":"investment.sc01.rules","unknown_policy":"preserve_and_restrict_uses","validator_id":"sc01-validator-v1"}
