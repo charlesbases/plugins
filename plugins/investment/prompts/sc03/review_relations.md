@@ -20,7 +20,6 @@ ReportingGapReview恰含gap_sha256、reviewed_objects、decision、reason、miss
 - fact /conflict_refs/i + contradiction：核该具体边是否构成同口径反证，成立为contradicted，不成立不应保留成冲突边；不可not_applicable掩盖一条错误边。
 - counterevidence /relation + contradiction：这里核该行relation和explanation是否被原文支持，正确关系为supported、错误为contradicted、缺证据为insufficient_evidence。revision、scope_difference、alternative_explanation也是实际关系，不能因不是直接矛盾而not_applicable。
 - observation /raw_value + measurement_scope：核原值、单位、币种、期间、季调/年化/名义实际口径与发布版本，并比较其他观测和相应反证。相同版本同口径的矛盾必须保留；不同vintage是修订，不得投票、平均、任选或覆盖。数值存在但属于另一指标不能supported。
-  明确分数/带分数在语义明确且能以既有DecimalString精度和范围有限精确表示时，等值十进制是同单位原值编码，如1/2与0.5、4-3/4与4.75；原quote、单位、期间、vintage须准确保留，不因字面写法不同认定改源值，也不能仅据此批准虚假的无法表示Gap。仍独立核数值及完整经济口径；禁止近似、单位/指标换算或补缺失，真实歧义/不可精确表示/源依据不足仍允许unknown及具体限制，不强迫所有数字known。
 - event /identity_status + event_identity：主体、事件性质、时间与事实关系均需支持归并；相近日期或主题不足。不确定身份须保留未决关系。
 - hypothesis 各mechanism_step/exposure/alternative/falsifiability：逐步区分源支持前提与明确条件假设，核实际或明确假设的暴露、方向、期限、替代解释、可观察证伪结果及数据来源。逻辑可能性不是已识别因果；关键词不能固定行业方向；没有实证不能生成收益概率或默认期限。source_supported需要真实事实，conditional需要明示假设，未支持步骤只能探索并明确Gap。
 - disposition /status + coverage：检查问题是否真正被证据回答、是否漏材料/冲突/重大未知。只看已得材料的受限探索不代表整窗完备。空语料或实质证据不足为insufficient_evidence并列missing_evidence，不伪造supported证据。answered不能仅靠重述问题。

@@ -1,10 +1,10 @@
 # SC05：时点数据与实验协议
 
-文档版本：v1。状态：机器契约已根审；独立验证器及源审核模板已实现待根审核冻结，流程与完整真实验收尚未实现/执行。
+文档版本：v1。状态：机器契约已定义，待根审核；验证器、流程与真实验收尚未实现。
 
 [总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md)
 
-子链标识：SC05。说明目录：docs/chains/research_dataset/。验证器代码包：src/investment/chains/research_dataset/；入口scripts/validate_sc05.py。精确规范：[SC05规则](../../spec/v1/sc05.md)、[Schema](../../spec/v1/sc05.schema.json)、[注册表](../../spec/v1/registry-sc05.json)、[方法与用途](../../spec/v1/method-sc05.json)。
+子链标识：SC05。说明目录：docs/chains/research_dataset/。代码包：尚未实现。精确规范：[SC05规则](../../spec/v1/sc05.md)、[Schema](../../spec/v1/sc05.schema.json)、[注册表](../../spec/v1/registry-sc05.json)、[方法与用途](../../spec/v1/method-sc05.json)。
 
 本页定义本子链对外解决的问题、输入输出、科学方法和验收。内部步骤、适配器和分析器由子链自行编排，不能改变这里的字段含义、数值口径或失败语义。内部实现只生成 CandidateOutput，由独立阶段验证者签发 ValidationReceipt，调度者形成 SealedOutput。
 
@@ -42,8 +42,6 @@ SourceAcquisitionAudit 的公共字段见 [公共契约](../../contracts.md)。�
 来源就绪不等于预测合格，历史版本不合格不自动否定当前观察用途。必要字段无法取得时保留具体 Gap，不补零、不插造价格、不删除成员或实际风险。来源审计只声明资料处置，不能自行修改 SC04 准入或签发科学资格。
 
 观测行至少含 entity_id、metric_id、observation_period、value、unit、currency、version_id、published_time、available_time、availability_basis、retrieved_at、raw_ref、supersedes_version_id。
-
-日历行另必填scheduled_valuation_period（完整TimeEvidence）：在所用origin/C之前有源的预计估值经济期间，不是未来NAV。保留日期/区间完整边界、精度、来源时区与依据，上界仅索引经济期间；缺来源、时区或当年可得证据保持unknown及Gap。有源明示无计划估值才可not_applicable，非交易日不足以证明，也不能借此删掉或顺延原请求。真实历史标签继续使用已观察期间；采用预计安排界定期限时须同一origin可得版本和同一观察口径。
 
 published_time 与 available_time 为 TimeEvidence；value 为 OptionalValue<DecimalString>，currency 与 supersedes_version_id 的不适用状态使用 OptionalValue。asof_panel 行至少含 origin_at、entity_id、universe_version_id、feature_values、source_version_ids、availability_bound_at。每个特征关联准确来源版本、单位与可得性界限；身份、暴露、合同与文本解释也通过同一时点检查。
 

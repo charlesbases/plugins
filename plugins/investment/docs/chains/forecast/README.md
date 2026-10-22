@@ -1,6 +1,6 @@
 # SC06：预测与联合情景
 
-文档版本 v1。状态：独立验证器已作为producer开发基线接受冻结；独立生产核心、正式forecast_assumptions模板及真实案例/Host续行测试入口已落盘。原四项数学/方法基础及同端点明确Failure的方法校准通过，总新增实际ElasticNet.fit一次；正式生产编排及其当前日历消费者尚未接入，四个完整selector、真实SC05封存/Context及正式Host均未执行。当前阶段不表示模型或金融资格通过。
+文档版本 v1。状态：仅契约阶段，流程、独立验证与校准待实现；登记不表示金融资格。
 
 [总览](../../../README.md) · [项目约束](../../../AGENTS.md) · [内部流程](internal.md) · [精确规范](../../spec/v1/sc06.md) · [Schema](../../spec/v1/sc06.schema.json) · [方法](../../spec/v1/method-sc06.json)
 
@@ -9,8 +9,6 @@
 ForecastBundle 保留原 U、发现/取材审计与全部实际风险，输出模型目录、规则、折内预处理、训练/调参审计、历史 OOS/当前预测、同步残差、共同情景、假设及诊断。每个原成员都有 ready/proven_not_applicable/unknown、准确依据与影响用途；缺数据不等于有据排除，instrument_ids 不替代 U。
 
 特征直接来自SC05协议预先冻结的有序predictors，对每个实体保留适用列表P(e)的原顺序与全部未知槽；历史退出成员无需current行。来源定义只读取准确source_rule_ref本体，不继承raw权限，也不从下载成功列或今日成员反推特征全集。
-
-未来端点从获准current CalendarRows按原Horizon计日；全体required实体及所有可得源时区须同目标日和完整预计经济期间。date/interval的保守upper仅为GridPoint.at和当前outcome_end_at索引，不表示物理精确估值、成交或到账；unknown/NA不顺延、删成员或缩期限。exact-calendar原C+length日及历史各origin实测口径不变。
 
 首个模型族为实际 ElasticNet，比较基线为同训练标签的 training_mean。每个 asset/horizon 直接拟合 origin 到端点的累计算术总回报，identity变换；折内标准化、成熟标签前向MSE选参、完全并列按冻结顺序。保存系数/截距、训练成员、实际输入/版本、迭代与数值审计，验证器独立重算；未拟合不报告已训练。[官方目标与停止准则](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html)
 

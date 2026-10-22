@@ -1,10 +1,10 @@
 # SC04：投资工具范围与暴露映射
 
-文档版本：v1。状态：生产流程与独立验证器已实现；实际完整流程及来源能力分别验收，基础检查不代表完整同类比较已通过。
+文档版本：v1。状态：业务契约已定义，待独立验证器校准与流程实现验收。
 
 [总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md)
 
-子链标识：SC04。说明目录：docs/chains/fund_universe/。代码包：src/investment/chains/fund_universe/。精确规范：[机器格式](../../spec/v1/sc04.schema.json) 与 [U01—U21规则、科学依据及用途门槛](../../spec/v1/sc04.md)。
+子链标识：SC04。说明目录：docs/chains/fund_universe/。代码包：验证器阶段实现中。精确规范：[机器格式](../../spec/v1/sc04.schema.json) 与 [U01—U21规则、科学依据及用途门槛](../../spec/v1/sc04.md)。
 
 本页定义本子链对外解决的问题、输入输出、科学方法和验收。内部步骤、适配器和分析器由子链自行编排，不能改变这里的字段含义、数值口径或失败语义。内部实现只生成 CandidateOutput，由独立阶段验证者签发 ValidationReceipt，调度者形成 SealedOutput。
 

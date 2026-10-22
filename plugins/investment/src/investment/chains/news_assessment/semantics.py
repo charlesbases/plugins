@@ -227,11 +227,6 @@ def validate_batch(snapshot, review, item, identity_ref):
             snapshot.quote(quote)
         snapshot.facts_exist(finding['supporting_fact_ids'], 'A12', '/findings/supporting_fact_ids')
         judgment = finding['judgment']
-        if (finding['target_kind'] == 'disposition' and row['status'] == 'answered'
-                and not any(snapshot.indexes['facts'][key]['verification_status'] in ACCEPTED for key in row['fact_ids'])):
-            require(judgment == 'supported' and finding['source_quotes'],
-                    'A10', '/dispositions/' + row['disposition_id'],
-                    'Answered question without accepted facts requires direct independently supported source quotes')
         if judgment in ('supported', 'contradicted'):
             require(finding['source_quotes'] or finding['supporting_fact_ids'],
                     'A12', '/findings', 'Substantive semantic judgment has no actual evidence')
@@ -379,7 +374,7 @@ def semantic_rules(snapshot, review, checks):
                 checks.fail('A07', '/events/' + identity, 'Event identity is not supported by independent source review')
         if kind == 'observation' and verdict != 'supported':
             row = snapshot.indexes['observations'][identity]
-            if verdict == 'contradicted' or row['raw_value']['status'] == 'known':
+            if row['raw_value']['status'] == 'known':
                 checks.fail('A08', '/observations/' + identity, 'Observed value or its measurement scope is not source-supported')
         if kind == 'hypothesis' and verdict != 'supported':
             row = snapshot.indexes['hypotheses'][identity]

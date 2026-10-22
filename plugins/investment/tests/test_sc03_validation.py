@@ -22,17 +22,16 @@ from investment.contracts import ContractError, SPEC, artifact, canonical, diges
 from investment.runtime.runs import atomic
 from investment.research.contracts import ResearchSchemas, StageContext, guard_namespace
 from investment.research.references import ResearchResolver
-from investment.research.controller import ResearchController, _input, _candidate, _receipt, _failure
+from investment.research.controller import ResearchController, _input
 from investment.chains.news_assessment.contracts import TABLES, number_literals, Checks
-from investment.chains.news_assessment import reporting, deterministic
+from investment.chains.news_assessment import reporting
 from investment.chains.news_assessment.validation import validate, _eligibility
 from investment.chains.news_assessment.semantics import work_item, plan
 
 SOURCE = importlib.util.spec_from_file_location('investment_sc02_scenario', PLUGIN / 'scripts/verify_sc02.py')
 SC02 = importlib.util.module_from_spec(SOURCE)
 SOURCE.loader.exec_module(SC02)
-CASES = ('supported_fact', 'source_republication', 'conflicting_metric', 'unsupported_mechanism', 'empty_corpus',
-         'raw_unknown_scope_contradiction')
+CASES = ('supported_fact', 'source_republication', 'conflicting_metric', 'unsupported_mechanism', 'empty_corpus')
 
 
 def case_material(selector):
@@ -55,12 +54,6 @@ def case_material(selector):
                      ('wire_b', 'Report of the same Agency Alpha advance estimate', initial.replace('2.8', '3.0'))]
         question = '同一机构、指标、季度、年化口径及初次发布日期的两份报道是否一致，如何保留分歧？'
         expected = {'source_numbers': ['2.8', '3.0'], 'relation': 'contradiction', 'preserve_both': True, 'average_or_vote': False}
-    elif selector == 'raw_unknown_scope_contradiction':
-        documents = [('agency_alpha', 'Agency Alpha advance GDP report',
-                      "Agency Alpha's advance estimate reports that real GDP increased year over year. No numeric growth rate is provided.")]
-        question = '原文使用什么GDP计量口径和发布版本，是否给出增长率数值？'
-        expected = {'source_basis': 'year_over_year', 'release_vintage': 'advance_estimate', 'raw_value': 'unknown',
-                    'A08': 'failed', 'reporting': False, 'candidate_origin': 'simulated_producer_error_not_actual_model_output'}
     else:
         documents = []
         question = '这个完整已核配置窗口内有哪些相关经济事件，能支持什么机制判断？'
@@ -164,13 +157,6 @@ def prepare(selector):
                  'news_seal_ref': outcome['result']['sealed_output_ref'], 'phase': 'awaiting_actual_producer_model',
                  'scope': 'independent_validator_calibration_not_SC03_controller_execution'}
         state_path = root / 'sc03-calibration.json'
-        if selector == 'raw_unknown_scope_contradiction':
-            ctx = context(state, 'producer')
-            simulated = assemble_candidate(ctx, simulated_scope_draft(ctx))
-            state['candidate_ref'] = write_artifact(resolver, ctx.attempt_dir / 'candidate.json', simulated, 'investment.candidate_output')
-            state['candidate_origin'] = 'simulated_producer_error_not_actual_model_output'
-            state['phase'] = 'independent_validator'
-            state['scope'] = 'simulated_producer_error_validator_calibration_not_SC03_controller_execution'
         state_path.write_bytes(canonical(state))
         (root / 'sc03-independent-expectation.json').write_bytes(canonical({'selector': selector, 'expected': expected,
             'source_origin': 'synthetic_fixture', 'source_documents': documents, 'authorization': 'validator_first_calibration'}))
@@ -192,15 +178,6 @@ def context(state, role):
     allowed += [item['ref'] for item in incoming['input_refs']]
     steps = [item for item in frozen['host_steps'] if item['role'] == role]
     allowed += [step[key] for step in steps for key in ('prompt_ref', 'output_schema_ref')]
-    feedback = []
-    feedback_refs = [item['failure_ref'] for item in state.get('validation_failures', [])] if role == 'producer' else []
-    for reference in feedback_refs:
-        value = resolver.resolve(reference, 'investment.research_failure')
-        require(value['run_id'] == state['run_id'] and value['invocation_id'] == state['invocation_id']
-                and value['stage_id'] == 'SC03' and value['input_ref'] == state['input_ref']
-                and value['attempt_no'] < state['attempt_no'], 'A14', '/feedback', 'Retry feedback identity differs')
-        feedback.append(value)
-    allowed += feedback_refs
     candidate = resolver.resolve(state['candidate_ref'], 'investment.candidate_output') if state['candidate_ref'] else None
     if candidate:
         allowed += [state['candidate_ref'], candidate['payload_ref']] + candidate['datasets'] + candidate['evidence_refs']
@@ -208,12 +185,11 @@ def context(state, role):
     attempt_dir = Path(state['folder']) / f"attempt-{state['attempt_no']:02}"
     scoped.local_context = ('SC03', role, attempt_dir)
     scoped.host_output_refs = []
-    scoped.opaque_refs.update(reference['uri'] for reference in feedback_refs)
     return StageContext(root=root, mode='test', stage_id='SC03', run_id=state['run_id'], invocation_id=state['invocation_id'],
         attempt_no=state['attempt_no'], role=role, schemas=schemas, resolver=scoped, input=incoming, input_ref=state['input_ref'], method=method,
         method_ref=frozen['method_ref'], definition=method['runtime'], attempt_dir=attempt_dir,
         candidate=candidate if role == 'validator' else None, candidate_ref=state['candidate_ref'] if role == 'validator' else None,
-        frozen_host_steps=steps, upstream_receipts=bindings, feedback=feedback)
+        frozen_host_steps=steps, upstream_receipts=bindings)
 
 
 def assemble_candidate(ctx, draft):
@@ -234,42 +210,6 @@ def assemble_candidate(ctx, draft):
         'gaps': draft['unresolved_questions']}
     ctx.schemas.validate('investment.candidate_output', candidate)
     return candidate
-
-
-def simulated_scope_draft(ctx):
-    # 只模拟producer把同比错标为季调年化；上游、原文及其他候选字段保持各自真实来源。
-    corpus = ctx.read_role('evidence_corpus_ref')
-    document, = ctx.resolver.resolve(corpus['documents_ref'])['rows']
-    body = ctx.resolver.resolve(document['body_ref'])
-    quote = {'quote_id': 'gdp-source', 'document_version_id': document['version_id'], 'body_ref': document['body_ref'],
-             'text_field': 'text', 'start': 0, 'end': len(body['text']), 'quote': body['text']}
-    fact = {'fact_id': 'gdp', 'assertion': "Agency Alpha's advance estimate reports that real GDP increased year over year.",
-            'document_version_ids': [document['version_id']], 'quote_locators': [quote],
-            'event_time': unknown('growth_period_not_dated'), 'known_time': deepcopy(document['available_time']),
-            'verification_status': 'source_reported', 'support_refs': [{'kind': 'quote', 'target_id': 'gdp-source'}], 'conflict_refs': []}
-    observation = {'observation_id': 'gdp', 'metric': 'real GDP growth', 'subject': 'Economy described in Agency Alpha report',
-                   'raw_value': unknown('numeric_growth_rate_not_provided'), 'unit': unknown('growth_rate_unit_not_explicit'),
-                   'currency': {'status': 'not_applicable', 'value': None, 'reason': 'dimensionless_growth_rate'},
-                   'economic_period': unknown('period_boundary_not_stated'),
-                   'measurement_basis': known('seasonally_adjusted_annualized'), 'release_vintage': known('advance_estimate'),
-                   'document_version_id': document['version_id'], 'quote_locator': quote,
-                   'available_time': deepcopy(document['available_time']), 'related_fact_ids': ['gdp']}
-    missing = {'rule_id': 'A08', 'field_or_object': '/observations/gdp',
-               'reason': 'Source supplies no numeric rate, explicit unit or economic-period boundary; these values remain unknown.',
-               'owner': 'source', 'required_evidence': ['source_bytes'],
-               'affected_uses': ['evidence_review', 'hypothesis_research', 'reporting']}
-    identity_gap = {'rule_id': 'A13', 'field_or_object': '/analyst_identity',
-                    'reason': 'Model identity and training cutoff are unavailable; historical exploration cannot exclude training contamination.',
-                    'owner': 'controller', 'required_evidence': ['source_bytes'], 'affected_uses': ['pit_training']}
-    _, upstream = ctx.upstream_receipt('evidence_corpus_ref')
-    draft = {('economic_observations' if name == 'observations' else name): {'rows': []} for name in TABLES}
-    draft['facts']['rows'] = [fact]
-    draft['economic_observations']['rows'] = [observation]
-    draft['dispositions']['rows'] = [{'disposition_id': 'gdp-scope', 'question_id': 'research-question',
-        'document_version_ids': [document['version_id']], 'status': 'answered',
-        'reason': '原文报告GDP同比增长，发布版本为初值，没有给出增长率数值。', 'fact_ids': ['gdp'], 'hypothesis_ids': [], 'gaps': [missing]}]
-    draft['unresolved_questions'] = deepcopy(upstream['blockers']) + [missing, identity_gap]
-    return draft
 
 
 def read_state(state_path):
@@ -316,54 +256,6 @@ def retry_failed_host(state_path):
     return advance(state_path)
 
 
-def retry_failed_candidate(state_path):
-    """仅重试当前实际验收拒绝；旧候选、回执和正式失败均不可变保存。"""
-    state_path, state = read_state(state_path)
-    require(state['phase'] == 'validator_returned' and state['candidate_ref'] is not None,
-            'A14', '/candidate', 'A completed actual candidate validation is required')
-    require(state['attempt_no'] < 3, 'A14', '/attempt_no', 'Three calibration attempts are exhausted')
-    ctx = context(state, 'validator')
-    _candidate(ctx.resolver, ctx.candidate, ctx.input, ctx.method_ref, ctx.definition, attempt_no=ctx.attempt_no)
-    receipt_raw = (ctx.root / 'sc03-validation-receipt.json').read_bytes()
-    receipt = ctx.schemas.document('investment.validation_receipt', receipt_raw)
-    require(receipt == state['actual_receipt'], 'A14', '/receipt', 'Actual receipt differs from recorded validation')
-    # 先由真实验证路径核宿主绑定并加载本角色输出，再核回执中的准确证据引用。
-    fresh = validate(ctx)
-    require('request_id' not in fresh and
-            {key: value for key, value in fresh.items() if key != 'validated_at'} ==
-            {key: value for key, value in receipt.items() if key != 'validated_at'},
-            'A14', '/receipt', 'Stored rejection was not reproduced from the current actual candidate')
-    require(not _receipt(ctx.resolver, receipt, ctx.input, ctx.candidate_ref, ctx.method)
-            and not receipt['allowed_uses'], 'A14', '/receipt', 'A usable receipt cannot enter failed retry')
-    failed = next((item for item in receipt['checks'] if item['verdict'] == 'failed'), None)
-    require(failed is not None, 'A14', '/checks', 'Retry requires an actual failed validation rule')
-    blocker = next((item for item in receipt['blockers'] if item['rule_id'] == failed['rule_id']), None)
-    error = ContractError(failed['rule_id'], blocker['field_or_object'] if blocker else '/allowed_uses',
-                          blocker['reason'] if blocker else failed['reason'], 'unsupported_output')
-    receipt_path = ctx.attempt_dir / 'receipt.json'
-    atomic(receipt_path, receipt_raw, immutable=True)
-    receipt_ref = artifact(receipt_raw, 'investment.validation_receipt',
-                           ctx.candidate_ref['uri'].rsplit('/', 1)[0] + '/receipt.json')
-    failure = _failure(ctx.input, ctx.input_ref,
-                       {'attempt_no': ctx.attempt_no, 'candidate_ref': known(ctx.candidate_ref)}, 'validation', error)
-    failure['evidence_refs'].append(receipt_ref)
-    ctx.schemas.validate('investment.research_failure', failure)
-    failure_raw = canonical(failure)
-    failure_path = ctx.attempt_dir / 'failure.json'
-    atomic(failure_path, failure_raw, immutable=True)
-    failure_ref = artifact(failure_raw, 'investment.research_failure',
-                           ctx.candidate_ref['uri'].rsplit('/', 1)[0] + '/failure.json')
-    state.setdefault('validation_failures', []).append({'attempt_no': ctx.attempt_no,
-        'candidate_ref': ctx.candidate_ref, 'receipt_ref': receipt_ref, 'failure_ref': failure_ref})
-    state['attempt_no'] += 1
-    state['candidate_ref'] = None
-    state.pop('actual_receipt')
-    state['phase'] = 'awaiting_actual_producer_model'
-    (Path(state['folder']) / f"attempt-{state['attempt_no']:02}").mkdir()
-    atomic(state_path, canonical(state))
-    return advance(state_path)
-
-
 def advance(state_path):
     state_path, state = read_state(state_path)
     if state['candidate_ref'] is None:
@@ -387,8 +279,6 @@ def advance(state_path):
         work = {'plan_id': 'calibration-source-plan', 'input_ref': ctx.input_ref, 'text_window_codepoints': budget, 'items': [item]}
         plan_ref = ctx.put_json('calibration-work-plan.json', work, 'investment.sc03.assessment_work_plan')
         refs.append(plan_ref)
-        if ctx.feedback:
-            refs += [item['failure_ref'] for item in state['validation_failures']]
         response = ctx.host_response('assess_documents', work_key=item['work_key'])
         if response is None:
             result = ctx.request_host('assess_documents', refs, work_key=item['work_key'])
@@ -566,38 +456,6 @@ class ReportingGapTests(unittest.TestCase):
 
 
 
-class CoverageBoundaryTests(unittest.TestCase):
-    """只核结构覆盖边界；不构造语义通过结果或宿主响应。"""
-
-    def snapshot(self):
-        row = {'disposition_id': 'd', 'question_id': 'q', 'status': 'answered', 'fact_ids': ['f'], 'gaps': []}
-        return SimpleNamespace(tables={'dispositions': [row]}, protocol={'questions': [{'question_id': 'q'}]},
-            payload={'unresolved_questions': []}, ctx=SimpleNamespace(candidate={'gaps': []}),
-            indexes={'facts': {'f': {'verification_status': 'disputed'}}}, documents={'v': {}}, inherited_gaps=[])
-
-    def test_disputed_answer_reaches_independent_review(self):
-        deterministic.coverage(self.snapshot())
-
-    def test_empty_corpus_cannot_be_answered(self):
-        snapshot = self.snapshot()
-        snapshot.documents = {}
-        with self.assertRaises(ContractError):
-            deterministic.coverage(snapshot)
-
-    def test_question_and_gap_completeness_remain_required(self):
-        for change in ('duplicate', 'unresolved_without_gap', 'outer_gap_mismatch'):
-            with self.subTest(change=change):
-                snapshot = self.snapshot()
-                if change == 'duplicate':
-                    snapshot.tables['dispositions'] *= 2
-                elif change == 'unresolved_without_gap':
-                    snapshot.tables['dispositions'][0]['status'] = 'unresolved'
-                else:
-                    snapshot.ctx.candidate['gaps'] = [{'rule_id': 'A10'}]
-                with self.assertRaises(ContractError):
-                    deterministic.coverage(snapshot)
-
-
 class SourceNumberTests(unittest.TestCase):
     def test_fomc_fraction_source_numbers(self):
         self.assertEqual(number_literals('lowered by 1/2 percentage point to 4-3/4 to 5 percent'), {'0.5', '4.75', '5'})
@@ -611,7 +469,6 @@ if __name__ == '__main__':
     parser.add_argument('--prepare', choices=CASES)
     parser.add_argument('--advance', type=Path)
     parser.add_argument('--retry-failed-host', type=Path)
-    parser.add_argument('--retry-failed-candidate', type=Path)
     args = parser.parse_args()
     if args.prepare:
         prepare(args.prepare)
@@ -619,7 +476,5 @@ if __name__ == '__main__':
         advance(args.advance)
     elif args.retry_failed_host:
         retry_failed_host(args.retry_failed_host)
-    elif args.retry_failed_candidate:
-        retry_failed_candidate(args.retry_failed_candidate)
     else:
         unittest.main(argv=[sys.argv[0]])

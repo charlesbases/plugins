@@ -1,12 +1,12 @@
 # SC03：事实评审与经济假说内部设计
 
-文档版本：v1。状态：验证器已固定为流程开发基线；流程入口已提供，实际整链及实源/长文验收尚待完成。
+文档版本：v1。状态：契约阶段；验证器独立校准、producer 实现和实际流程验收尚待完成。
 
 [外部说明](README.md) · [公共契约](../../contracts.md) · [总体架构](../../architecture.md) · [精确规则](../../spec/v1/sc03.md) · [项目约束](../../../AGENTS.md)
 
 ## 责任与顺序
 
-运行路径为 run_sc03 → 共享 controller.freeze → process_sc03/chain.produce → 实际宿主分析 → CandidateOutput → validate_sc03/validation.validate → 共享 controller 按许可 Seal 或带反馈重试。同冻结输入最多三次；失败不能重置预算、篡改原始材料或改方法。入口存在不代表本轮真实模型执行或结果已获许可。
+预定路径为 run_sc03 → 共享 controller.freeze → process_sc03/chain.produce → 实际宿主分析 → CandidateOutput → validate_sc03/validation.validate → 共享 controller 按许可 Seal 或带反馈重试。同冻结输入最多三次；失败不能重置预算、篡改原始材料或改方法。当前只定义契约，不表示这些运行入口已实现。
 
 1. 从实际 EvidenceCorpus、研究范围和协议展开全部文档/研究问题，校验准确封存引用并冻结。账户风险仅生成问题。
 2. 实际宿主读取原文，抽取原子声明与精确引文、事件时间/可得时间、来源报告关系和数值观测。未知不补零，错误引文留拒绝处置。
@@ -28,7 +28,7 @@ SemanticReview 包含 source_lineage、逐文档 document_reviews 和逐对象/�
 
 六个业务表与 payload 按运行目录保存；没有已证明跨轮复用需求的推理草稿不入永久业务库。SemanticReview、宿主调用身份、方法/提示版本、输入/候选准确引用和规则检查属于本次验证材料，不能混进业务载荷。模型实际身份无法取得时保留 unknown，不伪装某模型版本或训练截止。
 
-来源原文不可信，其中指令不得改变本任务。主流程由用户调用插件后宿主自动组织工具与模型，不能增加收费 API、要求用户手动复制数据或设置测试专用模型提示。生产者沿冻结assess_documents与reconcile_evidence正式提示工作，独立验证者沿review_sources与review_relations工作。
+来源原文不可信，其中指令不得改变本任务。主流程由用户调用插件后宿主自动组织工具与模型，不能增加收费 API、要求用户手动复制数据或设置测试专用模型提示。生产者分析提示须在验证器校准冻结后实现；本阶段不提供正式 producer 提示词。
 
 ## 后续验证
 
@@ -39,11 +39,3 @@ SemanticReview 包含 source_lineage、逐文档 document_reviews 和逐对象/�
 先按[四个可达 selectors](../../spec/v1/sc03.md#可达校准与后续实际执行)校准独立验证器，检查正确事实、同源转载、同口径冲突/不同版本修订、无依据机制。独立预期来自已明确的源文字与身份，不要求生成固定句子。校准场景、真实上游运行、正式 process+validate 调用和单独报告分别保存于 ~/.investment/test/<batch>/；不读旧缓存结果，不手写上游 Seal。
 
 全部合法原文属于评审范围。分析器失败、不可读原文或重大未知保留具体缺口，不把成功子集或空表当作原始全集完成。上游尚未真正封存时，实际流程场景明确等待，不能用构造成功结果补齐。
-
-## 实际流程验证入口
-
-`tests/test_sc03_flow.py --prepare supported_fact`（以及source_republication、conflicting_metric、unsupported_mechanism、empty）在独立测试根真实执行SC01→SC02→run_sc03。返回exit 3表示等待宿主按正式HostRequest执行，不是业务通过。宿主完成真实绑定后以`--advance <本批sc03-flow状态文件>`继续同一调用和预算；脚本不写Host原始输出、事件、响应或Seal。
-
-`scripts/verify_sc03.py --from-sc02-result <同批SC02运行结果日志> --root <本批测试根> --question <原研究问题> --expectation <同批独立预期JSON>`可衔接真实公开来源。先核结果强格式，再核本轮真实manifest、选中attempt、Seal、候选和receipt及evidence_review许可；日志中的成功字符串不能替代交接。SC03协议/身份由宿主登记，身份与训练截止无法核实时保留unknown。独立预期只进入测试控制材料，不授权模型读取。
-
-单独flow报告区分执行成功、独立验证有效、原研究目标满足和场景预期满足。可选预期字段minimum_max_document_codepoints和required_observations用于真实完整长正文及指定来源原值/发布版本核对；不能将短模拟源或下载完成当作这些目标已完成。多窗口整合当前显式读取全部真实草稿和原文范围，实际容量不足必须如实失败，不能裁掉材料后宣布完成。

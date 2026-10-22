@@ -1,22 +1,33 @@
-# SC10 内部流程：完整报告、独立预核对与真实接收
+# SC10 内部流程：报告组装与一致性核对
 
-版本v1；当前只有契约/依据，无业务运行证据。
+文档版本：v1。状态：内部设计，待实现与验收。
 
-[外部契约](README.md) · [精确字段与规则](../../spec/v1/sc10.md) · [方法及用途门](../../spec/v1/method-sc10.json) · [项目约束](../../../AGENTS.md)
+[外部说明](README.md) · [公共契约](../../contracts.md) · [总体架构](../../architecture.md) · [项目约束](../../../AGENTS.md)
 
-1. run_sc10调用共享controller，先校命名空间/root/mode，再冻结StageInput/method/prompt/schema和首次+两次预算。ResearchSchemas显式加载SC03—SC10前缀，不扫未完成资源。缺必要账户/范围或上游耗尽预算停止，交根控制出口。
-2. process_sc10只消费本轮具reporting许可的准确业务payload及主调度ReportingContext；共享controller核manifest→Seal→candidate/receipt，业务validator核账户/范围/祖先对应，不重执上游业务。不得读取旧缓存、latest或未授权SC05训练/heldout视图。
-3. 从原已登记完整表生成无损附件索引、十个完整集合快照、覆盖和资格摘要。成员按原主键和member_id分别核，未知保持unknown；原上游每表全行全字段随报告交付，索引不代替实际字节。
-4. producer的report_composition HostRequest由Codex宿主真实新上下文组织带来源的中文claims。依据工程预算批量处理全target，汇合后渲染最终Markdown，生成精确UTF8 byte span Claims。金钱/份额/费用/排名/条件沿源，不新算投资结论。
-5. producer的report_precheck在另一个真实新上下文读取固定实际Markdown+完整附表+原允许来源，PrecheckFinding恰覆盖实际targets×{T01,T02,T03,T04,T05,T06,T07,T08,T09,T15}，缺/多/重复/错阶段均不能passed。T08用真实checked_at核原来源时点和当时可核条件，T09读取固定报告与所有实际原附件/索引/claims及全部内容依据，核span/原表全行全字段；不读取未来delivery.completed_at/received_files，不要求T10未来四步骤或final review完成。正文保留原asof与执行条件，事前核查不保证未来有效。实际输出与公开precheck.json一致，私有host-*原文不进入candidate evidence。失败保存真实记录，禁止进入delivery或包装正常候选；改字节须重新预核对。
-6. producer的local_delivery仍经HostRequest，由宿主用现有文件读取与Bash/Python hash工具实际打开所选root内报告、索引、claims、覆盖/资格摘要及所有必要附件，返回逐文件绝对路径、read_at、实际hash/size。不是新投递API，不打开预览，不要求用户技术操作、付款或阅读。全部核对成功才delivered；真实读取/附件/path/hash错误记录delivery_failed、定位失败项/原因的非空真实错误和准确已收子集，不伪造没读文件。
-7. local_delivery以真实完成时间核SC09全部required有效界和exclusive/事件条件，记录DeliveryReview；无新检索，真实收到变化仅绑定原事实。正文预先明示来源时点和执行条件，源过期只能按历史/观察呈现。SC09 published_at不回写，SC10不把用户阅读时间当交付。
-8. 保存delivery-NN.json及实际事件后才组ReportBundle/CandidateOutput。candidate.datasets含Claims，evidence_refs含公开precheck/delivery及其它需公开的报告对象，不含producer私有host-*原文。源附表准确引用可指原本轮文件；delivered必须实际读所有required文件并在received_files全量准确登记；delivery_failed仅登记准确实际已收子集和真实失败，不把缺收项伪造补齐。
-9. validate_sc10独立读取当前完整候选和原允许输入，确定性核全量集合、字段、金额/单位、时间、来源、附件、预核对/交付绑定；report_review用validator角色真实新上下文复核全target/T01—T16，T10此时才核四步骤全量完成，不读producer私有推导。T08以实际delivery.completed_at/DeliveryReview重核全部必要finite/exclusive/event/unknown界；T09对delivered/delivery_failed先独立重核同一完整内容门，再按T12分全实收或真实错误+准确子集核状态。无内容或内容无效不能以delivery_failed免验。只能签ValidationReceipt，不能修改输入或候选求通过。
-10. 共享controller按完整规则与use_rules封存；本链只有reporting/evidence_review且16规则全passed才允许。delivery_failed内容真实可封存；最终验证失败不封存但不删真实已交付记录。根随后独立生成GoalEvidence/ResearchResult；SC10不反向引用它们。
+所有业务结论来自具有 reporting 许可的准确封存产物，失败控制记录只说明失败。私有视图和排版不产生金额、名单、排名或资格，不预判总研究目标。
 
-宿主实际context/model/tool_call身份取不到时按公共OptionalIdentity unknown并说明，不编造。未调用只保留host_work_required；已实际工具失败按公共failed event/response记录真实原因且消费attempt，不能永远等待。正式四模板本阶段仅登记路径，仍未创建；后续实现必须与冻结Schema一致，不能用测试专用prompt。
+## 步骤与私有结果
 
-同attempt恢复原准确input/method/时钟、合法同role响应及完整工作计划，分片不缩范围。公开副本与成功宿主结构化output规范值相等；最终validator不靠此自证，仍独立核原输入和实际文件。precheck/final review不能共用composition上下文；接收可在自己的新上下文执行实际工具，其已收到事件与内容质量分别表达。原attempt目录、manifest/同级README保留失败、已交付和修正版本；没有新跨轮业务数据库，测试/下载/辅助/原来源捕获全部~/.investment/test/<batch>。
+1. **绑定报告依据。** 核对所有实际完成上游阶段的哈希、任务、祖先关系、账户版本、范围及许可，整理产物、验收、缺口及失败边界。未取得材料保持 unknown，不自行选择 latest 或其他任务结果。必要账户和范围缺失只保存控制失败。
+2. **建立视图。** 提取新闻、事实、争议、行业机制、替代解释、名单及处置、实际比较、风险、建议和阶段资格。片段绑定来源对象、字段或原文定位，区分事实、假说、估计和条件，私有视图不成为新研究证据。
+3. **组织完整名单。** 分列原始发现、冻结同类、C/E/K、真实计算比较和未比较原因，保持法律基金与份额身份、同类组、时点及规则引用。计数来自封存对象，完整发现或完整取源不代替完整计算，有限结果不写成完整同类最优。
+4. **调用呈现组件。** 新闻展示原文版本、配置范围和覆盖；行业展示机制、反证和未知；基金沿用名单、口径和排名；账户及建议保留全部风险对象、批次、动作依据和执行条件；资格说明阶段证据、时段、许可和限制；缺口分列必要用户事实与内部待办，不要求用户填写模型参数或内部请求。
+5. **核对陈述。** 建立陈述与输入的对应表，逐项核对身份、完整名单、币种、金额、份额、费用、排名、资格、范围及风险保留。精确值沿用原语义，未知不写零、估计不写成交；附件的代码和精确值保留文本。缺必要内容或新增结论不通过。
+6. **生成字节。** 从统一视图生成中文报告及可选附件，完整清单放入正文或随报告交付的可核附表，绑定真实字节、哈希和引用。LLM 表述仍回到对应表核对；此时是私有草稿，不预填交付状态或总目标状态。
+7. **独立内容预核对。** 分离于生产者的验证者读取实际报告字节、准确上游引用及对应表，保存真实凭证。未通过则停止交付并保存控制记录/Gap，表达问题重生成，研究及金融问题返回责任阶段。
+8. **真实交付与记录。** 预核对通过后交付核对过的文件，保存渠道、引用、真实时间、成功或失败及原因。只生成文件不等于交付；真实失败为 delivery_failed，未发生尝试不伪造交付记录。
+9. **候选与封存。** 用准确文件、报告依据和真实 delivered/delivery_failed 组装 ReportBundle 及 CandidateOutput，evidence_refs 包含预核对与交付凭证。独立 SC10 验收再次核对内容、哈希、输入、预核对和交付记录，由调度者封存；生产者不自签，不将交付失败改成成功。内容有效的 delivery_failed 可通过内容及状态真实性验收。
 
-校准顺序依批准brief：规则→根fresh合同审核→validator及独立校准→根冻结→producer→真实四selector→fresh review。本阶段四selector均未执行；每项合法前置和独立预期见method.calibration。上游真实业务依赖尚缺则如实未执行，不造Seal或把静态Schema检查说成完整业务通过。
+ReportBundle.input_bundle_refs 只引用实际完成的上游阶段，不自引用 SC10，也不引用最终 GoalEvidence/ResearchResult。正常报告路径在 SC10 封存后，独立根目标验证者汇总十条子链，主调度形成根结果；ResearchResult 指向 GoalEvidence 和 SC10 报告。引用方向单向，避免哈希循环。缺账户或报告核对失败没有有效 SC10 封存时，主调度仍交独立根验证者读取已完成前缀及真实控制记录，返回 pending/unmet 的根结果，未取得账户与报告引用为 unknown，不伪造封存。
+
+## 组件扩展、并发与恢复
+
+私有组件登记输入角色、依赖、呈现责任和输出片段，可增加来源索引或格式渲染器，仍使用同一封存视图，不产生研究或经济决策。新分析需求返回相应子链。
+
+独立组件可并行后汇合，完整清单、必要内容及核对完成前不交付。部分研究失败只呈现获准观察、控制记录、资格及 Gap，不补建议、不提前声明总目标通过。
+
+表达错误基于相同输入重生成并重核；研究或金融错误返回责任阶段。最终验收发现错误保留已经发生的交付事实和失败边界，不删除或改写历史。
+
+真实交付失败在输入、内容和许可仍有效时重试，保留每次尝试。输入或许可变更重新绑定及核对；修正产物形成新记录，不修改原字节或交付事实。同任务恢复沿用准确输入和记录，不重置预算。
+
+SC01只提供基金交易、确认份额、未完成交易和到账状态；资金计划与用户风险/期限/流动性约束由任务材料独立绑定，不从买卖差额反推余额、净资产或本金。缺少这些独立材料时限制依赖它们的结论，不反向阻止合法交易登记。

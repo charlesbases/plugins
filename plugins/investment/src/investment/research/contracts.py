@@ -8,7 +8,7 @@ from dataclasses import InitVar, dataclass, field
 from decimal import Decimal
 from pathlib import Path
 from types import MappingProxyType
-from typing import Callable, Mapping
+from typing import Mapping
 
 from jsonschema import Draft202012Validator
 from referencing import Resource
@@ -181,92 +181,6 @@ class ResearchSchemas(NewsSchemas):
         return self.stage_methods[stage_id]['runtime']
 
 
-def _host_head_string(value, name, pattern):
-    require(isinstance(value, str) and re.fullmatch(pattern, value) is not None,
-            'RS05', '/' + name, 'Invalid host control head ' + name, 'schema_violation')
-
-
-def _host_role(role, *, optional=False):
-    require((optional and role is None) or (isinstance(role, str) and role in ('producer', 'validator')),
-            'RS05', '/role', 'Unknown host control role', 'schema_violation')
-
-
-@dataclass(frozen=True, slots=True)
-class HostWorkItem:
-    """已登记宿主工作的不可变控制头，不包含引用或模型内容。"""
-
-    role: str
-    step_id: str
-    work_key: str
-    request_id: str
-    request_sha256: str
-    state: str
-    response_sha256: str | None
-
-    def __post_init__(self):
-        _host_role(self.role)
-        for name in ('step_id', 'work_key', 'request_id'):
-            _host_head_string(getattr(self, name), name, r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}')
-        _host_head_string(self.request_sha256, 'request_sha256', r'[0-9a-f]{64}')
-        require(isinstance(self.state, str) and self.state in ('requested', 'completed', 'failed'),
-                'RS05', '/state', 'Unknown host control state', 'schema_violation')
-        if self.state == 'requested':
-            require(self.response_sha256 is None, 'RS05', '/response_sha256',
-                    'Pending host work cannot have a response digest', 'schema_violation')
-        else:
-            _host_head_string(self.response_sha256, 'response_sha256', r'[0-9a-f]{64}')
-
-
-@dataclass(frozen=True, slots=True)
-class HostWorkSummary:
-    """当前attempt的真实登记头；计数不代表物理模型/API调用次数。"""
-
-    run_id: str
-    stage_id: str
-    invocation_id: str
-    attempt_no: int
-    input_sha256: str
-    method_sha256: str
-    source_fingerprint: str
-    items: tuple[HostWorkItem, ...]
-
-    def __post_init__(self):
-        for name in ('run_id', 'invocation_id'):
-            _host_head_string(getattr(self, name), name, r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}')
-        require(isinstance(self.stage_id, str) and self.stage_id in STAGES,
-                'RS05', '/stage_id', 'Unknown research stage', 'schema_violation')
-        require(type(self.attempt_no) is int and 1 <= self.attempt_no <= 3,
-                'RS05', '/attempt_no', 'Invalid host control attempt', 'schema_violation')
-        for name in ('input_sha256', 'method_sha256', 'source_fingerprint'):
-            _host_head_string(getattr(self, name), name, r'[0-9a-f]{64}')
-        require(type(self.items) is tuple and all(type(item) is HostWorkItem for item in self.items),
-                'RS05', '/items', 'Host work items must be an immutable typed tuple', 'schema_violation')
-        keys = [(item.role, item.step_id, item.work_key) for item in self.items]
-        require(len(keys) == len(set(keys)), 'RS05', '/items', 'Duplicate registered host work key', 'identity_mismatch')
-
-    def _count(self, role, state=None):
-        _host_role(role, optional=True)
-        return sum(1 for item in self.items if (role is None or item.role == role) and (state is None or item.state == state))
-
-    def registered_count(self, role=None):
-        return self._count(role)
-
-    def completed_count(self, role=None):
-        return self._count(role, 'completed')
-
-    def failed_count(self, role=None):
-        return self._count(role, 'failed')
-
-    def pending_count(self, role=None):
-        return self._count(role, 'requested')
-
-    def contains(self, role, step_id, work_key):
-        _host_role(role)
-        _host_head_string(step_id, 'step_id', r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}')
-        _host_head_string(work_key, 'work_key', r'[A-Za-z0-9][A-Za-z0-9_-]{0,63}')
-        return any((item.role, item.step_id, item.work_key) == (role, step_id, work_key) for item in self.items)
-
-
 @dataclass
 class StageContext:
     """本attempt的受限能力；不授予业务有效性或默认通过凭证。"""
@@ -291,10 +205,8 @@ class StageContext:
     feedback: list = field(default_factory=list)
     frozen_host_steps: list = field(default_factory=list)
     upstream_receipts: InitVar[Mapping[str, tuple[dict, dict]] | None] = None
-    host_work_provider: InitVar[Callable[[], HostWorkSummary] | None] = None
 
-    def __post_init__(self, upstream_receipts, host_work_provider):
-        self._host_work_provider = host_work_provider
+    def __post_init__(self, upstream_receipts):
         self._upstream_receipts = MappingProxyType({
             role: (canonical(reference), canonical(receipt))
             for role, (reference, receipt) in (upstream_receipts or {}).items()
@@ -303,17 +215,6 @@ class StageContext:
             reference = parse_news(reference_raw)
             self.resolver.allow(reference)
             self.resolver.opaque_refs.add(reference['uri'])
-
-    def host_work_summary(self) -> HostWorkSummary:
-        """读取当前受信控制投影；无绑定不能将未知工作量当作零。"""
-        require(self._host_work_provider is not None, 'RS05', '/host_work_summary',
-                'No trusted current host work binding is available', 'missing_evidence')
-        summary = self._host_work_provider()
-        require(type(self.attempt_no) is int and type(summary) is HostWorkSummary and all(getattr(summary, key) == getattr(self, key)
-                for key in ('run_id', 'stage_id', 'invocation_id', 'attempt_no'))
-                and summary.input_sha256 == self.input_ref['sha256'] and summary.method_sha256 == self.method_ref['sha256'],
-                'RS05', '/host_work_summary', 'Host control summary differs from current context', 'identity_mismatch')
-        return summary
 
     def read_role(self, role, expected=None):
         rows = [item for item in self.input['input_refs'] if item['role'] == role]

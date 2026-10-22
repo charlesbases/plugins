@@ -1,35 +1,47 @@
 # SC08：独立资格验证
 
-文档版本v1。状态：仅契约/科学依据阶段，待根审核。尚未实现本链验证/流程脚本、正式宿主模板，未执行真实流程与四selector校准。机器格式可加载不是科学或金融验收通过。
+文档版本：v1。状态：外部业务契约设计，待实现与验收。
 
-[总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [精确规范](../../spec/v1/sc08.md) · [内部流程](internal.md)
+[总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md)
 
-SC08评价冻结预测/更新与政策的科学证据、费用后优势、风险、现金与账本可行性，以及原始范围和检验治理。独立评价结果不用于改金额、改门槛或重选总体赢家。生产者只生成CandidateOutput；独立验证者读取本轮输入及原依据，按Q01—Q18重算并签ValidationReceipt；共享调度才可封存。
+子链标识：SC08。说明目录：docs/chains/qualification/。代码包：尚未实现。精确规范：本链专用机器格式及验证规则待定义。
 
-## 输入与输出
+本页定义本子链对外解决的问题、输入输出、科学方法和验收。内部步骤、适配器和分析器由子链自行编排，不能改变这里的字段含义、数值口径或失败语义。内部实现只生成 CandidateOutput，由独立阶段验证者签发 ValidationReceipt，调度者形成 SealedOutput。
 
-准确输入为SC01 TransactionContext、独立FundingPlan、SC04 InstrumentUniverse、SC05 DatasetBundle及ExperimentProtocol/独立物理验证视图、SC06 ForecastBundle和ModelRule、SC07 FrozenPolicy/完整PolicySpace/当前动作及ComparisonInventory。读取权由本轮真实上游Seal/用途和显式grant核对，不重跑上游业务验收。报告用途不自动允许数值评价。
+## 外部业务定义
 
-UserMandate沿SC05 parameter_specs的真实用户/方法来源，由SC07 Objective、LossDefinition与ConstraintSpec中的准确parameter_id绑定，不建共享新包装。FundingPlan是本轮可投入上限，不是余额；SC01不供账户资金。历史默认SC05事前标准实验账户，只评价方法；今天持仓、名单、合同和费率不能回填旧origin冒称历史用户收益。
+**问题。** 冻结规则的预测、费用后优势、风险及金融可行性是否具有足够证据。
 
-QualificationVerdict精确绑定verified_policy_ref、verified_actions_ref Dataset、verified_model_rule_ref和原Optional selected_rule_ref，必填评价期间/访问审计、原origin回放/真实模型执行、独立动作/账本/核对、预测指标、同账户基准配对、净优势区间、风险估计、现金检查、原范围复核、重复检验和假设报告引用，以及verdict、permission_scope、rejection_reasons、valid_until。完整50类定义/十表及元信息见[Schema](../../spec/v1/sc08.schema.json)和[registry](../../spec/v1/registry-sc08.json)；任何未知都保留原因，不填0、删除对象或换为hold。
+**输入。** FrozenPolicy、冻结模型/更新规则、封存独立验证资料、ExperimentProtocol、SC01交易/登记持仓上下文、独立FundingPlan/UserMandate与当前动作、各阶段验收凭证及历史检验记录，以及 SC04 原名单/DiscoveryAudit、SC05 SourceAcquisitionAudit、SC06 逐成员预测处置、SC07 ComparisonInventory 的准确引用。
 
-## 方法与科学边界
+**输出 QualificationVerdict。**
 
-每历史origin只读当时实际可得范围/身份/合同/市场版本和已成熟训练标签；完整冻结规则允许的rolling/expanding再拟合与原定重规划才可执行，不能根据最终验证成绩换特征、超参、方法或胜者。准确治理登记时间与经济信息可得时间分别核验。SC06预计经济期间的upper索引不是成交/估值/到账的精确物理时间。
+| 字段 | 类型与语义 |
+|---|---|
+| verified_policy_ref、verified_actions_ref、verified_model_rule_ref | 必须绑定准确被验证对象 |
+| protocol_ref、evaluation_period_ref、test_access_audit_ref | 预登记协议、独立时段与访问审计 |
+| evidence_kind | historical_simulation、prospective_simulation 或 actual_execution |
+| predictive_results_ref、baseline_comparisons_ref | 预测诊断与配对费用后比较 |
+| net_advantage_intervals_ref、risk_estimates_ref | 估计、区间、单位、适用假设与有效样本 |
+| cash_feasibility_ref、ledger_reconciliation_ref | 现金、份额、费用、到账和交易核对 |
+| comparison_scope_validation_ref | ArtifactRef；原列表闭合、全成员处置、R 的依据与 A = R、重大未知及风险保留的独立核对 |
+| repeated_test_accounting_ref | 同方法族的已用检验记录与剩余许可 |
+| verdict、permission_scope、rejection_reasons、valid_until | 结论、允许用途、拒绝原因和时效 |
 
-资金/份额/批次费用及应收到账必须从原合同和交易事实独立重建；验证器不调用SC07或本链producer账本算法。政策和每个登记基准保持相同账户起点、资金贡献、CNY、期限与财富口径。标准实验结果不宣称真实用户收益。
+**方法。** 选择后独立评价、逐时点规则回放、配对经济比较、依赖结构适用的统计区间及独立金融重建。样本指标和置信区间必须注明所支持的假设；工程重算证明计算合同，市场证据评价投资效果。
 
-净优势为逐origin Wpolicy-Wbaseline的等权均值（CNY）；损失L=B-W_H保留负值，CVaR按最坏1-beta质量及概率原子部分权重。区间沿SC05冻结moving_block_bootstrap_percentile，同origin完整财富差/政策损失/基准损失向量同步连续块重抽；l/B/随机性/指标/门槛和逐claim alpha在开放前登记。均值下界须严格超过经济门槛，CVaR上界不得超适用预算。统计confidence、CVaR beta、用户预算和工程重复数分别表达。
+模型选择在有限数据上也会过拟合，必须隔离最终评价。[Cawley 与 Talbot：模型选择及评价偏差](https://www.jmlr.org/papers/v11/cawley10a.html)
 
-区间只是匹配依赖/稳定性/矩/尾部和统计量前提的条件渐近近似。l<=n、有限样本/B大、无显著诊断拒绝或固定N阈值均不能证明科学充分。ESS没有冻结估计量就unknown。已见资料后自适应修改不能只领新alpha再用同holdout；多重预算也不能把原来没有覆盖性质的bootstrap变成精确保证。预测coverage只用事前真实预测区间，不能拿事后均值区间替代。逐claim适用论证、成熟样本、缺失/重叠origin、尾部清单和知识污染限制必须保留。
+**内部链路。** 原列表/处置/实际比较独立复核 → 冻结对象鉴权 → 验证资料开放 → 每个 origin 重建信息与合同 → 冻结规则生成动作 → 独立账本回放 → 基准配对比较 → 风险/误差证据 → 许可判定。
 
-原范围复核回到SC04原目录/分页/raw、来源任务、预测处置及SC07真实计算/Proof原依据；核U闭合、R客观依据、A=R、R外有据排除/独立非重大证明和全部实际风险。成功下载、模型ready、预算或producer confirmed不能缩分母或自证完整；有限观察不得取得原完整研究资格。
+**验收。** 必要检查由预登记 acceptance_rules 决定，包括范围、预测证据、费用后比较、风险证据、金融可行性和检验治理；不得遗漏检查后整体通过。
 
-## 资格及未决依赖
+范围检查必须回到原始目录、分页、身份和处置证据，核对闭合与 U = C ∪ E ∪ K，再逐项核实来源、预测状态及真实比较记录。完整比较须验证 R 的客观依据、A = R、R 外逐项排除或非重大影响证明，以及所有实际持仓和在途风险保留。生产者生成的名单、自哈希、ready 标记或“已完成”声明不能单独作为证明。
 
-Q01—Q18完整有序。critical={Q01,Q02,Q03,Q16,Q17}全passed才可reporting/evidence_review；current_account_review另需Q06/Q13/Q18；independent_evaluation需全部通过，并受全部AcceptanceRule.required_for约束。不授decision_advice或未来盈利保证，SC09另核当前发布。qualified必须完整范围及全规则通过；证据/区间不足与成熟证据支持的金融/经济失败分开，失败不靠换赢家补救。
+原名单未知、应比较成员漏算或重大缺口未处理时，不能授予完整同类比较、跨范围最优或普通完整研究资格。有限集合仅支持其声明范围的观察；另行登记的风险恢复许可不替代普通完整目标。非重大影响证明须绑定本次目标和约束，从原证据独立核实，不能用模型分数或人工标签放行。可采用费用后优势的置信下界超过预定经济门槛、风险上界不超过预算的判据，但区间方法和适用条件必须先登记，不能事后选择。
 
-真实跨轮重复检验provider归Task10；目前没有可消费的已冻共享API。本阶段只定义[精确消费提案](internal.md)，不注册不存在共享角色/schema，不建本链历史库，不造首轮空历史。缺provider时不开放独立资料，history_ref=unknown、明确Gap、撤回独立资格；可诚实完成可访问范围的缺口报告。需要前轮历史的selector目前不得伪造执行。
+验证区间不能用于修改特征、模型、基金范围、目标、门槛或胜者。预先冻结的滚动更新规则可在每个 origin 使用此前已成熟资料，不能借已见验证结果修改规则。失败后的修改属于新试验，需要新的未接触证据或预登记重复检验处理，不能清空历史次数。
 
-已实际阅读[Cawley/Talbot](https://www.jmlr.org/papers/v11/cawley10a.html)、[ETH报告70](https://stat.ethz.ch/Research-Reports/70.ps.gz)、[一般损失CVaR原文](https://sites.math.washington.edu/~rtr/papers/rtr187-CVaR2.pdf)、[ES块bootstrap原文](https://content.scirp.org/pdf/TEL_2018030615221974.pdf)及[NIST并集界](https://www.itl.nist.gov/div898/handbook/prc/section4/prc473.htm)的相关原文范围；各自前提、用途及不能支持的结论详见[method.scientific_basis](../../spec/v1/method-sc08.json)。
+今天的持仓、现存基金目录和当前费率回放历史，不是整链历史样本外证明。实际来源版本、身份、曝险和合同必须逐时点可得；LLM 历史知识污染无法排除时限制对应证据用途。
+
+**失败路径。** insufficient_evidence 与 failed 分开；验证只返回结论和缺口，不重选赢家或改变金额。没有未来盈利保证类许可。

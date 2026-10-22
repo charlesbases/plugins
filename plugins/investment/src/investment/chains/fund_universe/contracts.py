@@ -3,8 +3,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from investment.contracts import ContractError, canonical, instant, is_known, require
-from .source_validation import numeric_literals
+from investment.contracts import canonical, instant, is_known, require
 
 RULES = tuple(f'U{number:02}' for number in range(1, 22))
 
@@ -161,30 +160,3 @@ def current_scope_gaps(tasks, rows, current_at, historical_origins):
         if is_current:
             selected.append(row)
     return selected
-
-
-def verify_historical_exposure(row, history, identity, mapping, source_texts):
-    """按历史身份与原文独立核版本；可得性未知不回填。"""
-    try:
-        require(row['member_id'] == history['member_id'], 'U15', '/exposure_version_refs',
-                'Historical exposure belongs to another member')
-        require(row['exposure_kind'] in mapping['permitted_kinds'], 'U15', '/exposure_kind',
-                'Historical exposure kind is not permitted by its versioned mapping rule')
-        if is_known(history['entity_id']):
-            require(identity is not None and is_known(identity['entity_id'])
-                    and history['entity_id'] == identity['entity_id'], 'U15', '/entity_id',
-                    'Historical entity differs from its identity version')
-        if is_known(row['share_class_id']):
-            require(identity is not None and is_known(identity['share_class_id'])
-                    and row['share_class_id'] == identity['share_class_id'], 'U15', '/share_class_id',
-                    'Historical exposure belongs to another or unproven share class')
-        values = verify_weight_bounds(row)
-        source_values = set().union(*(numeric_literals(text) for text in source_texts))
-        require(all(value in source_values for value in values.values()), 'U15', '/weight',
-                'Historical weight is not the exact originally disclosed number or percent conversion')
-        usable = availability_at(row['available_time'], row['availability_bound_at'], history['origin_at'])
-        require(usable or history['membership_status'] == 'unknown', 'U15', '/availability_bound_at',
-                'Later exposure evidence was asserted as known historical membership')
-        return usable and identity is not None and (not values or is_known(row['share_class_id']))
-    except ContractError as error:
-        raise ContractError('U15', error.pointer, error.reason, error.code) from error

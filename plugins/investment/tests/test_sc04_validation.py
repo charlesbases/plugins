@@ -10,17 +10,15 @@ import unittest
 from contextlib import redirect_stderr
 from decimal import Decimal
 from pathlib import Path
-from types import SimpleNamespace
 
-from investment.contracts import ContractError, canonical, known, na, unknown
+from investment.contracts import ContractError, known, na, unknown
 from investment.chains.fund_universe.contracts import (
     availability_at, current_scope_gaps, inherited_gaps, predicate_verdicts, recompute_partitions,
-    verify_mandatory_risks, verify_partition, verify_weight_bounds, verify_historical_exposure,
+    verify_mandatory_risks, verify_partition, verify_weight_bounds,
 )
 from investment.chains.fund_universe.source_validation import (
     capture_bytes, citation_text, numeric_literals, original_directory, pdf_page_text,
 )
-from investment.chains.fund_universe.review_work import ReviewWorkPlanner, field_batches
 from investment.research.contracts import ResearchSchemas
 
 
@@ -118,91 +116,6 @@ class ExactRuleCalibration(unittest.TestCase):
         self.assertEqual(current_scope_gaps(tasks, [old_page, current_page], current, [historical]), [current_page])
         with self.assertRaises(ContractError):
             current_scope_gaps(tasks, [{**current_page, 'scope_kind': 'historical_vintage'}], current, [historical])
-
-    def test_private_field_batches_cover_array_elements_and_empty_value(self):
-        value = {'rows': [{'member_id': 'first'}, {'member_id': 'second'}], 'empty': [], 'status': 'unknown'}
-        batches = list(field_batches(value, ['rows', 'empty', 'status']))
-        self.assertEqual(batches, [['/rows/0'], ['/rows/1'], ['/empty', '/status']])
-        self.assertEqual(sum(len(paths) for paths in batches), 4)
-
-    def test_history_work_item_keeps_original_versions_and_excludes_unrelated_member(self):
-        # 只校准私有引用图，不构造上游Seal或完整阶段对象。
-        values, refs = {}, {}
-        def reference(name, schema, value):
-            raw = canonical(value)
-            ref = {'artifact_id': name, 'schema_id': schema, 'schema_version': 1,
-                   'media_type': 'application/json', 'uri': 'investment-run://sc04/20261020/calibration/attempt-01/' + name + '.json',
-                   'sha256': hashlib.sha256(raw).hexdigest(), 'byte_size': len(raw)}
-            values[ref['uri']], refs[ref['uri']] = value, ref
-            return ref
-        raw_ref = reference('original', 'investment.sc04.capture', {'original_text': 'Original source context'})
-        unrelated = reference('unrelated', 'investment.sc04.capture', {'original_text': 'Another member'})
-        mapping_ref = reference('mapping', 'investment.sc04.exposure_mapping_rule', {'permitted_kinds': ['contract_range'], 'basis_refs': [raw_ref]})
-        historical_identity = reference('old-identity', 'investment.sc04.identity', {'entity_id': known('old-entity'), 'share_class_id': known('old-share')})
-        vintage_ref = reference('old-catalog', 'investment.sc04.catalog_vintage', {'original_list_refs': [raw_ref]})
-        eligibility_ref = reference('old-rule', 'investment.sc04.eligibility_rule', {'predicates': []})
-        exposure = {'exposure_id': 'exposure', 'member_id': 'past-member', 'hypothesis_id': unknown(),
-                    'mapping_rule_ref': mapping_ref, 'citations': []}
-        exposures_ref = reference('old-exposures', 'investment.sc04.exposures',
-                                  {'rows': [exposure, {**exposure, 'exposure_id': 'foreign', 'member_id': 'other-member', 'citations': [unrelated]}]})
-        history_ref = reference('history', 'investment.sc04.history', {'rows': [{
-            'origin_at': '2026-07-28T00:00:00Z', 'member_id': 'past-member',
-            'identity_version_ref': known(historical_identity), 'source_vintage_ref': vintage_ref,
-            'eligibility_rule_ref': eligibility_ref, 'exposure_version_refs': [exposures_ref]}]})
-        current_ref = reference('current-members', 'investment.sc04.members', {'rows': []})
-        review = SimpleNamespace(refs=refs, values=values, rows={'members_ref': [], 'peer_groups_ref': []},
-                                 history=values[history_ref['uri']]['rows'], funding=None, funding_ref=None,
-                                 payload={'universe_history_ref': known(history_ref), 'members_ref': current_ref}, assessment={})
-        planner = ReviewWorkPlanner(review)
-        work = planner.build(exposures_ref, ['/rows/0'])
-        locations = {(row['object_ref']['uri'], row['json_pointer']) for row in work['evidence_locations']}
-        self.assertIn((history_ref['uri'], '/rows/0'), locations)
-        self.assertIn((historical_identity['uri'], ''), locations)
-        self.assertNotIn((exposures_ref['uri'], '/rows/1'), locations)
-        selected_uris = {uri for uri, _ in locations}
-        self.assertNotIn(unrelated['uri'], selected_uris)
-        self.assertNotIn(current_ref['uri'], selected_uris)
-        self.assertEqual(work['field_paths'], ['/rows/0'])
-        expected_key = hashlib.sha256(canonical({key: value for key, value in work.items() if key != 'work_key'})).hexdigest()
-        self.assertEqual(work['work_key'], expected_key)
-        schemas = ResearchSchemas(('SC03', 'SC04'))
-        schemas.validate('investment.sc04.review_work_item', work)
-        with self.assertRaises(ContractError):
-            schemas.validate('investment.sc04.review_work_item', {**work, 'producer_summary': 'Not permitted'})
-        subject_ref = reference('subjects', 'investment.sc03.hypotheses', {'rows': [
-            {'hypothesis_id': 'selected', 'original_ref': raw_ref},
-            {'hypothesis_id': 'unrelated', 'original_ref': unrelated}]})
-        planner.locations = {}
-        planner.follow({'source_ref': subject_ref, 'source_locator': '/rows/0'}, {'subject_id': 'subject'})
-        subject_locations = {(row['object_ref']['uri'], row['json_pointer']) for row in planner.locations.values()}
-        self.assertIn((subject_ref['uri'], '/rows/0'), subject_locations)
-        self.assertNotIn((subject_ref['uri'], '/rows/1'), subject_locations)
-        self.assertNotIn(unrelated['uri'], {uri for uri, _ in subject_locations})
-        # 目标全集由原始行数独立给出，不将一份响应冒充全表覆盖。
-        isolated = SimpleNamespace(refs={exposures_ref['uri']: exposures_ref}, values={exposures_ref['uri']: values[exposures_ref['uri']]},
-                                   rows={'members_ref': [], 'peer_groups_ref': []}, history=[], funding=None)
-        self.assertEqual([paths for _, paths in ReviewWorkPlanner(isolated).targets()], [['/rows/0'], ['/rows/1']])
-
-    def test_history_exposure_checks_original_number_identity_and_origin(self):
-        history = {'member_id': 'past-member', 'entity_id': known('old-entity'),
-                   'origin_at': '2026-07-28T00:00:00Z', 'membership_status': 'candidate'}
-        old_identity = {'entity_id': known('old-entity'), 'share_class_id': known('old-share')}
-        row = {'member_id': 'past-member', 'share_class_id': known('old-share'),
-               'exposure_kind': 'contract_range', 'weight': known('0.8'), 'lower_weight': unknown(),
-               'upper_weight': unknown(), 'denominator': known('stock assets'),
-               'available_time': known({'lower_bound': '2026-07-27T00:00:00Z', 'upper_bound': '2026-07-27T23:59:59Z'}),
-               'availability_bound_at': known('2026-07-27T23:59:59Z')}
-        mapping = {'permitted_kinds': ['contract_range']}
-        self.assertTrue(verify_historical_exposure(row, history, old_identity, mapping, ['股票资产的80%']))
-        for changed in ({**row, 'weight': known('0.7')}, {**row, 'share_class_id': known('current-share')},
-                        {**row, 'availability_bound_at': known('2026-07-29T00:00:00Z')},
-                        {**row, 'member_id': 'current-member'}):
-            with self.subTest(change=changed):
-                with self.assertRaises(ContractError) as caught:
-                    verify_historical_exposure(changed, history, old_identity, mapping, ['股票资产的80%'])
-                self.assertEqual(caught.exception.rule, 'U15')
-        self.assertFalse(verify_historical_exposure({**row, 'availability_bound_at': unknown()}, {**history, 'membership_status': 'unknown'},
-                                                   old_identity, mapping, ['股票资产的80%']))
 
 
 @unittest.skipUnless(os.environ.get('SC04_CALIBRATION_ROOT'), 'Run with an explicitly prepared fresh source batch')

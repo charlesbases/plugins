@@ -208,6 +208,9 @@ def coverage(snapshot):
         require(all(gap in global_gaps for gap in row['gaps']), 'A10', '/unresolved_questions', 'Question gap omitted from assessment')
         require(row['status'] not in ('partial', 'unresolved', 'no_relevant_material') or row['gaps'],
                 'A10', '/dispositions', 'Unresolved question lacks an explicit gap')
+        if row['status'] == 'answered':
+            require(any(snapshot.indexes['facts'][key]['verification_status'] in ACCEPTED for key in row['fact_ids']),
+                    'A10', '/dispositions', 'Answered question has no accepted source fact')
         if not snapshot.documents:
             require(row['status'] in ('no_relevant_material', 'unresolved') and row['gaps'],
                     'A10', '/dispositions', 'Empty corpus cannot answer a substantive question')

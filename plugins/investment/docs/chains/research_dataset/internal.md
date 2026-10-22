@@ -1,6 +1,6 @@
 # SC05 内部设计：时点数据与实验协议
 
-文档版本：v1。状态：独立验证器阶段；规则与验证器已实现，源级/数学/权限接口校准与完整业务执行分别报告，待根审冻结后才实现流程。
+文档版本：v1。状态：契约阶段；规则已登记，验证器、流程与真实校准待根审核后分阶段实现。
 
 [外部说明](README.md) · [公共契约](../../contracts.md) · [总体架构](../../architecture.md) · [项目约束](../../../AGENTS.md)
 
@@ -33,8 +33,6 @@ NAV、权益、费用与申赎、日历和市场是不同 Provider 能力，分�
 
 独立对象和来源可按冻结规则并行，分页、原文、合同和共享身份依顺序处理。预算、失败、重试和取消统一记账，一个来源成功不能清除另一个未知；汇总不平均不兼容口径，不按完成先后选可信材料。
 
-日历预计估值期间scheduled_valuation_period沿calendar真实来源解析完整TimeEvidence；D10核完整经济期间/日期/时区、依据与C前可得性，D11仅在使用安排时核origin可得版本及观察同口径，D18完整原行逐字段核预计语义和有源不适用。不借订单截止、非交易日或今日合同推造未来/历史估值。日期/区间上界只用于经济期间索引；历史观察原规则保留，预计未知保留Gap与依赖该安排的用途限制。
-
 缓存绑定准确输入、原始版本、构建规则、时点、范围和权限；内容相同不自动获得新许可。恢复沿用任务、结果和累计尝试，继续未处理项；新资料、合同或方法产生新绑定并重核前提，不替换旧输入沿用旧审计。
 
 ## 输出与已确认边界
@@ -49,11 +47,7 @@ SC01只提供基金交易、确认份额、未完成交易和到账状态；资�
 
 [SC05精确规范](../../spec/v1/sc05.md)定义D01—D20、13张表、SourceAcquisitionAudit、完整ExperimentProtocol及DataView。入口事前生成method_policy_ref与scope_ref绑定同一协议，SC04时间请求来自该协议；SC05不要求用户填写内部JSON，不引入循环上游依赖。参数未知按来源与受影响用途保存。
 
-运行设计为run_sc05→共享controller冻结本轮输入/方法/attempt→process_sc05产生候选或实际HostRequest→独立validate_sc05→用途凭证→共享seal。首次加两次失败终止，不自签、不假seal。当前已实现validate_sc05→共享stage_main/load_context→D01—D20→逐行字段financial_source_review→凭证；真实宿主工作需本轮合法候选，缺响应返回HostRequest。producer、financial_source_analysis与run/process/verify待下阶段授权；不能用基础函数校准代完整运行。validator回原文独立核对，不读producer私有响应作证明。
-
-validator的contracts.py核精确Gap键、分数half-even、转换、P(entity)、时点/成熟与权益财富；source_validation.py独立定位实际原字节；validation.py分发完整规则、过滤表与真实Resolver权限探测、正式私有ReviewTarget及用途门。SourceReview按准确field_path全覆盖，真实响应未到不签凭证。D02只核SC04已公开当前时点/历史origin范围与本轮协议，不绕读opaque上游凭证的内部输入。D03强对象键及逐Identity有据基准规则见精确规范。
-
-在插件根执行`PYTHONIOENCODING=utf-8 PYTHONPATH=src .venv/Scripts/python.exe -B -m unittest discover -s tests -p test_sc05_validation.py -v`进行已批准源级/数学/接口校准；全部HTTP模拟发布者、Capture与报告落于`~/.investment/test/<batch>/`，可用SC05_TEST_ROOT选本批严格后代。测试不创建StageInput、Seal、模型响应或全链成功，正式业务CLI仍须真实控制器当前attempt。
+运行调用为run_sc05→共享controller冻结本轮输入/方法/attempt→process_sc05产生候选或实际HostRequest→独立validate_sc05→用途凭证→共享seal。首次加两次失败终止，不自签、不假seal。正式financial_source_analysis与独立financial_source_review按实际task工作计划调用新宿主上下文；validator回原文独立核对，不读producer私有响应作证明。当前阶段只登记模板路径和输出格式，尚无实际调用。
 
 SC05构建训练、选择、当前和独立验证的物理过滤表。SC06/07只能取得允许的DataView；原始取材审计可展示来源身份但其raw、quote及时间依据不能成为读取holdout的祖先通道。SC08另获独立验证视图；共享正常API权限不是OS沙箱。ctx.upstream_receipt只取本轮绑定上游凭证的用途/阻断信息，不重新验收上游或递归开放凭证证据。
 

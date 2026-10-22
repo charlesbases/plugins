@@ -1,21 +1,45 @@
 # SC09：建议形成与发布许可
 
-文档v1；插件0.0.1。独立验证器基线已接受，producer、标准入口与正式publication_assessment提示词已落盘，待fresh生产流程复审及真实业务验证。四个完整selector与真实Host尚未执行，基础数学检查不能代替业务资格。
+文档版本：v1。状态：外部业务契约设计，待实现与验收。
 
-[总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md) · [精确规范](../../spec/v1/sc09.md)
+[总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md)
 
-SC09将已冻结且获得适用许可的当前首步动作映射成用户可理解指令，并核对发布所需前提。只有独立验证者签发ValidationReceipt、控制器形成SealedOutput后，后链才按许可消费。完整规则、引用权限、字段、单位、未知语义和四个事前selector见[Schema](../../spec/v1/sc09.schema.json)、[registry](../../spec/v1/registry-sc09.json)、[method](../../spec/v1/method-sc09.json)。
+子链标识：SC09。说明目录：docs/chains/recommendation/。代码包：尚未实现。精确规范：本链专用机器格式及验证规则待定义。
 
-输入是准确SC01 TransactionContext、独立FundingPlan、SC05 DatasetBundle、SC07 FrozenPolicy、SC08 QualificationVerdict和宿主自动组装的PublicationContext。本链核本轮已收到/已登记事实及真实来源；不宣称查到无法访问的外部账户，不计算余额或增加对账职责，不要求用户技术JSON或再次确认已提供事实。新事实只能阻断已不适用建议并返回原责任方，不能改写冻结上游。
+本页定义本子链对外解决的问题、输入输出、科学方法和验收。内部步骤、适配器和分析器由子链自行编排，不能改变这里的字段含义、数值口径或失败语义。内部实现只生成 CandidateOutput，由独立阶段验证者签发 ValidationReceipt，调度者形成 SealedOutput。
 
-RecommendationSet保留advice_id、decision_at、published_at、publication_checked_at、valid_until及端点、account/market/policy/qualification/publication_context准确引用，decision_kind为rebalance、no_action、risk_recovery或observation_only。它导出五表：advisory_orders、action_mappings、position_dispositions、funding_conditions、publication_checks。每个原动作恰一映射，每个原成员与登记持仓均有处置；未知/排除保留，不把就绪子集当全集。
+## 外部业务定义
 
-申购指令是用户实际支付金额，赎回指令是份额，执行方向known且>0，另一方向not_applicable。金额、份额与源指令精确相等；本链不重新优化、不重新选择批次、不在发布时舍入。批次分配沿冻结AllocationDimension/状态记录及来源合同唯一重建并核份额守恒；证据不足回SC07。费用、参考份额与预计净到账使用Estimate，绑定真实来源、合同、假设和时点；参考净值不是成交净值，未到账应收不是当前可用资金。
+**问题。** 将通过验证的动作表达成用户可执行建议，并确认发布时仍满足原前提。
 
-发布检查包括账户记录/资金/用户约束、真实合同/费阶、申赎状态和提交窗口、资格与必要边界。valid_until取全部必要可证有限边界最早值并保留源端点；未知必要界不填TTL，实际新事实触发的失效条件单列保留。过期只作历史材料。published_at未发生时为unknown，SC09实际复核时间单列；SC10记录真实交付，不回写本链不可变对象。
+**输入。** FrozenPolicy、QualificationVerdict、发布时交易/登记持仓版本核对、独立资金计划与用户约束有效性核对、市场与费用有效性、申赎状态及提交窗口。
 
-no_action仍需完整比较、风险与发布依据，不出零金额订单。observation_only不出任何交易指令，保留原动作、全集处置与Gap。risk_recovery只沿用单独真实政策授权的冻结动作；恢复消费闭环需当前上游接口与独立资格证据，不能用普通许可冒充。critical规则通过才可报告，高建议用途另核全部适用规则；producer不能自签许可。
+**输出 RecommendationSet。**
 
-SC01只读准确Context及investment-run三表，不直接读数据库latest。登记确认决定持仓，卖出到账不再扣份额；资金计划独立。涉及到账或偏好变化，登记/更新真实事实并重算受影响方案，不发布假定条件已成的订单。首次加两次失败停止后链。本阶段静态契约检查不代表业务、模型或科学资格通过。
+| 字段 | 类型与语义 |
+|---|---|
+| advice_id、decision_at、published_at、valid_until | 建议身份与时效 |
+| account_snapshot_ref、market_snapshot_ref、policy_ref、qualification_ref | 准确绑定决策和资格 |
+| decision_kind | rebalance、no_action、risk_recovery 或 observation_only |
+| advisory_orders_ref | 已验证当前动作及执行条件 |
+| position_dispositions_ref | 每项持仓和候选的建议、理由、资格及未知 |
+| funding_conditions_ref | 等待到账/追加的条件，不作为当前可支配资金 |
+| publication_checks_ref、limitations | 发布核对和限制 |
 
-本链SC05读取仅限准确当前市场快照及原动作所需contract_vintages/真实合同原文；不消费DataView/current_view、panel、labels、independent_view，不借GridRule子引用旁路SC05 whitelist。
+建议订单行至少含 advisory_order_id、instrument_id、platform、currency、side、subscription_cash_amount、redemption_shares、lot_allocations、fee_estimate、reference_nav、reference_nav_date、estimated_result、precision_contract_ref、execution_conditions、reason、evidence_refs。
+
+side 决定金额/份额字段互斥：申购以用户实际支付金额为指令，并说明是否含费；赎回以份额为指令，保留批次分配及持有期费率。非本方向字段明确 not_applicable。参考申购份额、预计净到账金额与费用标为 estimated，不冒充确认成交。
+
+subscription_cash_amount 与 redemption_shares 使用 OptionalValue<DecimalString>；执行方向的指令值必须为 known 且大于零，另一字段为 not_applicable。fee_estimate 与 estimated_result 中的各估计量使用 Estimate；reference_nav 为 OptionalValue<DecimalString>，reference_nav_date 为 OptionalValue<Date>，必须绑定可核市场来源。实际确认的无动作由 no_action 表达，不生成金额为零的交易指令。
+
+**方法。** 已验证动作的确定性映射、来源合同精度校验、账户版本核对与有效期相交；不重新优化。
+
+**内部链路。** 资格及对象绑定 → 账户/市场/合同新鲜度 → 精度与动作一致 → 指令及条件表达 → 发布许可。
+
+**验收。** 当前建议只能复制被验证动作。合并展示保留批次和核算明细；改变动作金额或经济效果需要新决策和验证。valid_until 为必要条件有效边界的最早值；已过期只允许作为历史产物。
+
+decision_kind=no_action 须有明确验证依据；未知金额保持 null 及原因。observation_only 不生成交易指令。risk_recovery 只能取得其单独政策的许可。资金条件达成后更新独立资金计划并重新核验；涉及基金卖出到账时登记交易到账事实，再重算受影响方案，不发布假定已到账的订单。
+
+**失败路径。** 发布前发现账户、风险、费用或市场条件变化，阻断原建议，不在原对象内替换新值；回到受影响阶段重新计算。
+
+SC01消费边界：读取准确冻结的TransactionContext及其investment-run交易、持仓、pending引用，核对generation、ledger_digest、登记范围、完成依据和allowed_uses；不直接读取数据库latest替代输入。整笔确认份额决定持仓，卖出款项到账不再次扣份额。expected_due不等于已知实际到账时间；应收不得自动当成本次可用资金。缺费用或持有起点仅限制需要它的成本/持有期判断，不能猜0。不同买入trade可供持有期分析，单个trade没有分批确认/到账。有效消费结束前保留运行引用；清理后新建执行，从实际账本重新导出。

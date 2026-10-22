@@ -12,7 +12,7 @@ from urllib.parse import urlsplit
 
 from investment.contracts import ContractError, canonical, instant, is_known, known, na, now, require, unknown
 from investment.research.contracts import PLUGIN, STAGES, ResearchSchemas, StageContext, guard_namespace
-from investment.research.host import _project_host_work_summary, validate_host_response, validate_schema_bundle
+from investment.research.host import validate_host_response, validate_schema_bundle
 from investment.research.references import ResearchResolver
 from investment.chains.news.contracts import parse_news
 from investment.runtime.paths import validate_input_path
@@ -236,66 +236,6 @@ def _receipt(resolver, receipt, incoming, candidate_ref, method):
     return bool(allowed) and critical and receipt['overall_verdict'] in ('passed', 'partial') and receipt['business_result'] in ('usable', 'observation_only')
 
 
-def _receipt_failure(receipt):
-    selected = next(((index, check) for index, check in enumerate(receipt['checks']) if check['verdict'] == 'failed'), None)
-    if selected is None:
-        selected = next(((index, check) for index, check in enumerate(receipt['checks']) if check['verdict'] != 'passed'), None)
-    if selected is not None:
-        index, check = selected
-        blocker = next((item for item in receipt['blockers'] if item['rule_id'] == check['rule_id']), None)
-        return ContractError(check['rule_id'], blocker['field_or_object'] if blocker else f'/checks/{index}',
-                             check['reason'], 'unsupported_output')
-    blocker = receipt['blockers'][0] if receipt['blockers'] else None
-    return ContractError(blocker['rule_id'] if blocker else 'RS07',
-                         blocker['field_or_object'] if blocker else '/allowed_uses',
-                         blocker['reason'] if blocker else 'Independent receipt permits no handoff', 'unsupported_output')
-
-
-def _bound_host_work_summary(root, mode, stage_id, day, run_id, invocation_id, attempt_no, role, frozen_binding):
-    """每次重新读取受信登记，不把内部resolver或跨角色引用交给阶段。"""
-    selected = guard_namespace(root, mode)
-    resolver = ResearchResolver(selected, _schemas(stage_id), mode=mode)
-    manifest = _manifest(resolver, stage_id, day)
-    matches = [item for item in manifest['invocations'] if item['invocation_id'] == invocation_id]
-    require(len(matches) == 1, 'RS05', '/host_work_summary', 'Current invocation control binding is missing', 'missing_evidence')
-    invocation = matches[0]
-    require(invocation['run_id'] == run_id and invocation['attempts']
-            and attempt_no == len(invocation['attempts']) and invocation['attempts'][-1]['attempt_no'] == attempt_no,
-            'RS05', '/attempt_no', 'Host work provider no longer belongs to the current attempt', 'identity_mismatch')
-    require(role in ('producer', 'validator')
-            and invocation['attempts'][-1]['state'] == ('processing' if role == 'producer' else 'validating'),
-            'RS06', '/role', 'Host work provider role is no longer active', 'use_not_allowed')
-    require(canonical([invocation['frozen_input_ref'], invocation['method_ref']]) == frozen_binding,
-            'RS05', '/host_work_summary', 'Frozen host work source changed from context binding', 'identity_mismatch')
-    method = resolver.resolve(invocation['method_ref'], 'investment.' + stage_id.lower() + '_method')
-    validate_schema_bundle(invocation['schema_bundle_ref'], method['runtime']['payload_schema_id'], resolver)
-    return _project_host_work_summary(resolver, stage_id, invocation, invocation['attempts'][-1])
-
-
-def _feedback_bindings(resolver, invocation, incoming, input_ref, *, role, attempt_no, base):
-    if role != 'producer':
-        return [], []
-    references, feedback = [], []
-    for previous in invocation['attempts']:
-        number = previous['attempt_no']
-        if number >= attempt_no:
-            continue
-        require(previous['state'] == 'failed' and is_known(previous['failure_ref']),
-                'RS04', '/failure_ref', 'Previous attempt has no registered failure', 'missing_evidence')
-        reference = previous['failure_ref']['value']
-        expected = resolver.path_ref(base / f'attempt-{number:02}' / 'failure.json', 'investment.research_failure')
-        require(reference == expected, 'RS03', '/failure_ref',
-                'Previous failure differs from its exact attempt binding', 'identity_mismatch')
-        failure = resolver.resolve(reference, 'investment.research_failure')
-        require(all(failure[key] == value for key, value in
-                    {'run_id': incoming['run_id'], 'stage_id': incoming['stage_id'],
-                     'invocation_id': incoming['invocation_id'], 'input_ref': input_ref, 'attempt_no': number}.items()),
-                'RS03', '/failure_ref', 'Previous failure differs from current invocation input', 'identity_mismatch')
-        references.append(reference)
-        feedback.append(failure)
-    return references, feedback
-
-
 def load_context(root, *, mode, stage_id, input_path, run_id, invocation_id, attempt_no, role, candidate_path=None):
     """仅从控制器已登记的当前attempt构造阶段能力，不替直接脚本创建预算。"""
     selected = guard_namespace(root, mode)
@@ -353,24 +293,16 @@ def load_context(root, *, mode, stage_id, input_path, run_id, invocation_id, att
         validate_host_response(request, response, resolver)
         host_outputs.append(response['output_ref']['value'])
     allowed += host_outputs
-    feedback_refs, feedback = _feedback_bindings(resolver, invocation, incoming, input_ref,
-                                                role=role, attempt_no=attempt_no, base=base)
-    allowed += feedback_refs
     scoped = ResearchResolver(selected, schemas, mode=mode, allowed_refs=allowed, reference_grants=definition['reference_grants'])
-    scoped.opaque_refs.update(reference['uri'] for reference in feedback_refs)
     scoped.local_context = (stage_id, role, attempt_dir)
     scoped.host_output_refs = host_outputs
-    frozen_binding = canonical([input_ref, invocation['method_ref']])
-
-    def current_host_work():
-        return _bound_host_work_summary(selected, mode, stage_id, parts[0], run_id, invocation_id,
-                                        attempt_no, role, frozen_binding)
-
+    feedback = [resolver.resolve(item['failure_ref']['value'], 'investment.research_failure')
+                for item in invocation['attempts'][:-1] if is_known(item['failure_ref'])] if role == 'producer' else []
     return StageContext(root=selected, mode=mode, stage_id=stage_id, run_id=run_id, invocation_id=invocation_id,
                         attempt_no=attempt_no, role=role, schemas=schemas, resolver=scoped, input=incoming, input_ref=input_ref,
                         method=method, method_ref=invocation['method_ref'], definition=definition, attempt_dir=attempt_dir,
                         candidate=candidate, candidate_ref=candidate_ref, feedback=feedback,
-                        frozen_host_steps=steps, upstream_receipts=upstream_receipts, host_work_provider=current_host_work)
+                        frozen_host_steps=steps, upstream_receipts=upstream_receipts)
 
 
 def _failure(incoming, input_ref, attempt, phase, error):
@@ -735,8 +667,8 @@ class ResearchController:
                                      'candidate_ref': attempt['candidate_ref']}.items()),
                                 'RS03', '/failure', 'Stage failure identity differs', 'identity_mismatch')
                         raise ContractError(result['rule_id'], result['pointer'], result['reason'], result['code'])
+                    self._required_work(invocation, attempt, role, directory)
                     if role == 'producer':
-                        self._required_work(invocation, attempt, role, directory)
                         require(process.returncode == 0, 'RS06', '/candidate', 'Producer returned no completed candidate', 'execution_failed')
                         _candidate(self.resolver, result, incoming, invocation['method_ref'], method['runtime'], attempt_no=attempt['attempt_no'])
                         reference = _put(self.resolver, directory / 'candidate.json', result, 'investment.candidate_output')
@@ -748,8 +680,12 @@ class ResearchController:
                     attempt['receipt_ref'] = known(reference)
                     _save(self.resolver, manifest)
                     if process.returncode != 0 or not permitted:
-                        raise _receipt_failure(result)
-                    self._required_work(invocation, attempt, role, directory)
+                        blocker = result['blockers'][0] if result['blockers'] else None
+                        failed = next((item for item in result['checks'] if item['verdict'] != 'passed'), None)
+                        raise ContractError(blocker['rule_id'] if blocker else failed['rule_id'] if failed else 'RS07',
+                                            blocker['field_or_object'] if blocker else '/allowed_uses',
+                                            blocker['reason'] if blocker else failed['reason'] if failed else 'Independent receipt permits no handoff',
+                                            'unsupported_output')
                     phase = 'seal'
                     self._seal(manifest, invocation, attempt, base, incoming, method)
                 except (ContractError, OSError, ValueError, KeyError, TypeError) as error:
