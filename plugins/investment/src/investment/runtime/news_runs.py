@@ -1,4 +1,4 @@
-"""SC02 运行互斥、不可变产物与三次尝试的持久化约束。"""
+"""SC02 运行互斥、不可变产物与单次执行的持久化约束。"""
 from __future__ import annotations
 
 import html
@@ -135,7 +135,7 @@ def verify_manifest(manifest, resolver):
                     'N03', '/sealed_output_ref', 'Seal does not bind current accepted attempt')
         if state == 'failed':
             summary = resolver.resolve(invocation['failure_summary_ref']['value'], 'investment.sc02_failure_summary')
-            require(len(attempts) == 3 and summary['attempt_count'] == len(attempts)
+            require(attempts and summary['attempt_count'] == len(attempts)
                     and summary['attempt_failure_refs'] == [item['failure_ref']['value'] for item in attempts]
                     and (summary['run_id'], summary['invocation_id']) == (invocation['run_id'], invocation['invocation_id']),
                     'N03', '/failure_summary_ref', 'Terminal failure budget/bindings differ')

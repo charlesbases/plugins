@@ -1,10 +1,10 @@
 # SC05：时点数据与实验协议
 
-文档版本：v1。状态：机器契约已根审；独立验证器及源审核模板已实现待根审核冻结，流程与完整真实验收尚未实现/执行。
+文档版本：v1。状态：机器契约已定义，待根审核；验证器、流程与真实验收尚未实现。
 
 [总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md)
 
-子链标识：SC05。说明目录：docs/chains/research_dataset/。验证器代码包：src/investment/chains/research_dataset/；入口scripts/validate_sc05.py。精确规范：[SC05规则](../../spec/v1/sc05.md)、[Schema](../../spec/v1/sc05.schema.json)、[注册表](../../spec/v1/registry-sc05.json)、[方法与用途](../../spec/v1/method-sc05.json)。
+子链标识：SC05。说明目录：docs/chains/research_dataset/。代码包：尚未实现。精确规范：[SC05规则](../../spec/v1/sc05.md)、[Schema](../../spec/v1/sc05.schema.json)、[注册表](../../spec/v1/registry-sc05.json)、[方法与用途](../../spec/v1/method-sc05.json)。
 
 本页定义本子链对外解决的问题、输入输出、科学方法和验收。内部步骤、适配器和分析器由子链自行编排，不能改变这里的字段含义、数值口径或失败语义。内部实现只生成 CandidateOutput，由独立阶段验证者签发 ValidationReceipt，调度者形成 SealedOutput。
 
@@ -43,8 +43,6 @@ SourceAcquisitionAudit 的公共字段见 [公共契约](../../contracts.md)。�
 
 观测行至少含 entity_id、metric_id、observation_period、value、unit、currency、version_id、published_time、available_time、availability_basis、retrieved_at、raw_ref、supersedes_version_id。
 
-日历行另必填scheduled_valuation_period（完整TimeEvidence）：在所用origin/C之前有源的预计估值经济期间，不是未来NAV。保留日期/区间完整边界、精度、来源时区与依据，上界仅索引经济期间；缺来源、时区或当年可得证据保持unknown及Gap。有源明示无计划估值才可not_applicable，非交易日不足以证明，也不能借此删掉或顺延原请求。真实历史标签继续使用已观察期间；采用预计安排界定期限时须同一origin可得版本和同一观察口径。
-
 published_time 与 available_time 为 TimeEvidence；value 为 OptionalValue<DecimalString>，currency 与 supersedes_version_id 的不适用状态使用 OptionalValue。asof_panel 行至少含 origin_at、entity_id、universe_version_id、feature_values、source_version_ids、availability_bound_at。每个特征关联准确来源版本、单位与可得性界限；身份、暴露、合同与文本解释也通过同一时点检查。
 
 ExperimentProtocol 必填：protocol_id、target_definition、horizons、origin_rule、split_rule、purge_embargo_rule、universe_rule、baseline_definitions、wealth_definition、cost_execution_rules、model_search_space、scenario_method、metrics、acceptance_rules、statistical_assumptions、search_budget、repeated_test_policy、randomness_policy、parameter_specs、registered_at。
@@ -53,7 +51,7 @@ ExperimentProtocol 必填：protocol_id、target_definition、horizons、origin_
 
 **内部链路。** 原成员及风险范围 → 逐对象资料任务 → NAV/权益/费用/申赎/日历/市场取材 → 身份、单位和合同核验 → 来源处置 → 可得时点审计 → 各 origin 信息集 → 标签成熟审计 → 分区与方法冻结 → 数据清单。
 
-**验收。** 任务和处置完整覆盖原始成员及必要风险对象，每个已执行请求、失败、重试和未处理项均可复核。原始来源支持 NAV 日期、权益、费用和合同口径；不能用空值、零或删除对象制造就绪。SC05 不改变 SC04 原同类分母；身份、暴露或列表冲突交回主调度处理。
+**验收。** 任务和处置完整覆盖原始成员及必要风险对象，每个已执行请求、失败、历史尝试和未处理项均可复核，当前不重试。原始来源支持 NAV 日期、权益、费用和合同口径；不能用空值、零或删除对象制造就绪。SC05 不改变 SC04 原同类分母；身份、暴露或列表冲突交回主调度处理。
 
 origin=t 的特征只使用 availability_bound_at 为 known 且不晚于 t 的版本；日期级证据采用协议登记的保守边界，不虚构时分。面板 entity_id 必须属于 universe_version_id 绑定的该时点合格范围；资料未核的实际持仓继续作为风险对象，不能冒充训练成员。标签在训练截止前须成熟且可观察，最新修订不回填历史。学习型标准化、插补和特征选择由 SC06 在训练折内拟合。
 

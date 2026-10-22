@@ -1,4 +1,4 @@
-"""正式调度：冻结真实账本、独立进程验收、三次预算和提交后恢复。"""
+"""正式调度：冻结真实账本、单次执行与独立验收、提交后收尾。"""
 import os
 import sqlite3
 import subprocess
@@ -182,11 +182,11 @@ class Controller:
             runs.save_manifest(self.root, manifest, self.schemas)
         day = manifest["execution_date"]; base = self.root / "runs/sc01" / day / invocation_id
         input_ref = inv["frozen_input_ref"]
-        # 中断的未提交尝试占用原预算，不能凭重启获得第四次。
+        # 中断且未提交的执行记失败，不重新运行流程。
         if inv["attempts"] and inv["attempts"][-1]["state"] == "running":
             attempt = inv["attempts"][-1]
             self._finish_failure(manifest, inv, attempt, self._failure(ContractError("V01", "/", "Attempt interrupted before commit", "validator_exception"), inv, attempt["attempt_no"], attempt["phase"]), base)
-        while len(inv["attempts"]) < 3:
+        if not inv["attempts"]:
             number = len(inv["attempts"]) + 1
             directory = base / f"attempt-{number:02}"
             attempt = {"attempt_no": number, "directory": directory.name, "state": "running", "phase": "production", "started_at": known(now()), "finished_at": unknown(), "files": [], **{key: na() for key in ("input_check_ref", "candidate_ref", "output_validation_ref", "sealed_ref", "execution_record_ref", "failure_ref")}}
@@ -217,7 +217,7 @@ class Controller:
             if committed:
                 return 0, self._complete(store, manifest, inv, meta)
             self._finish_failure(manifest, inv, attempt, failure, base)
-        summary = {"schema_version": 1, "run_id": run_id, "stage_id": "SC01", "invocation_id": invocation_id, "status": "failed", "attempt_count": 3, "failure_refs": [a["failure_ref"]["value"] for a in inv["attempts"]], "terminated_at": now(), "next_chain_allowed": False, "termination_code": "attempts_exhausted"}
+        summary = {"schema_version": 1, "run_id": run_id, "stage_id": "SC01", "invocation_id": invocation_id, "status": "failed", "attempt_count": len(inv["attempts"]), "failure_refs": [a["failure_ref"]["value"] for a in inv["attempts"]], "terminated_at": now(), "next_chain_allowed": False, "termination_code": "attempts_exhausted"}
         summary_ref = runs.put(self.root, base / "terminal-failure.json", summary, "investment.failure_summary", self.schemas)
         inv.update(processing_state="failed", validation_state="exhausted", finished_at=known(summary["terminated_at"]), terminal_failure_ref=known(summary_ref))
         inv["retention"] = {"state": "eligible", "blockers": [], "persistent_refs": [], "evaluated_at": known(summary["terminated_at"])}

@@ -1,4 +1,4 @@
-"""真实CLI重试、冻结身份及真实提交后中断恢复。"""
+"""真实CLI单次失败、冻结身份及真实提交后中断恢复。"""
 import copy
 import json
 from unittest.mock import patch
@@ -12,12 +12,12 @@ from tests import RealFlowCase, harness
 
 
 class RuntimeTests(RealFlowCase):
-    def test_three_failed_attempts(self):
+    def test_single_failed_attempt(self):
         self.first()
         before = self.ledger()
         buy = harness.make_trade("buy", "10", "20"); buy["confirmed_shares"] = harness.k(10)
         record = self.execute([harness.mutate(buy)], "invalid-type", False)
-        self.assertEqual(record["result"]["attempt_count"], 3)
+        self.assertEqual(record["result"]["attempt_count"], 1)
         self.assertFalse(record["result"]["next_chain_allowed"])
         self.assertEqual(self.ledger(), before)
         for path in record["folder"].glob("attempt-*/failure.json"):
@@ -28,7 +28,7 @@ class RuntimeTests(RealFlowCase):
         (folder / "submitted-input.json").write_bytes(harness.encode(incoming))
         result = harness.invoke(self.root, folder, incoming)
         self.assertEqual(result.returncode, 1, result.stderr)
-        self.assertEqual(json.loads(result.stdout)["attempt_count"], 3)
+        self.assertEqual(json.loads(result.stdout)["attempt_count"], 1)
         for path in folder.glob("attempt-*/failure.json"):
             self.assertEqual(json.loads(path.read_bytes())["rule_id"], "I01")
         wrong_time = harness.make_trade("buy", "10", "20")

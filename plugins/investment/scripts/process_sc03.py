@@ -1,4 +1,4 @@
-"""SC03生产CLI；真实宿主工作与候选交给共享运行边界。"""
+"""SC03生产CLI：来源并发子session分析及完整候选装配。"""
 import sys
 from pathlib import Path
 

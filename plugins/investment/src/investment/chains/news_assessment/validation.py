@@ -61,13 +61,17 @@ def validate(ctx):
             if request is not None:
                 return request
             review, references = result
-            reporting_reviews = review['reporting_gap_reviews']
             evidence_refs += references
-            semantics.semantic_rules(snapshot, review, checks)
-            for rule, name in (('A05', 'facts'), ('A06', 'facts'), ('A07', 'events'),
-                               ('A08', 'observations'), ('A09', 'hypotheses')):
-                if not snapshot.tables[name] and (rule != 'A06' or not snapshot.tables['counterevidence']):
-                    checks.set(rule, 'not_applicable', 'The exact object set is empty and full source/question coverage has been independently checked')
+            if review is None:
+                for rule in semantic_rules:
+                    checks.set(rule, 'insufficient_evidence', 'Remaining semantic qualification was not executed after a verified source-batch rejection')
+            else:
+                reporting_reviews = review['reporting_gap_reviews']
+                semantics.semantic_rules(snapshot, review, checks)
+                for rule, name in (('A05', 'facts'), ('A06', 'facts'), ('A07', 'events'),
+                                   ('A08', 'observations'), ('A09', 'hypotheses')):
+                    if not snapshot.tables[name] and (rule != 'A06' or not snapshot.tables['counterevidence']):
+                        checks.set(rule, 'not_applicable', 'The exact object set is empty and full source/question coverage has been independently checked')
         except (ContractError, KeyError, ValueError, TypeError) as error:
             rule = getattr(error, 'rule', 'A12')
             rule = rule if rule in ctx.definition['required_rules'] else 'A11'

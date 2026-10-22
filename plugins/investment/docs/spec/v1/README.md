@@ -29,8 +29,20 @@
 |---|---|
 | [sc02.schema.json](sc02.schema.json) | SC02 输入、Collector 协议、捕获、正文/原生记录、六表、运行及单测对象结构 |
 | [registry-sc02.json](registry-sc02.json)、[method-sc02.json](method-sc02.json) | SC02 独立类型登记、数据表元信息和固定方法 |
-| [sc02.md](sc02.md) | N01—N12、时间窗口、机会和缺口、独立验收、隔离及三次尝试的确定性约束 |
+| [sc02.md](sc02.md) | N01—N12、时间窗口、机会和缺口、独立验收、隔离及单次执行、失败即结束的确定性约束 |
 
 [外部说明](../../chains/news_collection/README.md) · [内部流程、运行与验证](../../chains/news_collection/internal.md)
 
-SC03—SC10 尚未定义本链专用机器格式与验证规则，不能仅凭职责文档启用。JSON Schema 检查结构；跨对象、状态和事实依据按相应精确规则独立核验，二者不能相互替代。
+## SC03：事实评审与经济假说
+
+| 文件 | 权威范围 |
+|---|---|
+| [research.schema.json](research.schema.json)、[research.md](research.md) | SC03及后续研究阶段共享的宿主协议、运行控制与引用授权边界 |
+| [sc03.schema.json](sc03.schema.json) | 六表、ResearchAssessment、私有 Draft/WorkPlan/SemanticReview，以及独立 VerificationReport 的封闭结构 |
+| [sc03-generation.schema.json](sc03-generation.schema.json) | 私有GenerationDraft：结构化事实、源单位名称及限定；流程组装公共草稿，不替代独立验证 |
+| [registry-sc03.json](registry-sc03.json)、[method-sc03.json](method-sc03.json) | SC03类型、逐行单位、方法、模板、角色及用途规则 |
+| [sc03.md](sc03.md) | A01—A17、事实支持、来源独立性、时间/原值、全文覆盖、条件机制及校准预期 |
+
+[外部说明](../../chains/news_assessment/README.md) · [内部流程、运行与验证](../../chains/news_assessment/internal.md#运行与验证)
+
+其他子链的机器格式与启用条件见其专用规范；本页导航不作为实现或资格通过凭证。JSON Schema 检查结构，跨对象、状态和事实依据按相应精确规则独立核验，二者不能相互替代。

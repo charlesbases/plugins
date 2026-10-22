@@ -20,7 +20,6 @@ ReportingGapReview恰含gap_sha256、reviewed_objects、decision、reason、miss
 - fact /conflict_refs/i + contradiction：核该具体边是否构成同口径反证，成立为contradicted，不成立不应保留成冲突边；不可not_applicable掩盖一条错误边。
 - counterevidence /relation + contradiction：这里核该行relation和explanation是否被原文支持，正确关系为supported、错误为contradicted、缺证据为insufficient_evidence。revision、scope_difference、alternative_explanation也是实际关系，不能因不是直接矛盾而not_applicable。
 - observation /raw_value + measurement_scope：核原值、单位、币种、期间、季调/年化/名义实际口径与发布版本，并比较其他观测和相应反证。相同版本同口径的矛盾必须保留；不同vintage是修订，不得投票、平均、任选或覆盖。数值存在但属于另一指标不能supported。
-  明确分数/带分数在语义明确且能以既有DecimalString精度和范围有限精确表示时，等值十进制是同单位原值编码，如1/2与0.5、4-3/4与4.75；原quote、单位、期间、vintage须准确保留，不因字面写法不同认定改源值，也不能仅据此批准虚假的无法表示Gap。仍独立核数值及完整经济口径；禁止近似、单位/指标换算或补缺失，真实歧义/不可精确表示/源依据不足仍允许unknown及具体限制，不强迫所有数字known。
 - event /identity_status + event_identity：主体、事件性质、时间与事实关系均需支持归并；相近日期或主题不足。不确定身份须保留未决关系。
 - hypothesis 各mechanism_step/exposure/alternative/falsifiability：逐步区分源支持前提与明确条件假设，核实际或明确假设的暴露、方向、期限、替代解释、可观察证伪结果及数据来源。逻辑可能性不是已识别因果；关键词不能固定行业方向；没有实证不能生成收益概率或默认期限。source_supported需要真实事实，conditional需要明示假设，未支持步骤只能探索并明确Gap。
 - disposition /status + coverage：检查问题是否真正被证据回答、是否漏材料/冲突/重大未知。只看已得材料的受限探索不代表整窗完备。空语料或实质证据不足为insufficient_evidence并列missing_evidence，不伪造supported证据。answered不能仅靠重述问题。
@@ -28,3 +27,14 @@ ReportingGapReview恰含gap_sha256、reviewed_objects、decision、reason、miss
 每条supported/contradicted都给实际源引文或已核支持事实与简要支持关系理由；insufficient_evidence必须列所缺事实。除fact真正没有反证的/assertion维度外，不使用not_applicable。source_reported只是“来源报告”，转载不能提升cross_checked；如果实际依赖未取得材料，就不能把继承缺口当作已经解决。
 
 真实原文的部分范围可诚实报告，但本链新提出的断言仍必须有证据。禁止把缺来源、来源错引、原文未读、单批响应完成或字符串一致当成全量验证。实际模型执行及时间由HostEvent记录，不在输出里编造执行完成时钟。
+
+
+## 自动子session执行接口
+
+本任务由流程脚本自动创建独立Codex子session。这是本轮资料分析或验证任务，不是仓库开发任务；不修改软件、配置或依赖，不制定工程实施方案。本文最后追加的JSON对象仅给出packet_path、result_path、bash_executable，是程序绑定的文件位置，不是临时业务要求。先读取packet_path中的request、input、method、artifacts、output_schema_bundle及schema_resources；artifacts的reference和值保持原始准确身份。按request.work_key选取工作计划项，完成全部指派来源/目标。本上下文独立完成任务，不调用其他模型、Codex CLI、子代理或外部网络；不读取历史运行、仓库实现、测试预期或未授权的兄弟私有材料。
+
+所有终端命令显式使用bash_executable，禁止PowerShell、cmd或ps1。Python用packet.python_executable，可用已安装的JSON Schema库和本地辅助脚本解析本轮数据。每条命令保持小于8KiB，避免已发生的Windows命令长度限制。只在本session目录写辅助文件和result_path，不修改输入或候选。大型表不要整份打印到终端，按本工作项读取实际条目。
+
+result_path必须写完整的本角色业务JSON，严格符合request.output_schema_id对应的冻结Schema，不能用摘要、文件名或passed字符串替代。schema_resources可用于本地结构检查，不能据结构通过自签业务验收。生产者输出AssessmentDraft；验证者输出SemanticBatchReview，独立从原文判断每个目标，不能按候选自述批量默认supported。完成必要检查后结束，不等待人工确认，也不请求补发提示。
+
+最终消息只返回执行状态JSON：完成并已写result_path时为{"status":"completed","reason":""}；实际无法完成时为{"status":"failed","reason":"实际原因"}。该状态只表示本角色任务是否完成，不是SC03验收结果。不得伪造业务输出、调用证据、Receipt或Seal。

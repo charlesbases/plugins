@@ -1581,7 +1581,11 @@
           "const": "sc02.collect.v1"
         },
         "max_attempts": {
-          "const": 3
+          "enum": [
+            1,
+            3
+          ],
+          "description": "Current execution is single-pass. The value 3 is retained only to read immutable historical method records; it cannot enable retry."
         },
         "method_id": {
           "const": "sc02-source-capture"

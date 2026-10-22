@@ -58,13 +58,7 @@ def load_process_input(input_ref: dict, resolver: NewsResolver, *, run_id: str, 
     require(invocation['processing_state'] == 'running' and len(invocation['attempts']) == attempt_no
             and invocation['attempts'][-1]['processing_state'] == 'running',
             'N03', '/attempts', 'Process must own current running attempt', 'identity_mismatch')
-    if attempt_no > 1:
-        previous = invocation['attempts'][-2]
-        require(previous['processing_state'] == 'failed' and is_known(previous['failure_ref']),
-                'N03', '/attempts', 'Previous attempt must retain actual failure feedback')
-        feedback = resolver.resolve(previous['failure_ref']['value'], 'investment.sc02_failure')
-        require((feedback['run_id'], feedback['invocation_id'], feedback['attempt_no']) == (run_id, invocation_id, attempt_no - 1),
-                'N03', '/failure_ref', 'Previous failure belongs to another attempt', 'identity_mismatch')
+    require(attempt_no == 1, 'N03', '/attempt_no', 'Repeated chain execution is not allowed')
     account = _consume_account(refs['account_risk_objects_ref'], resolver, run_id)
     require((account['source_authority'] == 'synthetic_fixture') == (resolver.mode == 'test'),
             'N03', '/account_risk_objects_ref', 'SC01 authority crosses namespace', 'use_not_allowed')

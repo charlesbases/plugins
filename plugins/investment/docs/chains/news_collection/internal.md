@@ -12,7 +12,7 @@
 
 1. **建立采集计划。** 从已登记的信息窗口、来源域、检索协议和账户风险对象生成任务，冻结网站适配器、正文解析器、版本及预算。计划同时建立发现机会清单，区分未选、未取和未处理项。按 source_scope_ref 的站点/来源域选择支持的适配器；不支持来源保留配置和待补证任务，不静默删除。新闻发现只对声明范围负责，不扩展成全球覆盖声明。
 2. **发现材料。** 各来源适配器返回标准发现条目，包含来源定位和可核发布信息。检索顺序只决定工作分配，不充当可信度或行业影响评分。
-3. **捕获响应。** 按任务取得原始字节，保存请求地址、最终地址、真实获取时刻及结果。每次执行过的请求都形成尝试记录，重试不能删除此前失败。
+3. **捕获响应。** 按任务取得原始字节，保存请求地址、最终地址、真实获取时刻及结果。每次执行过的请求都形成尝试记录，当前不重试，历史失败记录保留。
 4. **解析与定位。** 用冻结解析器生成正文及原字节定位关系。发布和可得时间保留来源精度；抓取时间不能反推为较早的可得时刻。网页内容只作材料，不作为执行指令。
 5. **归并版本。** 依据稳定文档身份及字节证据关联重复材料和不同版本，保留来源关系及所有获取记录。转载不因网址不同就变成独立佐证。
 6. **组装语料。** 汇总结构合格的版本行、检索尝试、解析规范、机会与待处理清单，形成覆盖说明和 Gap，再组装 EvidenceCorpus 与 CandidateOutput。
@@ -28,7 +28,7 @@
 
 同能力实现可以有不同网站解析方式，统一映射私有捕获和解析结果，由组装器输出同一 EvidenceCorpus；不把网站字段泄漏到公共输入输出。
 
-多个网站可并发执行，分别限制请求量、超时和重试，总预算由子链统一控制。某网站失败不清空其他已取材料；失败范围、预算耗尽和未处理任务都进入覆盖缺口，不能解释为没有新闻或已经完整覆盖。
+多个网站可并发执行，分别限制请求量和超时，不重试失败请求或子链，总预算由子链统一控制。某网站失败不清空其他已取材料；失败范围、预算耗尽和未处理任务都进入覆盖缺口，不能解释为没有新闻或已经完整覆盖。
 
 ## 输出与边界
 
@@ -42,7 +42,11 @@ runtime.news_controller.NewsController从run_sc02入口先执行namespace guards
 
 process_sc02按source_scope选择普通目录内collect.py，各源受信Context共享全局并发/请求预算。每个实际hop均保存Capture，包括redirect、失败、超时；所有来源任务终止后才冻结完整capture-log，来源程序异常不能取消其他来源或伪装正常空结果。按稳定主键产生documents、retrieval_attempts、opportunity_inventory、pending_items、extraction_spec、coverage六表及Corpus/CandidateOutput。无材料且未证明空窗时返回强格式Failure。
 
-主控先绑定实际Candidate和capture-log，再另启validate_sc02，核对独立凭证身份、N01—N12必要检查和用途后写Seal。N10未知覆盖保留insufficient_evidence；部分有效材料可封存为研究观察，goal_status保持unmet。失败凭证及原因反馈到下一次process，输入事实、方法、窗口和规则不变；三次失败返回FailureSummary，禁止后链。
+主控先绑定实际Candidate和capture-log，再另启validate_sc02，核对独立凭证身份、N01—N12必要检查和用途后写Seal。N10未知覆盖保留insufficient_evidence；部分有效材料可封存为研究观察，goal_status保持unmet。失败凭证及原因保存后立即返回FailureSummary，不再次调用process，禁止后链。
+
+时间窗口判定同时保留原始日历日期的排除依据：来源仅缺时区时不补时区、不编造精确发布时间；按[SC02时间规则](../../spec/v1/sc02.md)的最宽日期界限能证明窗外则排除，不能一律以unknown/uncertain采纳。采集端与独立验证端各自解析和判定，没有共用业务算法；界限仍可能与窗口重叠、原日期缺失或不可解析时保留uncertain及原缺口，不声明已在窗内。
+
+2026-10-27修复验证使用原始实际捕获回放，原2026-10-13至10-20窗口的35篇中7篇旧闻全部排除，剩余28篇的行内容不变；原始捕获、原封存及失败记录均保留，回放不作为新封存输出。另一次实际全17来源执行复用已保存SC01，未重跑上游，窗口为2026-10-20T02:21:43.322670Z至2026-10-27T02:21:43.322670Z，一次封存，N07 passed；取得9个来源24篇材料（9篇within、15篇uncertain）。N10仍insufficient_evidence，凭证为partial/observation_only，goal_status=unmet，不能声称整窗覆盖齐全。实际[修复报告](C:/Users/sun/.investment/test/sc02-window-repair-df7121a8c5744a4794365190e4073db8/repair-report.json)、[原始捕获校准](C:/Users/sun/.investment/test/sc02-window-repair-df7121a8c5744a4794365190e4073db8/calendar-calibration.json)与[交接示例](../../spec/v1/examples/sc02.md)分别登记。SC03仅准备了绑定新输出的输入模板，本次未执行其生产和验证。
 
 业务证据均在当前runs，SC02不访问账户Store、不新增新闻库。每日manifest/README记录调用、全部文件、状态、失败原因和引用保留条件。注册单测报告、实际业务文件和进程日志分别表达。普通本地HTTP配置复制正式collector算法，用于验证运行路径；真实站点就绪必须由真实响应支持。
 
@@ -74,7 +78,7 @@ PYTHONIOENCODING=utf-8 PYTHONPATH=src .venv/Scripts/python.exe -B scripts/run_sc
 
 主控先校验根、模式、插件根和输入命名空间，冻结输入/方法/来源规则及预算，再调用process_sc02.py。候选产生后另进程运行validate_sc02.py；只有必要完整性检查和允许用途成立才封存。N10可诚实表达insufficient_evidence，部分有效材料只支持evidence_review、hypothesis_research、reporting，goal_status仍为unmet。模拟来源永远observation_only。无有效材料且未证明空窗时返回强Failure，不伪造正常候选或成功凭证。
 
-stdout是investment.sc02_run_result：sealed准确引用SealedOutput，failed引用FailureSummary，退出码分别0、1；启动拒绝退出2并只写stderr。相同已完成invocation返回原控制结果，新invocation重新联网。失败原因、已开始的尝试预算跨中断保留，最多三次。业务产物在`runs/sc02/<YYYYMMDD>/<invocation_id>/`，日期manifest/README与调用同级；有效用途结束前保留原始捕获、冻结规则、候选和凭证。本入口不提供自动清理接口。
+stdout是investment.sc02_run_result：sealed准确引用SealedOutput，failed引用FailureSummary，退出码分别0、1；启动拒绝退出2并只写stderr。相同已完成invocation返回原控制结果，新invocation重新联网。失败原因、已开始的尝试预算跨中断保留，单次执行，不重试。业务产物在`runs/sc02/<YYYYMMDD>/<invocation_id>/`，日期manifest/README与调用同级；有效用途结束前保留原始捕获、冻结规则、候选和凭证。本入口不提供自动清理接口。
 
 ### 独立验证入口
 

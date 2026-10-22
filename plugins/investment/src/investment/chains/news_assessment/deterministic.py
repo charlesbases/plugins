@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from collections import deque
+import re
 from investment.contracts import canonical, instant, require, now
 
 from .contracts import ACCEPTED, KINDS, TABLES, number_literals, time_bounds
@@ -147,6 +148,46 @@ def events(snapshot):
         seen.add(identity)
 
 
+def unit_supported_by_quote(row):
+    """独立核单位词素；表头计价与行计量可组成复合单位，不改原值。"""
+    quote = row['quote_locator']['quote']
+    value = row['unit']['value'].casefold()
+    aliases = {'percent': (('percent',), ('%',)),
+               'percentage_point': (('percentage point',), ('百分点',)),
+               'percentage points': (('percentage point',), ('百分点',)),
+               'months': (('month',),), 'dollars': (('dollar',), ('$',)),
+               'million dollars': (('million', 'dollar'), ('million', '$')),
+               'billion dollars': (('billion', 'dollar'), ('billion', '$'))}
+    # 复合单位的量级与符号须同时有源依据；符号不代替后续独立币种核对。
+    compact_quote = ''.join(quote.casefold().split())
+    factors = tuple(value.replace('/', ' ').replace('（', ' ').replace('）', ' ').split())
+    supported = any(markers and all(''.join(token.split()) in compact_quote for token in markers)
+                    for markers in aliases.get(value, (factors,)))
+    if not supported and value == 'million' and row['raw_value']['status'] == 'known':
+        supported = re.search(r'€' + re.escape(row['raw_value']['value']) + r'm\b', quote.casefold()) is not None
+    return supported
+
+
+def currency_supported_by_quote(row):
+    """核源明确币种及组合的原文顺序；不凭符号猜币种或推报价单位。"""
+    quote = row['quote_locator']['quote'].casefold()
+    aliases = {'USD': ('USD', 'U.S. dollar', 'US dollar', '美元'),
+               'CNY': ('CNY', '人民币', 'RMB'), 'EUR': ('EUR', '€')}
+    cursor = 0
+    for currency in row['currency']['value'].split('/'):
+        currency = currency.strip()
+        if not currency:
+            return False
+        positions = [(quote.find(token.casefold(), cursor), len(token))
+                     for token in aliases.get(currency, (currency,))]
+        positions = [(start, size) for start, size in positions if start >= 0]
+        if not positions:
+            return False
+        start, size = min(positions)
+        cursor = start + size
+    return True
+
+
 def observations(snapshot):
     for row in snapshot.tables['observations']:
         path = '/observations/' + row['observation_id']
@@ -157,15 +198,10 @@ def observations(snapshot):
         for field in ('unit', 'measurement_basis', 'release_vintage'):
             require(row[field]['status'] != 'not_applicable', 'A08', path + '/' + field, 'Missing measurement metadata is unknown, not inapplicable')
         if row['unit']['status'] == 'known':
-            value = row['unit']['value'].casefold()
-            aliases = {'percent': ('percent', '%'), 'percentage_point': ('percentage point', '百分点'),
-                       'percentage points': ('percentage point', '百分点')}
-            require(any(token in quote.casefold() for token in aliases.get(value, (value,))),
+            require(unit_supported_by_quote(row),
                     'A08', path + '/unit', 'Unit is not stated in the observation quote')
         if row['currency']['status'] == 'known':
-            value = row['currency']['value']
-            aliases = {'USD': ('USD', 'U.S. dollar', 'US dollar'), 'CNY': ('CNY', '人民币', 'RMB')}
-            require(any(token.casefold() in quote.casefold() for token in aliases.get(value, (value,))),
+            require(currency_supported_by_quote(row),
                     'A08', path + '/currency', 'Currency is not explicit in the observation quote')
 
 
@@ -208,6 +244,9 @@ def coverage(snapshot):
         require(all(gap in global_gaps for gap in row['gaps']), 'A10', '/unresolved_questions', 'Question gap omitted from assessment')
         require(row['status'] not in ('partial', 'unresolved', 'no_relevant_material') or row['gaps'],
                 'A10', '/dispositions', 'Unresolved question lacks an explicit gap')
+        if row['status'] == 'answered':
+            require(any(snapshot.indexes['facts'][key]['verification_status'] in ACCEPTED for key in row['fact_ids']),
+                    'A10', '/dispositions', 'Answered question has no accepted source fact')
         if not snapshot.documents:
             require(row['status'] in ('no_relevant_material', 'unresolved') and row['gaps'],
                     'A10', '/dispositions', 'Empty corpus cannot answer a substantive question')

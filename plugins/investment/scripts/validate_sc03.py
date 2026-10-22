@@ -1,4 +1,4 @@
-"""SC03独立验证CLI；共享入口负责冻结身份、宿主等待和结构化失败。"""
+"""SC03独立验证CLI；独立来源子session审阅及最终结构化凭证。"""
 import sys
 from pathlib import Path
 

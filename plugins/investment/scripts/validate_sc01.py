@@ -19,7 +19,7 @@ def main():
     parser.add_argument("--root", type=Path, required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--invocation-id", required=True)
-    parser.add_argument("--attempt-no", type=int, choices=(1, 2, 3), required=True)
+    parser.add_argument("--attempt-no", type=int, choices=(1,), required=True)
     parser.add_argument("--fixture-mode", action="store_true")
     args = parser.parse_args()
     root, schemas = validate_root(args.root, args.fixture_mode), Schemas()

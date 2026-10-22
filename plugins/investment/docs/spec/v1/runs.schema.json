@@ -355,15 +355,16 @@
           "const": "failed"
         },
         "attempt_count": {
-          "const": 3,
-          "type": "integer"
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
         },
         "failure_refs": {
           "type": "array",
           "items": {
             "$ref": "urn:investment:spec:v1:common#/$defs/ArtifactRef"
           },
-          "minItems": 3,
+          "minItems": 1,
           "maxItems": 3
         },
         "terminated_at": {

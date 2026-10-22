@@ -1,4 +1,4 @@
-"""正式SC01运行入口，输出SealedOutput或三次失败汇总。"""
+"""正式SC01运行入口，输出SealedOutput或单次失败汇总。"""
 
 import argparse
 import sys

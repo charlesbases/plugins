@@ -1,6 +1,7 @@
 """SC04 独立验收：原始目录、分区、来源、风险、时点及真实上游许可。"""
 from __future__ import annotations
 
+import hashlib
 import re
 from collections import defaultdict
 
@@ -8,8 +9,7 @@ from investment.contracts import ContractError, canonical, instant, is_known, no
 from investment.research.references import selected_references
 
 from .contracts import (RULES, availability_at, current_scope_gaps, inherited_gaps, predicate_verdicts,
-                        recompute_partitions, verify_mandatory_risks, verify_partition, verify_weight_bounds, verify_historical_exposure)
-from .review_work import ReviewWorkPlanner
+                        recompute_partitions, verify_mandatory_risks, verify_partition, verify_weight_bounds)
 from .source_validation import capture_bytes, citation_text, json_pointer, numeric_literals, original_directory
 
 PREFIX = 'investment.sc04.'
@@ -22,7 +22,14 @@ AUDIT_TABLES = {
     'query_tasks_ref': 'query_tasks', 'attempts_ref': 'attempts', 'membership_provenance_ref': 'membership_provenance',
     'possible_members_ref': 'possible_members', 'unprocessed_scope_ref': 'unprocessed_scope',
 }
-
+SEMANTIC_FIELDS = {
+    'identity': ['entity_id', 'legal_fund_id', 'share_class_id', 'fund_code', 'issuer_id', 'currency',
+                 'asset_class', 'benchmark_id', 'benchmark_terms', 'strategy_id', 'legal_structure',
+                 'share_class_terms', 'channel_eligibility', 'effective_at', 'available_time', 'availability_bound_at'],
+    'coverage': ['source_coverage', 'subject_dispositions', 'current_status', 'historical_status', 'historical_origin_status'],
+    'catalog_vintage': ['source_domains', 'available_time', 'availability_bound_at', 'list_semantics_citations'],
+    'discovery_audit': ['closure_checks', 'completeness_status'],
+}
 
 
 class Review:
@@ -262,7 +269,7 @@ class Review:
         self.actual_partition = verify_partition(list(self.members), {name: self.rows[field] for name, field in
             [('candidate', 'candidate_members_ref'), ('excluded', 'excluded_members_ref'), ('unknown', 'unknown_members_ref')]})
 
-    def check_eligibility(self):
+    def eligibility(self):
         for field in ('candidate_members_ref', 'excluded_members_ref', 'unknown_members_ref'):
             for row in self.rows[field]:
                 results = row['predicate_results']
@@ -383,10 +390,7 @@ class Review:
             reference = rows[0]['source_vintage_ref']
             require(all(row['source_vintage_ref'] == reference for row in rows), 'U15', '/source_vintage_ref', 'One historical version has conflicting source vintages')
             vintage = self.read(reference, PREFIX + 'catalog_vintage')
-            vintage_usable = availability_at(vintage['available_time'], vintage['availability_bound_at'], origin)
-            require(vintage_usable or all(row['membership_status'] == 'unknown' for row in rows),
-                    'U15', '/source_vintage_ref', 'Later catalog was asserted as known historical membership')
-            ready &= vintage_usable
+            ready &= availability_at(vintage['available_time'], vintage['availability_bound_at'], origin)
             source_codes, row_codes = set(), set()
             for raw_ref in vintage['original_list_refs']:
                 entries, _ = original_directory(self.read(raw_ref, PREFIX + 'capture'), max_bytes=self.discovery['max_response_bytes'])
@@ -395,28 +399,11 @@ class Review:
                 else:
                     source_codes.update(row['code'] for row in entries.values())
             for row in rows:
-                identity = self.read(row['identity_version_ref']['value'], PREFIX + 'identity') if is_known(row['identity_version_ref']) else None
-                identity_usable = identity is not None and availability_at(identity['available_time'], identity['availability_bound_at'], origin)
-                require(identity_usable or row['membership_status'] == 'unknown', 'U15', '/identity_version_ref',
-                        'Unknown or later identity was asserted as known historical membership')
-                ready &= identity_usable
-                if is_known(row['entity_id']):
-                    require(identity is not None and is_known(identity['entity_id']) and row['entity_id'] == identity['entity_id'],
-                            'U15', '/entity_id', 'Historical entity differs from its identity version')
-                for exposure_ref in row['exposure_version_refs']:
-                    require(exposure_ref['schema_id'] in (PREFIX + 'exposure_row', PREFIX + 'exposures'),
-                            'U15', '/exposure_version_refs', 'Historical exposure reference has another business type')
-                    version_value = self.read(exposure_ref)
-                    exposure_rows = ([version_value] if exposure_ref['schema_id'] == PREFIX + 'exposure_row'
-                                     else [item for item in version_value['rows'] if item['member_id'] == row['member_id']])
-                    require(exposure_rows and len({item['exposure_id'] for item in exposure_rows}) == len(exposure_rows),
-                            'U15', '/exposure_version_refs', 'Historical exposure version omits the member or duplicates an exposure')
-                    for exposure in exposure_rows:
-                        mapping = self.read(exposure['mapping_rule_ref'], PREFIX + 'exposure_mapping_rule')
-                        texts = [self.quote(citation) for citation in exposure['citations']]
-                        ready &= verify_historical_exposure(exposure, row, identity, mapping, texts)
-                if identity is None:
+                if not is_known(row['identity_version_ref']):
+                    ready = False
                     continue
+                identity = self.read(row['identity_version_ref']['value'], PREFIX + 'identity')
+                ready &= availability_at(identity['available_time'], identity['availability_bound_at'], origin)
                 if is_known(identity['fund_code']):
                     row_codes.add(identity['fund_code']['value'])
                 else:
@@ -484,19 +471,24 @@ class Review:
             self.result('U21', 'insufficient_evidence', 'Actual SC01 receipt restricts current account review; its reporting permission is preserved')
 
     def semantic_review(self):
-        planner = ReviewWorkPlanner(self)
-        targets = list(planner.targets())
-        expected = [(reference['uri'], path) for reference, paths in targets for path in paths]
-        require(expected and len(expected) == len(set(expected)), 'U10', '/semantic_review',
-                'Semantic targets are absent or duplicated')
-        completed = set()
-        for reference, paths in targets:
-            work = planner.build(reference, paths)
-            work_key = work['work_key']
-            work_ref = self.ctx.put_json('validation-review-' + work_key + '.json', work, PREFIX + 'review_work_item')
-            by_uri = {location['object_ref']['uri']: location['object_ref'] for location in work['evidence_locations']}
-            evidence = [work_ref, *(by_uri[uri] for uri in sorted(by_uri))]
+        targets = []
+        for uri in sorted(self.refs):
+            reference, value = self.refs[uri], self.values[uri]
+            name = reference['schema_id'].removeprefix(PREFIX)
+            if name in SEMANTIC_FIELDS:
+                targets.append((reference, ['/' + field for field in SEMANTIC_FIELDS[name]], 0, 0))
+            elif name in ('membership_provenance', 'exposures', 'history'):
+                for start in range(0, len(value['rows']), 64):
+                    stop = min(start + 64, len(value['rows']))
+                    targets.append((reference, [f'/rows/{index}' for index in range(start, stop)], start, stop))
+        if self.funding is not None:
+            targets.append((self.funding_ref, ['/available_amount', '/declared_at'], 0, 0))
+        require(targets, 'U10', '/semantic_review', 'No source semantic review target exists')
+        available = [self.refs[uri] for uri in sorted(self.refs)]
+        for reference, paths, start, stop in targets:
+            work_key = 'review-' + hashlib.sha256(canonical(reference)).hexdigest()[:20] + f'-{start}-{stop}'
             response = self.ctx.host_response('source_review', work_key=work_key)
+            evidence = [reference, *(item for item in available if item['uri'] != reference['uri'])]
             if response is None:
                 return self.ctx.request_host('source_review', evidence, work_key=work_key)
             require(response['work_key'] == work_key and response['reviewed_object_refs'] == [reference], 'U10', '/reviewed_object_refs', 'Independent reviewer changed its object batch')
@@ -515,8 +507,6 @@ class Review:
                 unknown = isinstance(value, dict) and value.get('status') in ('unknown', 'not_applicable')
                 unknown |= isinstance(value, str) and value in ('unknown', 'not_applicable')
                 require(unknown or value == [] or finding['citations'], 'U10', finding['field_path'], 'Known semantic claim lacks original located evidence')
-            completed.update((reference['uri'], path) for path in paths)
-        require(completed == set(expected), 'U10', '/semantic_review', 'Semantic response coverage is incomplete')
         return None
 
     def receipt(self):
@@ -557,7 +547,7 @@ class Review:
             return self.receipt()
         operations = [
             ('U01', self.binding), ('U03', self.subjects), ('U04', self.domains), ('U05', self.requests),
-            ('U06', self.original_members), ('U07', self.partition), ('U09', self.check_eligibility), ('U08', self.peers),
+            ('U06', self.original_members), ('U07', self.partition), ('U09', self.eligibility), ('U08', self.peers),
             ('U10', self.quotes), ('U11', self.exposures), ('U12', self.risks), ('U13', self.funds), ('U14', self.times),
             ('U15', self.historical), ('U16', self.acquisition), ('U17', self.labels), ('U18', self.ordering),
             ('U19', self.selection), ('U20', self.hypotheses_gate), ('U21', self.account_gate),

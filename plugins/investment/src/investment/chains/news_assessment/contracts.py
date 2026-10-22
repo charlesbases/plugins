@@ -45,7 +45,14 @@ def time_bounds(value):
 def number_literals(text):
     """独立读取十进制与明确分数原值，不转换单位、不猜经济含义。"""
     values = set()
-    pattern = r'(?<![\w.])-?\d+(?:,\d{3})*(?:\.\d+)?(?:-\d+/\d+|/\d+)?(?![\w.])'
+    # WHO实际使用空格千位分组；仅补完整整数读法，仍保留逐项数字供口径核对。
+    grouped = r'(?<![A-Za-z0-9_.])-?\d{1,3}(?: \d{3})+(?!\d|\.\d)'
+    values.update(token.replace(' ', '') for token in re.findall(grouped, text))
+    # WHO的n/N也分别报告原始计数，不能仅保留整体分数而吞掉分子分母。
+    scalar = r'(?<![A-Za-z0-9_.])-?\d+(?:,\d{3})*(?:\.\d+)?(?!\d|\.\d)'
+    values.update(token.replace(',', '') for token in re.findall(scalar, text))
+    # 中文及单位后缀不属于数字本体；句末句号也不能阻断完整数值。
+    pattern = r'(?<![A-Za-z0-9_.])-?\d+(?:,\d{3})*(?:\.\d+)?(?:-\d+/\d+|/\d+)?(?!\d|\.\d)'
     for match in re.finditer(pattern, text):
         token = match.group().replace(',', '')
         if '/' not in token:

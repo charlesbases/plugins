@@ -7,7 +7,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from investment.chains.account.chain import load_process_input, produce
-from investment.contracts import ContractError, Schemas, artifact, canonical, is_known, known, now, require
+from investment.contracts import ContractError, Schemas, artifact, canonical, known, now, require
 from investment.references import Resolver
 from investment.runtime import runs
 from investment.runtime.paths import validate_input_path, validate_root, validate_source_root
@@ -19,7 +19,7 @@ def main():
     parser.add_argument("--input", type=Path, required=True)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--invocation-id", required=True)
-    parser.add_argument("--attempt-no", type=int, choices=(1, 2, 3), required=True)
+    parser.add_argument("--attempt-no", type=int, choices=(1,), required=True)
     parser.add_argument("--fixture-mode", action="store_true")
     args = parser.parse_args()
     root, schemas = validate_root(args.root, args.fixture_mode), Schemas()
@@ -29,12 +29,6 @@ def main():
     try:
         frozen = resolver.frozen_invocation(input_ref, args.run_id, args.invocation_id)
         require(frozen["processing_state"] == "running" and len(frozen["attempts"]) == args.attempt_no and frozen["attempts"][-1]["state"] == "running" and frozen["attempts"][-1]["phase"] == "production", "I07", "/attempts", "Process must own the current production attempt")
-        if args.attempt_no > 1:
-            previous = frozen["attempts"][-2]
-            require(previous["state"] == "failed" and is_known(previous["failure_ref"]), "I07", "/attempts", "Previous attempt must supply actual failure feedback")
-            feedback = resolver.resolve(previous["failure_ref"]["value"], "investment.failure")
-            require((feedback["run_id"], feedback["invocation_id"], feedback["attempt_no"]) == (args.run_id, args.invocation_id, args.attempt_no - 1), "I07", "/failure_ref", "Feedback belongs to another attempt")
-            print(f"Reprocessing failure rule={feedback['rule_id']} code={feedback['reason_code']}", file=sys.stderr, flush=True)
         bundle = load_process_input(input_ref, resolver, args.run_id, args.invocation_id, frozen)
         validate_source_root(root, bundle["source"]["source_type"])
         base = args.input.resolve().parent / f"attempt-{args.attempt_no:02}"

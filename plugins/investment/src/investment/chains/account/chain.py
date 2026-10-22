@@ -24,7 +24,7 @@ def load_process_input(input_ref, resolver, run_id, invocation_id, frozen=None):
     method_ref = artifact((SPEC / "method.json").read_bytes(), "investment.method", "investment-spec://v1/method.json")
     resolver.resolve(method_ref, "investment.method")
     parameters = resolver.resolve(incoming["parameters_ref"], "investment.parameter_set")
-    expected = {"max_attempts": (3, "count", "engineering_budget"), "max_json_bytes": (10485760, "count", "engineering_budget"), "decimal_precision": (80, "count", "engineering_budget"), "execution_timezone": ("Asia/Shanghai", "code", "registered_business_rule")}
+    expected = {"max_attempts": (1, "count", "engineering_budget"), "max_json_bytes": (10485760, "count", "engineering_budget"), "decimal_precision": (80, "count", "engineering_budget"), "execution_timezone": ("Asia/Shanghai", "code", "registered_business_rule")}
     cutoff = frozen["created_at"] if frozen else now()
     require({p["name"] for p in parameters["parameters"]} == set(expected), "I05", "/parameters", "Process parameter set mismatch")
     for parameter in parameters["parameters"]:

@@ -4,6 +4,8 @@
 
 [总览](../README.md) · [总体设计](architecture.md)
 
+对外执行边界为一次调用完成完整流程并返回最终结果。单链单测一次调用执行流程脚本和独立验证脚本；代理根据该次结束后的输出定位问题、修改流程脚本，再完整运行。禁止子链分步执行、人工补做中间模型工作或向执行中的生产者/验证者追加提示。历史HostRequest、等待和续行字段不构成例外，不能作为正常完成结果交付。
+
 公共类型与交接包遵守[项目约束](../AGENTS.md)的职责划分：上一子链对其输出负责验证，下一子链直接消费本轮已验证输出；当前验证脚本仅验证自身输出，可以回溯本轮输入和原始依据重算当前结果，不重复执行上游业务验证。第一子链由入口登记用户事实及完成必要结构检查。
 
 本页说明各子链共用的类型及外部交接。精确字段、封闭 JSON Schema、登记表、跨对象规则和失败控制以 [v1 格式规范](spec/v1/README.md) 为准；各子链 README 说明职责。内部适配器、分析器和步骤的私有约定不加入公共外部契约。已登记机器格式及待定义范围统一见强格式索引；子链职责说明不能代替机器规则或实际验收。
@@ -70,7 +72,7 @@ null 只能在契约允许的 OptionalValue 中表示未知或不适用，并附
 
 input_refs 的每项包含 role 与 ArtifactRef 或 DatasetRef，由对应 role 的登记类型限定。datasets 与 evidence_refs 可为空数组，但必须满足阶段规定的必要项。不适用 method_ref 的阶段引用其固定业务规则，不省略责任依据。SC01 精确 role、顺序、身份绑定与引用定位见 v1 规范。
 
-ExecutionRecord 记录 pending、running、completed 或 failed；started_at、finished_at 为 OptionalValue<Instant>，failure_ref 为 OptionalValue<ArtifactRef>。pending 的 started_at 为 unknown，开始执行后才为 known；实际完成或失败后记录真实 finished_at。正常 CandidateOutput 的 processing_state 必须为 completed。未产生候选时返回强格式 Failure，不伪造正常 payload 或候选验收凭证；不以前置 InputCheck 代替“流程后验证当前输出”的职责。每个子链首次加两次重试共三次；耗尽后全部后续流程终止，包含 SC10，由主调度控制出口说明失败原因。
+ExecutionRecord 记录 pending、running、completed 或 failed；started_at、finished_at 为 OptionalValue<Instant>，failure_ref 为 OptionalValue<ArtifactRef>。pending 的 started_at 为 unknown，开始执行后才为 known；实际完成或失败后记录真实 finished_at。正常 CandidateOutput 的 processing_state 必须为 completed。未产生候选时返回强格式 Failure，不伪造正常 payload 或候选验收凭证；不以前置 InputCheck 代替“流程后验证当前输出”的职责。主链及所有子链均只执行一次，不自动重试；失败立即结束本次调用并停止全部后链（含SC10），保存实际原因。
 
 SealedOutput 的结构示意如下，尖括号为占位符，不是真实证据：
 
@@ -155,7 +157,7 @@ complete 必须由独立验证者复核原列表的来源覆盖域、列表含�
 | acquisition_tasks_ref、attempts_ref、raw_refs | DatasetRef、DatasetRef、ArtifactRef 数组；逐对象/能力任务、每次请求、取得的原字节 |
 | source_dispositions_ref、pending_tasks_ref、gaps | DatasetRef、DatasetRef、Gap 数组；来源处置、未完成项及影响用途 |
 
-任务行至少有 task_id、object_ref、capability、requested_time_scope_ref、source_rule_ref、task_state、attempt_refs。task_state 为 pending、running、completed、failed 或 cancelled，不推导业务就绪。处置行至少有 object_ref、capability、disposition、rule_ref、evidence_refs、reason、affected_uses；disposition 为 ready、proven_not_applicable 或 unknown。ready 须有必要来源证据；proven_not_applicable 须有规则和原文依据；未取得、冲突、预算耗尽或解析失败为 unknown。每次尝试保存任务、来源、真实时刻和结果，失败和重试不删除。工程预算不能改变原分母，不适用处置不能静默改变 SC04 准入。
+任务行至少有 task_id、object_ref、capability、requested_time_scope_ref、source_rule_ref、task_state、attempt_refs。task_state 为 pending、running、completed、failed 或 cancelled，不推导业务就绪。处置行至少有 object_ref、capability、disposition、rule_ref、evidence_refs、reason、affected_uses；disposition 为 ready、proven_not_applicable 或 unknown。ready 须有必要来源证据；proven_not_applicable 须有规则和原文依据；未取得、冲突、预算耗尽或解析失败为 unknown。每次尝试保存任务、来源、真实时刻和结果，失败及历史尝试记录不删除（当前不重试）。工程预算不能改变原分母，不适用处置不能静默改变 SC04 准入。
 
 **ComparisonInventory。** SC07 的 comparison_inventory_ref 指向此对象，SC06 的逐成员预测处置为其前置证据。
 

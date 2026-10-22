@@ -80,7 +80,7 @@ class NewsController:
                     error = binding_error or ContractError('N04', '/attempts', 'Controller interrupted before attempt finished', 'execution_failed')
                     failure = self._failure(invocation, attempt, 'validation' if is_known(attempt['candidate_ref']) else 'collection', error)
                 self._finish_failure(manifest, invocation, attempt, directory, failure)
-            while len(invocation['attempts']) < 3:
+            if not invocation['attempts']:
                 stamp = now()
                 attempt = {'attempt_no': len(invocation['attempts']) + 1, 'processing_state': 'running',
                            'started_at': stamp, 'finished_at': unknown('running'),
@@ -130,10 +130,10 @@ class NewsController:
                     binding_error = self._bind_available(attempt, directory, tolerate_unbound=True)
                     failure = self._failure(invocation, attempt, phase, binding_error or error)
                 self._finish_failure(manifest, invocation, attempt, directory, failure)
-            require(len(invocation['attempts']) == 3 and all(row['processing_state'] == 'failed' and is_known(row['failure_ref'])
-                    for row in invocation['attempts']), 'N03', '/attempts', 'Terminal summary requires three actual failures')
+            require(invocation['attempts'] and all(row['processing_state'] == 'failed' and is_known(row['failure_ref'])
+                    for row in invocation['attempts']), 'N03', '/attempts', 'Terminal summary requires actual recorded failures')
             expected = {'run_id': run_id, 'stage_id': 'SC02', 'invocation_id': invocation_id, 'status': 'failed',
-                        'attempt_count': 3, 'attempt_failure_refs': [row['failure_ref']['value'] for row in invocation['attempts']],
+                        'attempt_count': len(invocation['attempts']), 'attempt_failure_refs': [row['failure_ref']['value'] for row in invocation['attempts']],
                         'downstream_allowed': False}
             summary_path = base / 'failure-summary.json'
             if summary_path.exists():
@@ -249,12 +249,12 @@ class NewsController:
                 'failed_at': now(), 'phase': phase, 'rule_id': getattr(error, 'rule', 'N04'), 'code': code if code in allowed else 'execution_failed',
                 'pointer': getattr(error, 'pointer', '/'), 'reason': (str(error) or type(error).__name__)[:2048],
                 'input_ref': invocation['frozen_input_ref'], 'candidate_ref': attempt['candidate_ref'], 'evidence_refs': refs,
-                'retryable': code not in ('identity_mismatch', 'use_not_allowed')}
+                'retryable': False}
 
     def _finish_failure(self, manifest, invocation, attempt, directory, failure):
         reference = runs.put(self.root, directory / 'failure.json', failure, 'investment.sc02_failure', self.schemas)
         attempt.update(processing_state='failed', finished_at=known(now()), failure_ref=known(reference))
-        # 两次尝试之间仍是running调用，最后失败暂作为已完成失败前缀保存。
+        # 失败摘要写入前保留落盘状态；后续不得创建新的执行。
         invocation['processing_state'] = 'running'
         runs.save_manifest(self.root, manifest, self.resolver)
 

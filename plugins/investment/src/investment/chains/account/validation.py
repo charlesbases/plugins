@@ -36,7 +36,7 @@ def load_source_input(input_ref, resolver, run_id, invocation_id, frozen=None):
     method_ref = artifact((SPEC / "method.json").read_bytes(), "investment.method", "investment-spec://v1/method.json")
     require(resolver.resolve(method_ref) == schemas.method, "I05", "/method_ref", "Unregistered method")
     params = resolver.resolve(incoming["parameters_ref"], "investment.parameter_set")
-    expected = {"max_attempts": (3, "count", "engineering_budget"), "max_json_bytes": (10485760, "count", "engineering_budget"), "decimal_precision": (80, "count", "engineering_budget"), "execution_timezone": ("Asia/Shanghai", "code", "registered_business_rule")}
+    expected = {"max_attempts": (1, "count", "engineering_budget"), "max_json_bytes": (10485760, "count", "engineering_budget"), "decimal_precision": (80, "count", "engineering_budget"), "execution_timezone": ("Asia/Shanghai", "code", "registered_business_rule")}
     require({p["name"] for p in params["parameters"]} == set(expected), "I05", "/parameters", "Parameter set mismatch")
     for param in params["parameters"]:
         require((param["value"], param["unit"], param["source_kind"]) == expected[param["name"]] and param["basis_ref"] == method_ref and param["determination_rule"] == "constant_v1" and instant(param["determined_at"]) <= instant(cutoff), "I05", "/parameters", "Parameter contract mismatch")

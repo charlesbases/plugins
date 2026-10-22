@@ -147,6 +147,18 @@ def _material(capture, raw_ref, profile, profile_ref, limit):
         raise ContractError('N06', '/body_ref', 'Source layout/encoding cannot be independently extracted') from exc
 
 
+def _calendar_date(text, time_format):
+    formats = {'date_ymd':['%Y-%m-%d'], 'date_dmy':['%d/%m/%Y'], 'date_mdy':['%m/%d/%Y'],
+               'english_date':['%B %d, %Y','%d %B %Y','%d %b %Y']}
+    values = []
+    for fmt in formats.get(time_format, []):
+        try:
+            values.append(datetime.strptime(text, fmt))
+        except ValueError:
+            continue
+    return values[0] if values else None
+
+
 def _time_evidence(body, rule, raw_ref):
     if not is_known(body['source_time']):
         return unknown('source_time_missing')
@@ -164,17 +176,10 @@ def _time_evidence(body, rule, raw_ref):
         else:
             if not is_known(rule['timezone']):
                 return unknown('source_timezone_missing')
-            formats = {'date_ymd':['%Y-%m-%d'], 'date_dmy':['%d/%m/%Y'], 'date_mdy':['%m/%d/%Y'],
-                       'english_date':['%B %d, %Y','%d %B %Y','%d %b %Y']}
-            values = []
-            for fmt in formats.get(rule['time_format'], []):
-                try:
-                    values.append(datetime.strptime(text, fmt))
-                except ValueError:
-                    continue
-            if not values:
+            day = _calendar_date(text, rule['time_format'])
+            if day is None:
                 return unknown('source_time_format_unknown')
-            point = values[0].replace(tzinfo=ZoneInfo(rule['timezone']['value']))
+            point = day.replace(tzinfo=ZoneInfo(rule['timezone']['value']))
             precision = 'date'
         lower = point.astimezone(timezone.utc)
         upper = (point + timedelta(days=1)).astimezone(timezone.utc) if precision == 'date' else lower
@@ -186,8 +191,17 @@ def _time_evidence(body, rule, raw_ref):
         return unknown('source_time_format_unknown')
 
 
-def _membership(evidence, window):
+def _membership(evidence, window, body, rule):
     if not is_known(evidence):
+        if evidence['reason'] == 'source_timezone_missing':
+            date = _calendar_date(body['source_time']['value'], rule['time_format'])
+            if date is not None:
+                # 独立用原始日历日期重算最宽时差界限，不调用采集端判定。
+                calendar = date.replace(tzinfo=timezone.utc)
+                before = calendar + timedelta(days=2) <= instant(window['start_at'])
+                after = calendar - timedelta(days=1) >= instant(window['end_at'])
+                if before or after:
+                    return 'outside'
         return 'uncertain'
     value = evidence['value']
     lower, upper = instant(value['lower_bound']), instant(value['upper_bound'])
@@ -540,7 +554,7 @@ def validate_output(input_ref: dict, candidate_ref: dict, resolver: NewsResolver
                 evidence = [v for url in sorted(publication_urls) for v in publication_times.get((sid,url),[])]
                 evidence.sort(key=lambda v:capture_order[v['value']['basis_ref']['uri']])
                 source_time = _choose_publication(source_time,evidence)
-            membership = _membership(source_time,window)
+            membership = _membership(source_time,window,body,rule)
             supported[capture['capture_id']] = {'capture':capture,'raw_ref':raw_ref,'body':body,'rule':rule,
                 'requested_url':root_capture['requested_url'],'document_id':document_id,'version_id':version_id,
                 'time':source_time,'membership':membership}

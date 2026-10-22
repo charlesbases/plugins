@@ -55,7 +55,7 @@ class StorageTests(RealFlowCase):
         with patch.object(Store, "commit", interleave):
             code, result = Controller(self.root, True).run(folder_a / "submitted-input.json", incoming_a["run_id"], incoming_a["invocation_id"])
         self.assertEqual(code, 1)
-        self.assertEqual(result["attempt_count"], 3)
+        self.assertEqual(result["attempt_count"], 1)
         self.assertEqual([t["trade_id"] for t in self.ledger()["trades"]["rows"]], [buy_b["trade_id"]])
         for path in folder_a.glob("attempt-*/failure.json"):
             self.assertEqual(json.loads(path.read_bytes())["rule_id"], "D03")

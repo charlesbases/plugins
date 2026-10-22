@@ -1,6 +1,6 @@
 # SC03：事实评审与经济假说
 
-文档版本：v1。状态：独立验证器已固定为流程开发基线，生产及调度入口已提供；真实整链和实源/长文验收仍待完成。
+文档版本：v1。状态：已有生产、独立验证和运行入口；验证器完成规定场景的限定校准，实际业务资格仍以本轮独立凭证为准。
 
 [总览](../../../README.md) · [总体设计](../../architecture.md) · [公共契约](../../contracts.md) · [内部流程](internal.md) · [精确规则](../../spec/v1/sc03.md) · [Schema](../../spec/v1/sc03.schema.json)
 
@@ -28,6 +28,6 @@ verification_status 精确为 source_reported、cross_checked、disputed、unkno
 
 **输出资格。** 原文定位错误拒绝对应声明；同口径未决冲突保留 disputed；证据不足的机制保持探索属性。可授用途限于 evidence_review、hypothesis_research、reporting，各自按 A01—A17 门槛核定。观察结果不等于原始研究目标满足，更不授予预测、回测或建议资格。
 
-运行类型与方法分别登记在 [registry-sc03.json](../../spec/v1/registry-sc03.json) 和 [method-sc03.json](../../spec/v1/method-sc03.json)。原文按冻结工作计划分批分析，跨片段/跨文档关系单独核对；全部文档及研究目标仍须覆盖。实际解释时间读取宿主事件，身份记录的生成时点不冒称模型解释完成。登记文件存在不代表提示词或运行链已实现。
+运行类型与方法登记在 [registry-sc03.json](../../spec/v1/registry-sc03.json) 和 [method-sc03.json](../../spec/v1/method-sc03.json)。实际执行必须一次调用，由流程脚本完整处理材料及独立验证后返回最终结果，失败立即结束且不重试；禁止代理分批代做、执行中追加提示或人工resume。失败后依据输出定位并修改流程脚本，再完整单测。此前人工宿主分步运行已停止，尚无符合此要求的完整验收结果，工作计划和事件格式不构成例外。见[运行与验证](internal.md#运行与验证)。
 
 **历史解释边界。** [Glasserman 与 Lin](https://arxiv.org/abs/2309.17322)讨论新闻情绪回测的训练期重叠与公司知识干扰；本链据此记录身份/训练时间证据，无法取得则 unknown。禁检索未来资料和匿名化均不能证明无训练污染。[FActScore](https://aclanthology.org/2023.emnlp-main.741/)仅支持逐原子声明对源核查的设计，其传记任务性能不能当作本链金融语义准确率。方法适用性、可达校准场景与限制详见精确规范。

@@ -82,7 +82,7 @@ TransactionContext包含account_id、generation、ledger_digest、transaction_as
 
 SQLite只存trades和ledger_meta，详见[数据库规范](../../spec/v1/sc01.md#必要数据存储)。Context、持仓、pending、源输入、基线、候选、凭证和封存结果只在runs。真实用户事实时间不会因自动执行刷新；每轮控制提交marker可变化，只有业务事实变化才增加generation。
 
-正式链路在本轮事实和必要历史记录上生成候选，经独立验证后提交并封存交接。失败最多重试两次，共三次；全部失败终止后链。提交已成功但产物未收尾时先恢复，禁止按普通失败重复记账。具体编排与恢复见 [内部说明](internal.md#提交恢复与清理)，精确关系见 [SC01 规范](../../spec/v1/sc01.md)。
+正式链路在本轮事实和必要历史记录上生成候选，经独立验证后提交并封存交接。失败立即结束本次调用并终止后链，不重试。提交已成功但产物未收尾时先恢复，禁止按普通失败重复记账。具体编排与恢复见 [内部说明](internal.md#提交恢复与清理)，精确关系见 [SC01 规范](../../spec/v1/sc01.md)。
 
 允许用途由实际ValidationReceipt给出：确认份额缺失限制相应持仓用途，手续费或持有时间缺失只限制依赖它的分析；fixture始终observation_only。next_chain_allowed表示SC01控制成功，下游仍须检查allowed_uses和缺失事实，不能因此取得最终投资建议资格。资金计划与约束由后续任务独立输入。
 

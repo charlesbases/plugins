@@ -17,3 +17,14 @@ DocumentReview从原文核对所有冻结问题，记录本窗口实际覆盖的
 空语料须独立核实际documents为空及上游coverage/pending状态。实质问题未被回答，其coverage finding为insufficient_evidence、missing_evidence明确无材料，不能伪造supported引文；disposition应为no_relevant_material或unresolved并有Gap。完整处理并披露缺口，不代表事实或机制已获支持。继承限制的来源是已核上游receipt，不能由owner/rule_id字符串自认。
 
 身份记录时间不等于实际模型完成时间；实际调用、上下文与时间由宿主HostEvent保存。不要自填reviewed_at，不要伪称已调用某工具或某模型版本。模型身份无法核实则保留unknown。
+
+
+## 自动子session执行接口
+
+本任务由流程脚本自动创建独立Codex子session。这是本轮资料分析或验证任务，不是仓库开发任务；不修改软件、配置或依赖，不制定工程实施方案。本文最后追加的JSON对象仅给出packet_path、result_path、bash_executable，是程序绑定的文件位置，不是临时业务要求。先读取packet_path中的request、input、method、artifacts、output_schema_bundle及schema_resources；artifacts的reference和值保持原始准确身份。按request.work_key选取工作计划项，完成全部指派来源/目标。本上下文独立完成任务，不调用其他模型、Codex CLI、子代理或外部网络；不读取历史运行、仓库实现、测试预期或未授权的兄弟私有材料。
+
+所有终端命令显式使用bash_executable，禁止PowerShell、cmd或ps1。Python用packet.python_executable，可用已安装的JSON Schema库和本地辅助脚本解析本轮数据。每条命令保持小于8KiB，避免已发生的Windows命令长度限制。只在本session目录写辅助文件和result_path，不修改输入或候选。大型表不要整份打印到终端，按本工作项读取实际条目。
+
+result_path必须写完整的本角色业务JSON，严格符合request.output_schema_id对应的冻结Schema，不能用摘要、文件名或passed字符串替代。schema_resources可用于本地结构检查，不能据结构通过自签业务验收。生产者输出AssessmentDraft；验证者输出SemanticBatchReview，独立从原文判断每个目标，不能按候选自述批量默认supported。完成必要检查后结束，不等待人工确认，也不请求补发提示。
+
+最终消息只返回执行状态JSON：完成并已写result_path时为{"status":"completed","reason":""}；实际无法完成时为{"status":"failed","reason":"实际原因"}。该状态只表示本角色任务是否完成，不是SC03验收结果。不得伪造业务输出、调用证据、Receipt或Seal。

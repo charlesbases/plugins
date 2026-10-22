@@ -111,7 +111,7 @@ def build_input(root, account, changes, replies=None):
     scope_ref = write("scope.json", scope, "investment.task_scope")
     method = json.loads((SPEC / "method.json").read_text(encoding="utf-8"))
     method_ref = ref(method, "investment.method", "investment-spec://v1/method.json")
-    params = {"schema_version": 1, "stage_id": "SC01", "parameters": [{"name": name, "value": value, "unit": unit, "source_kind": kind, "basis_ref": method_ref, "determination_rule": "constant_v1", "determined_at": moment} for name, value, unit, kind in (("max_attempts", 3, "count", "engineering_budget"), ("max_json_bytes", 10485760, "count", "engineering_budget"), ("decimal_precision", 80, "count", "engineering_budget"), ("execution_timezone", "Asia/Shanghai", "code", "registered_business_rule"))]}
+    params = {"schema_version": 1, "stage_id": "SC01", "parameters": [{"name": name, "value": value, "unit": unit, "source_kind": kind, "basis_ref": method_ref, "determination_rule": "constant_v1", "determined_at": moment} for name, value, unit, kind in (("max_attempts", 1, "count", "engineering_budget"), ("max_json_bytes", 10485760, "count", "engineering_budget"), ("decimal_precision", 80, "count", "engineering_budget"), ("execution_timezone", "Asia/Shanghai", "code", "registered_business_rule"))]}
     params_ref = write("parameters.json", params, "investment.parameter_set")
     incoming = {"contract_id": "investment.stage_input", "contract_version": 1, "run_id": run_id, "stage_id": "SC01", "invocation_id": invocation_id, "decision_at": offset(600), "information_cutoff_at": fact_time, "scope_ref": scope_ref, "input_refs": [{"role": "transaction_facts_ref", "ref": facts_ref}, {"role": "changes_ref", "ref": changes_ref}, {"role": "task_scope_ref", "ref": scope_ref}], "parameters_ref": params_ref}
     write("submitted-input.json", incoming, "investment.stage_input")
@@ -210,7 +210,7 @@ def run_suite(root, invocations, checks):
     check("actual_not_estimate", next(t for t in current(root, account)["trades"]["rows"] if t["trade_id"] == actual["trade_id"])["amount"] == k("998"))
     old = copy.deepcopy(actual); invalid = copy.deepcopy(actual); invalid["amount"] = k("1000")
     _, _, failed = execute(root, account, [mutate(invalid, old, "update")], "known-conflict", invocations, success=False)
-    check("three_attempts_stop", failed["attempt_count"] == 3 and not failed["next_chain_allowed"])
+    check("single_failure_stops", failed["attempt_count"] == 1 and not failed["next_chain_allowed"])
     check("failed_no_commit", current(root, account)["trades"]["rows"] == sorted(current(root, account)["trades"]["rows"], key=lambda t:t["trade_id"]) and next(t for t in current(root, account)["trades"]["rows"] if t["trade_id"] == actual["trade_id"])["amount"] == k("998"))
     pending = make_trade("buy", None, "20", True); pending["expected_at"] = raw(offset(120))
     execute(root, account, [mutate(pending)], "future-cutoff", invocations)

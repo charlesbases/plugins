@@ -22,7 +22,7 @@ def main():
     parser.add_argument('--input', type=Path, required=True)
     parser.add_argument('--run-id', required=True)
     parser.add_argument('--invocation-id', required=True)
-    parser.add_argument('--attempt-no', type=int, choices=(1, 2, 3), required=True)
+    parser.add_argument('--attempt-no', type=int, choices=(1,), required=True)
     args = parser.parse_args()
     # 根、模式、插件根与输入命名空间必须先于Schema/输入读取及任何目录创建。
     root, plugins = guard_namespace(args.root, args.mode, args.network_origin, args.plugins_dir)
@@ -59,7 +59,7 @@ def main():
                    'pointer': getattr(error, 'pointer', '/'), 'reason': (str(error) or type(error).__name__)[:2048],
                    'input_ref': input_ref, 'candidate_ref': na('candidate_not_produced'),
                    'evidence_refs': [input_ref] + getattr(error, 'evidence_refs', []),
-                   'retryable': phase == 'collection' and code not in ('identity_mismatch', 'use_not_allowed')}
+                   'retryable': False}
         schemas.validate('investment.sc02_failure', failure)
         sys.stdout.buffer.write(canonical(failure))
         return 1

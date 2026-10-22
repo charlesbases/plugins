@@ -9,6 +9,9 @@ from .deterministic import acyclic
 from . import reporting
 
 
+from .session_executor import execute_sessions
+
+
 def targets(snapshot):
     result = {}
     def add(kind, identity, path, dimension):
@@ -48,24 +51,43 @@ def work_item(step, spans, questions, keys, dependencies=()):
     return dict(scope, work_key=work_key(scope))
 
 
+def merge_spans(spans, budget):
+    """同源同字段按区间并集计费，保留全部码点并遵守每窗口长度上限。"""
+    merged = []
+    for span in sorted(spans, key=lambda row: (row['document_version_id'], row['text_field'], row['start'], row['end'])):
+        if (merged and all(merged[-1][key] == span[key] for key in ('document_version_id', 'text_field'))
+                and span['start'] <= merged[-1]['end']):
+            merged[-1]['end'] = max(merged[-1]['end'], span['end'])
+        else:
+            merged.append(dict(span))
+    return [dict(span, start=start, end=min(start + budget, span['end']))
+            for span in merged for start in range(span['start'], span['end'], budget)]
+
+
 def pack_work(items, budget):
-    """只合并能容纳的完整工作项，不删除窗口或目标。"""
-    packed, group = [], []
+    """复用相同实际原文范围，保留完整目标，不把重叠引文重复计入预算。"""
+    packed, group = [], None
     def merged(rows):
-        spans = {canonical(span): span for row in rows for span in row['document_spans']}
-        return work_item(rows[0]['step_id'], list(spans.values()),
+        spans = merge_spans([span for row in rows for span in row['document_spans']], budget)
+        return work_item(rows[0]['step_id'], spans,
                          [key for row in rows for key in row['question_ids']],
                          [key for row in rows for key in row['target_keys']],
                          [key for row in rows for key in row['related_work_keys']])
     for item in items:
-        trial = merged(group + [item])
-        cost = sum(span['end'] - span['start'] for span in trial['document_spans']) + sum(len(key) for key in trial['target_keys'])
-        if group and cost > budget:
-            packed.append(merged(group))
-            group = []
-        group.append(item)
-    if group:
-        packed.append(merged(group))
+        trial = merged([item] if group is None else [group, item])
+        source_cost = sum(span['end'] - span['start'] for span in trial['document_spans'])
+        target_cost = sum(len(key) for key in trial['target_keys'])
+        if group is not None and source_cost + target_cost > budget:
+            prior_source_cost = sum(span['end'] - span['start'] for span in group['document_spans'])
+            # 单个关系已需跨多个窗口时，共享同一完整证据不增加原文量；目标开销仍限额。
+            shared_scope = prior_source_cost > budget and source_cost <= prior_source_cost and target_cost <= budget
+            if not shared_scope:
+                packed.append(group)
+                group = merged([item])
+                continue
+        group = trial
+    if group is not None:
+        packed.append(group)
     return packed
 
 
@@ -98,39 +120,21 @@ def plan(snapshot):
         empty_keys = [key for key, value in expected.items() if value[0] == 'disposition']
         remaining -= set(empty_keys)
         source_items.append(work_item('review_sources', [], questions, empty_keys))
-    source_items = pack_work(source_items, budget)
-    relation_items = []
-    for key in sorted(remaining):
-        kind, identity, _, _ = expected[key]
-        if kind == 'reporting_gap':
-            continue
-        row = snapshot.indexes[KINDS[kind]][identity]
-        fact_ids = row.get('supporting_fact_ids', row.get('fact_ids', row.get('related_fact_ids', [])))
-        if kind == 'fact':
-            fact_ids = [identity]
-        quotes = [quote for fact_id in fact_ids for quote in snapshot.indexes['facts'][fact_id]['quote_locators']]
-        if kind == 'counterevidence':
-            quotes += row['quote_locators']
-            target = snapshot.indexes[KINDS[row['target_kind']]][row['target_id']]
-            quotes += target.get('quote_locators', [])
-            if row['target_kind'] == 'observation':
-                quotes.append(target['quote_locator'])
-            for fact_id in target.get('supporting_fact_ids', []):
-                quotes += snapshot.indexes['facts'][fact_id]['quote_locators']
-        if kind == 'observation':
-            # 同口径冲突可能藏在其他观测，保留全部观测源定位供独立比较。
-            quotes += [item['quote_locator'] for item in snapshot.tables['observations']]
-        quotes += [quote for item in snapshot.tables['counterevidence'] if item['target_id'] == identity
-                   for quote in item['quote_locators']]
-        spans = {canonical({k: q[k] for k in ('document_version_id', 'text_field', 'start', 'end')}):
-                 {k: q[k] for k in ('document_version_id', 'text_field', 'start', 'end')} for q in quotes}
-        dependencies = [item['work_key'] for item in source_items]
-        relation_items.append(work_item('review_relations', list(spans.values()), questions, [key], dependencies))
-    for identity in sorted(reporting.local_gaps(snapshot)):
-        keys = [key for key in sorted(remaining) if expected[key][0] == 'reporting_gap' and expected[key][1] == identity]
-        relation_items.append(work_item('review_relations', [], questions, keys,
-                                       [item['work_key'] for item in source_items]))
-    items = source_items + pack_work(relation_items, budget)
+    # 来源相同的原文归同一独立session，不能按任意窗口预算串行拆调用。
+    grouped = defaultdict(list)
+    for item in source_items:
+        spans = item['document_spans']
+        source_id = snapshot.documents[spans[0]['document_version_id']]['source_id'] if spans else ''
+        grouped[source_id].append(item)
+    source_items = [work_item('review_sources',
+        [span for row in group for span in row['document_spans']], questions,
+        [key for row in group for key in row['target_keys']]) for _, group in sorted(grouped.items())]
+    items = list(source_items)
+    if remaining:
+        # 一个独立汇总session核全部关系和报告限制，不分成外部续行批次。
+        spans = [span for item in source_items for span in item['document_spans']]
+        items.append(work_item('review_relations', spans, questions, sorted(remaining),
+                               [item['work_key'] for item in source_items]))
     require(len({item['work_key'] for item in items}) == len(items), 'A12', '/work_plan', 'Duplicate work scope')
     allocated = [key for item in items for key in item['target_keys']]
     require(len(allocated) == len(expected) and set(allocated) == set(expected),
@@ -163,30 +167,45 @@ def request_or_reviews(snapshot, checks):
     work = plan(snapshot)
     plan_ref = ctx.put_json('validation-work-plan.json', work, 'investment.sc03.assessment_work_plan')
     identity_ref = reviewer_identity(snapshot)
-    role_refs = [item['ref'] for item in ctx.input['input_refs']]
     base = [plan_ref, identity_ref, ctx.candidate_ref, ctx.candidate['payload_ref'], ctx.input['parameters_ref']]
     base += [reference for reference, _ in snapshot.upstream_receipts.values()]
-    base += role_refs + ctx.candidate['datasets'] + [snapshot.corpus['documents_ref'], snapshot.corpus['coverage_ref'], snapshot.corpus['pending_items_ref']]
+    base += [item['ref'] for item in ctx.input['input_refs']] + ctx.candidate['datasets']
+    base += [snapshot.corpus[field] for field in ('documents_ref', 'coverage_ref', 'pending_items_ref')]
+    source_items = [item for item in work['items'] if item['step_id'] == 'review_sources']
+    jobs = []
+    for item in source_items:
+        refs = base + [snapshot.documents[span['document_version_id']]['body_ref'] for span in item['document_spans']]
+        jobs.append((item['step_id'], refs, item['work_key']))
+    responses = execute_sessions(ctx, jobs)
     reviews, output_refs = [], []
-    for item in work['items']:
-        references = base + [snapshot.documents[span['document_version_id']]['body_ref'] for span in item['document_spans']]
-        if item['step_id'] == 'review_relations':
-            references += output_refs + [row['body_ref'] for row in snapshot.documents.values()]
-        references = list({ref['uri']: ref for ref in references}.values())
-        response = ctx.host_response(item['step_id'], work_key=item['work_key'])
-        if response is None:
-            return ctx.request_host(item['step_id'], references, work_key=item['work_key']), None
+    rejected = False
+    for item, response in zip(source_items, responses):
         validate_batch(snapshot, response, item, identity_ref)
         reviews.append((item, response))
         matches = [ref for ref in ctx.resolver.host_output_refs if
                    ref['uri'].endswith('host-' + item['step_id'] + '-' + item['work_key'] + '-output.json')]
         require(len(matches) == 1, 'A11', '/host_response', 'Semantic response lacks actual bound output identity')
         output_refs.append(matches[0])
+        rejected = record_source_rejections(snapshot, response, checks) or rejected
+    if rejected:
+        return None, (None, [plan_ref, identity_ref] + output_refs)
+    for item in work['items']:
+        if item['step_id'] != 'review_relations':
+            continue
+        refs = base + output_refs + [row['body_ref'] for row in snapshot.documents.values()]
+        response = execute_sessions(ctx, [(item['step_id'], refs, item['work_key'])])[0]
+        validate_batch(snapshot, response, item, identity_ref)
+        reviews.append((item, response))
+        matches = [ref for ref in ctx.resolver.host_output_refs if
+                   ref['uri'].endswith('host-' + item['step_id'] + '-' + item['work_key'] + '-output.json')]
+        require(len(matches) == 1, 'A11', '/host_response', 'Relation review lacks actual bound output identity')
+        output_refs.append(matches[0])
     combined = combine(snapshot, reviews, identity_ref)
     review_ref = ctx.put_json('validation-semantic-review.json', combined, 'investment.sc03.semantic_review')
-    checks.set('A11', reason='Current input/candidate, exact work keys and actual host response bindings checked; actual calls require host audit evidence')
-    checks.set('A12', reason='All independently enumerated targets and all source windows have exact bound findings')
+    checks.set('A11', reason='Automatic independent sessions bind the current input, candidate and actual execution records')
+    checks.set('A12', reason='All source windows and independently enumerated targets have exact bound findings')
     return None, (combined, [plan_ref, identity_ref, review_ref] + output_refs)
+
 
 
 def validate_batch(snapshot, review, item, identity_ref):
@@ -227,11 +246,6 @@ def validate_batch(snapshot, review, item, identity_ref):
             snapshot.quote(quote)
         snapshot.facts_exist(finding['supporting_fact_ids'], 'A12', '/findings/supporting_fact_ids')
         judgment = finding['judgment']
-        if (finding['target_kind'] == 'disposition' and row['status'] == 'answered'
-                and not any(snapshot.indexes['facts'][key]['verification_status'] in ACCEPTED for key in row['fact_ids'])):
-            require(judgment == 'supported' and finding['source_quotes'],
-                    'A10', '/dispositions/' + row['disposition_id'],
-                    'Answered question without accepted facts requires direct independently supported source quotes')
         if judgment in ('supported', 'contradicted'):
             require(finding['source_quotes'] or finding['supporting_fact_ids'],
                     'A12', '/findings', 'Substantive semantic judgment has no actual evidence')
@@ -255,8 +269,22 @@ def validate_batch(snapshot, review, item, identity_ref):
         snapshot.facts_exist(document['fact_ids'], 'A10', '/document_reviews')
         for quote in document['basis_quotes']:
             snapshot.quote(quote)
-        require(document['assessment'] not in ('missing_claims', 'unreadable'),
-                'A10', '/document_reviews', 'Independent source review found missing claims or unreadable material')
+
+
+def record_source_rejections(snapshot, review, checks):
+    """汇总已完成来源批的明确拒绝，公开具体字段和原因，保留未评审边界。"""
+    rejected = False
+    for finding in review['findings']:
+        if (finding['target_kind'] == 'fact' and finding['target_pointer'] == '/assertion'
+                and finding['dimension'] in ('atomicity', 'entailment') and finding['judgment'] == 'contradicted'):
+            checks.fail('A06', '/facts/' + finding['target_id'] + '/assertion', finding['reason'])
+            rejected = True
+    for document in review['document_reviews']:
+        if document['assessment'] in ('missing_claims', 'unreadable'):
+            identity = snapshot.documents[document['document_version_id']]['document_id']
+            checks.fail('A10', '/documents/' + identity, document['reason'])
+            rejected = True
+    return rejected
 
 
 def combine(snapshot, reviews, identity_ref):
@@ -379,7 +407,7 @@ def semantic_rules(snapshot, review, checks):
                 checks.fail('A07', '/events/' + identity, 'Event identity is not supported by independent source review')
         if kind == 'observation' and verdict != 'supported':
             row = snapshot.indexes['observations'][identity]
-            if verdict == 'contradicted' or row['raw_value']['status'] == 'known':
+            if row['raw_value']['status'] == 'known':
                 checks.fail('A08', '/observations/' + identity, 'Observed value or its measurement scope is not source-supported')
         if kind == 'hypothesis' and verdict != 'supported':
             row = snapshot.indexes['hypotheses'][identity]

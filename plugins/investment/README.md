@@ -4,7 +4,7 @@
 
 Investment 将投资研究划分为十条职责明确的子链，通过强格式输入输出和独立验证交接。本页是项目目标与文档入口；开发、验证和审查先遵守 [AGENTS.md](AGENTS.md)。
 
-当前能力：SC01 已有确定性交易登记、独立验证及运行入口，自然语言转强格式的宿主适配尚未实现；SC02 已有可插拔采集框架、独立验收及运行入口，来源适配和整窗覆盖仍有缺口，详见 [SC02 能力边界](docs/chains/news_collection/internal.md#来源能力与限制)。SC03—SC10 保留职责与模型设计，尚未实现。实现入口存在不等于来源可用、模型有效或投资资格通过。
+当前能力：SC01已有交易登记、独立验证及运行入口，自然语言宿主适配尚未实现；SC02已有来源采集、独立验收及运行入口，来源和整窗覆盖仍有缺口，见[能力边界](docs/chains/news_collection/internal.md#来源能力与限制)。SC03已接入脚本自动按来源并发子session、独立验证和单次运行入口，当前完整示例单测未通过、没有有效封存输出，见[SC03内部说明](docs/chains/news_assessment/internal.md)。实现存在不代表业务验收通过。SC04—SC10范围见各自说明。
 
 investment.bak 仅提供理论和业务链路参考，旧版实现、函数划分、字段及运行结果不作为当前实现依据。
 
@@ -64,6 +64,7 @@ investment.bak 仅提供理论和业务链路参考，旧版实现、函数划�
 | 字段、Schema、规则、SQL及格式示例 | [v1 机器规范索引](docs/spec/v1/README.md) |
 | SC01 实现、安装、运行和真实场景验证 | [SC01 内部说明](docs/chains/account/internal.md#运行与验证) |
 | SC02 来源插件、运行和真实场景验证 | [SC02 内部说明](docs/chains/news_collection/internal.md#运行与验证) |
+| SC03 一次调用要求、禁止中途干预及未完成状态 | [SC03 内部说明](docs/chains/news_assessment/internal.md#运行与验证) |
 | 既往文档审查范围和结论 | [历史审查记录](docs/reviews/20261019-project-constraints.md) |
 
 每条子链从上表业务链路中的子链名称进入：README 负责外部业务说明，internal 负责内部编排与操作；精确规则从子链页面链接到 spec/v1。当前目录、代码包映射及后续示意布局见架构文档。

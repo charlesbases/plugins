@@ -13,8 +13,8 @@ class NewsPluginTests(unittest.TestCase):
         self.assertIsNone(error, error)
         self.assertTrue(all(case['passed'] for case in report['cases']))
 
-    def test_all_failed_three_attempts(self):
-        report, error = run_case('all_failed_three_attempts')
+    def test_all_failed_once(self):
+        report, error = run_case('all_failed_once')
         self.assertIsNone(error, error)
         self.assertTrue(all(case['passed'] for case in report['cases']))
 

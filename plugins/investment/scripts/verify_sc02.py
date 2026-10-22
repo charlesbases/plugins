@@ -30,7 +30,7 @@ from investment.runtime.paths import production_root, test_parent, validate_root
 
 PLUGIN = Path(__file__).resolve().parents[1]
 CASES = ('multi_source', 'wait_all_partial', 'pagination_duplicates', 'unknown_time_or_layout',
-         'plugin_add_remove', 'all_failed_three_attempts', 'fresh_invocation', 'isolation')
+         'plugin_add_remove', 'all_failed_once', 'fresh_invocation', 'isolation')
 LIVE_LIMITS = {'global_concurrency': 8, 'per_source_concurrency': 2, 'timeout_ms': 10000,
                'response_byte_limit': 8388608, 'decoded_byte_limit': 16777216, 'request_budget': 256,
                'page_budget': 8, 'document_budget': 4, 'redirect_budget': 3}
@@ -127,7 +127,7 @@ class Scenario:
         parameters = {'schema_version': 1, 'stage_id': 'SC01', 'parameters': [
             {'name': name, 'value': value, 'unit': unit, 'source_kind': kind, 'basis_ref': method_ref,
              'determination_rule': 'constant_v1', 'determined_at': self.clock}
-            for name, value, unit, kind in (('max_attempts', 3, 'count', 'engineering_budget'),
+            for name, value, unit, kind in (('max_attempts', 1, 'count', 'engineering_budget'),
                 ('max_json_bytes', 10485760, 'count', 'engineering_budget'), ('decimal_precision', 80, 'count', 'engineering_budget'),
                 ('execution_timezone', 'Asia/Shanghai', 'code', 'registered_business_rule'))]}
         params_ref = write('parameters.json', parameters, 'investment.parameter_set')
@@ -436,19 +436,19 @@ def plugin_add_remove(s):
     assert len(added['captures']) == 4
 
 
-def all_failed_three_attempts(s):
+def all_failed_once(s):
     entries = []
     for source_id in ('outage_a', 'outage_b'):
         s.listing(source_id, [], status=503)
         entries.append(s.install(source_id))
-    outcome = s.execute(entries, 'all_failed_three_attempts', 'Both actual publishers return 503 for every request.',
-        'Exactly three failed process attempts/six captured503s; no candidate/receipt/Seal; actual reasons/logs retained; downstream denied and goal unmet.')
+    outcome = s.execute(entries, 'all_failed_once', 'Both actual publishers return 503 for every request.',
+        'Exactly one failed process attempt/two captured503s; no candidate/receipt/Seal; actual reasons/logs retained; downstream denied and goal unmet.')
     assert outcome['code'] == 1, s.cases[-1]['actual']
     result, invocation = outcome['result'], outcome['invocation']
-    assert result['status'] == 'failed' and result['attempt_count'] == 3 and result['allowed_uses'] == []
+    assert result['status'] == 'failed' and result['attempt_count'] == 1 and result['allowed_uses'] == []
     assert result['sealed_output_ref']['status'] == 'not_applicable' and invocation['processing_state'] == 'failed'
     summary = s.resolver.resolve(result['failure_summary_ref']['value'], 'investment.sc02_failure_summary')
-    assert summary['attempt_count'] == len(summary['attempt_failure_refs']) == 3 and summary['downstream_allowed'] is False
+    assert summary['attempt_count'] == len(summary['attempt_failure_refs']) == 1 and summary['downstream_allowed'] is False
     for number, attempt in enumerate(invocation['attempts'], 1):
         assert attempt['attempt_no'] == number and attempt['processing_state'] == 'failed'
         assert attempt['candidate_ref']['status'] == attempt['receipt_ref']['status'] == 'not_applicable'
@@ -460,7 +460,7 @@ def all_failed_three_attempts(s):
         assert len(captures) == 2 and all(item['http_status'] == known(503) for item in captures)
         directory = outcome['folder'] / f'attempt-{number:02}'
         assert not any((directory / filename).exists() for filename in ('candidate.json', 'receipt.json', 'sealed.json', 'validation.stdout.log'))
-    assert len([item for item in s.requests if item['phase'] == 'all_failed_three_attempts']) == 6
+    assert len([item for item in s.requests if item['phase'] == 'all_failed_once']) == 2
 
 
 def fresh_invocation(s):

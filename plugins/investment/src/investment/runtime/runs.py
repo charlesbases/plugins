@@ -163,7 +163,7 @@ def save_manifest(root, manifest, schemas):
             # 失败落盘到下一次开始/终态汇总之间也是可恢复的确定状态。
             require(bool(states) and (states == ["failed"] * len(states) or states == ["failed"] * (len(states) - 1) + ["running"]), "T04", "/attempts", "Invalid active attempt sequence")
         elif processing == "failed":
-            require(states == ["failed", "failed", "failed"], "T02", "/attempts", "Failure requires exactly three failed attempts")
+            require(states and all(state == "failed" for state in states), "T02", "/attempts", "Failure requires actual failed execution records")
         else:
             require(bool(states) and states == ["failed"] * (len(states) - 1) + ["passed"], "T02", "/attempts", "Completion requires one final passed attempt")
         previous_finish = instant(inv["created_at"])

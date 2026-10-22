@@ -145,6 +145,17 @@ def extract_body(response: CapturedResponse, frozen, limit: int):
         raise LayoutUnknown(str(error) or 'source_layout_unknown') from error
 
 
+def calendar_date(literal: str, fmt: str):
+    formats = {'date_ymd': ('%Y-%m-%d',), 'date_dmy': ('%d/%m/%Y',), 'date_mdy': ('%m/%d/%Y',),
+               'english_date': ('%B %d, %Y', '%d %B %Y', '%d %b %Y')}
+    for date_format in formats.get(fmt, ()):
+        try:
+            return datetime.strptime(literal, date_format)
+        except ValueError:
+            continue
+    return None
+
+
 def time_evidence(source_time: dict, rule: dict, basis_ref: dict):
     if not is_known(source_time):
         return unknown('source_time_missing')
@@ -163,15 +174,7 @@ def time_evidence(source_time: dict, rule: dict, basis_ref: dict):
         else:
             if not is_known(rule['timezone']):
                 return unknown('source_timezone_missing')
-            formats = {'date_ymd': ('%Y-%m-%d',), 'date_dmy': ('%d/%m/%Y',), 'date_mdy': ('%m/%d/%Y',),
-                       'english_date': ('%B %d, %Y', '%d %B %Y', '%d %b %Y')}
-            point = None
-            for date_format in formats.get(fmt, ()):
-                try:
-                    point = datetime.strptime(literal, date_format)
-                    break
-                except ValueError:
-                    pass
+            point = calendar_date(literal, fmt)
             if point is None:
                 return unknown('source_time_format_unknown')
             zone = rule['timezone']['value']
@@ -187,8 +190,16 @@ def utc_text(point: datetime) -> str:
     return point.astimezone(timezone.utc).isoformat(timespec='microseconds').replace('+00:00', 'Z')
 
 
-def window_membership(evidence: dict, window: dict) -> str:
+def window_membership(evidence: dict, window: dict, source_time: dict, rule: dict) -> str:
     if not is_known(evidence):
+        if evidence['reason'] == 'source_timezone_missing':
+            day = calendar_date(source_time['value'], rule['time_format'])
+            if day is not None:
+                # UTC仅标记日历坐标；全部合法offset小于一天，不作为来源时区证据。
+                day = day.replace(tzinfo=timezone.utc)
+                earliest, latest = day - timedelta(days=1), day + timedelta(days=2)
+                if latest <= instant(window['start_at']) or earliest >= instant(window['end_at']):
+                    return 'outside'
         return 'uncertain'
     lower, upper = (instant(evidence['value'][key]) for key in ('lower_bound', 'upper_bound'))
     start, end = instant(window['start_at']), instant(window['end_at'])
@@ -406,7 +417,7 @@ def assemble_result(state: SourceCollector, global_capture_count: int):
             evidence = choose_publication(evidence, listing_times)
         document_id = identifier('doc', state.manifest['publisher_id'], normalize_url(capture['final_url']))
         version_id = 'ver-' + digest(raw)
-        membership = window_membership(evidence, request['window'])
+        membership = window_membership(evidence, request['window'], body['source_time'], rule)
         item = {'response': response, 'requested_url': root.envelope['requested_url'],
                 'document_id': document_id, 'version_id': version_id, 'membership': membership}
         supported[capture_id] = item
