@@ -7,7 +7,7 @@ description: Build one complete engineering proposal from requirements, design i
 
 ## Proposal Boundary
 
-- Follow the [single proposal workflow](../using-cortex/SKILL.md#workflow-state). Start from requirements, design input, and source evidence without a prior design approval.
+- Follow the [single proposal workflow](../using-cortex/SKILL.md#workflow-state). Start from brainstorming's retained scope, its requirement or evidence basis, and the design produced within that scope, without a separate scope or design approval.
 - Do not edit implementation files, generate patches, or execute proposed work. Create a plan file only when explicitly requested as a deliverable.
 - Use code-tracing for missing source proof and brainstorming for outcome-affecting unknowns or its Revision Evidence workflow. Resolve evidence and design questions before presenting a complete proposal.
 - Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) when accepting design input. Preserve the distinction between confirmed facts, explicit requirements, hypotheses, external evidence gaps, and proposed behavior throughout the proposal.
@@ -16,7 +16,7 @@ description: Build one complete engineering proposal from requirements, design i
 
 ## Entry And Return
 
-- If complete design input is missing, use brainstorming; do not wait for a separate design approval.
+- If scope pruning or complete design input is missing, return to brainstorming before constructing the proposal. Return unsupported additions to requirement analysis; do not establish their necessity by turning them into design decisions or implementation tasks. Do not request a separate scope or design approval.
 - If the complete current proposal is already presented but unapproved, discuss it or wait; do not generate a duplicate approval stage.
 - For objections, new directions, narrowed meaning, or changed proposal decisions, require brainstorming's Revision Evidence before presenting the revised complete proposal. State the revision reason and retain the earlier approved content while the revision is pending.
 - With an unchanged approved proposal, resume its execution workflow without another confirmation. The proposal already specifies its mode.
@@ -26,7 +26,7 @@ description: Build one complete engineering proposal from requirements, design i
 
 For this skill, behavior-changing work includes changes to runtime output (including logs), state, control flow, or external effects.
 
-1. Review the requirements, design input, source evidence, and established constraints. Verify the key premises of each design decision, including whether existing mechanisms already satisfy the requirement; return critical source gaps to tracing and genuine user decisions to brainstorming.
+1. Review the retained scope and its basis before constructing tasks. Verify that the design stays within it and that its key premises remain supported, including whether existing mechanisms already satisfy the requirement. Return scope additions to brainstorming's requirement analysis, critical source gaps to tracing, and genuine user decisions to brainstorming.
 2. Identify affected files or packages, responsible symbols, entry points, ownership boundaries, state dependencies, and configuration dependencies.
 3. Build an ordered task list with one coherent change per task. For behavior-changing work, build both an end-to-end code-level call chain and separate file-by-file pseudocode across the affected tasks; split only when files, dependencies, or ordering require it.
 4. Define exact implementation boundaries, behavior that must remain unchanged, and validation evidence for every task.

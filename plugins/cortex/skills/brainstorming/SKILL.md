@@ -7,25 +7,32 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Entry And Handoff
 
-- Follow the [single proposal workflow](../using-cortex/SKILL.md#workflow-state). Analyze design input without a separate design approval, then hand it to `cortex:writing-plans` for one complete proposal.
+- Follow the [single proposal workflow](../using-cortex/SKILL.md#workflow-state). Complete requirement analysis and scope pruning before design, then hand the retained scope and its design to `cortex:writing-plans` for one complete proposal. This ordering adds no separate approval.
 - Preserve valid approved content when continuing the same scope. For objections, new directions, narrowed designs, or changed meanings, apply Revision Evidence below before recommending a revised proposal.
 - A delegated implementer returns design decisions and evidence to its controller rather than seeking user approval.
 - Keep this phase analytical: do not edit implementation files or generate patches. An explicitly requested design document is a permitted deliverable, not implementation authority.
 - Use `cortex:code-tracing` when current behavior, call chains, configuration timing, state branches, or impact affect a decision.
 
-## Requirement And Design Analysis
+## Requirement Analysis And Scope Pruning
 
 - Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) to questions and design premises in both initial designs and revisions.
 - Preserve established interface, configuration-format, and scope decisions. Implementation convenience or a missing dependency does not justify changing them.
+- Establish the requested outcomes, constraints, and existing contracts that must be preserved before considering implementation choices. Prune proposed additions, not explicit requirements or required existing behavior.
 - Treat an unclear target, location, affected path, output, persistence, validation scope, or temporary-versus-permanent behavior as an evidence gap first. Recover established context and trace source-resolvable details before deciding whether a necessary user question remains.
-- Map each proposed change to an explicit requirement or proven prerequisite. For a claimed correction, establish both the current problem and why existing mechanisms do not satisfy the required outcome; for new behavior, identify the user requirement and proposed design. Check source-based proposals under the [batch evidence contract](../code-tracing/references/evidence-contract.md); a checkpoint cannot establish user approval or semantic correctness.
+- For each candidate addition to behavior or scope, determine whether all requested outcomes and constraints can be satisfied without it. If they can, exclude the addition before design. Otherwise identify the explicit requirement or source-proven prerequisite it satisfies; a hypothetical benefit or risk alone does not establish necessity. Do not generate optional additions merely to populate this assessment.
+- For a claimed correction, establish both the current problem and why existing mechanisms do not satisfy the required outcome; an explicit new requirement does not need evidence of an existing defect. Check source-based conclusions under the [batch evidence contract](../code-tracing/references/evidence-contract.md); a checkpoint cannot establish user approval or semantic correctness.
+- Use the invoking skill's mode. Otherwise an explicit target and outcome is `Precision`; diagnosis, comparison, design, or choice is `Exploration`. Ask about classification only when it changes the visible outcome.
+- Classify potential actions as `Required`, `Blocker`, or `Observation`. Only Required actions enter the retained scope. Resolve a scope-critical Blocker through tracing or necessary user input before designing the dependent part; independent established scope may proceed. Do not investigate or design an Observation.
+- Keep the retained scope and its requirement or evidence basis in task context. Enter design only after this assessment; do not defer necessity decisions to planning, code generation, or review. No additional report or user confirmation is required.
+
+## Design Within Retained Scope
+
+- Design only the retained scope. If design reveals a new behavior or scope addition, return it to requirement analysis and scope pruning before designing the affected part. Implementation details that satisfy the retained scope do not create new requirements.
 - Check key design premises against state transitions, lifecycle timing, consumers, and the strongest relevant counterexample before recommending a change. A missing field or display requirement alone does not prove a missing capability or equivalent business states. Preserve unresolved premises as conditional discussion, not required implementation work.
 - Explain interpreted scope when it can be misread. Default to the smallest repository-owned change that satisfies the requirement; unrelated cleanup or expansion does not enter the proposal without explicit user scope.
-- Use the invoking skill's mode. Otherwise an explicit target and outcome is `Precision`; diagnosis, comparison, design, or choice is `Exploration`. Ask about classification only when it changes the visible outcome.
-- Classify potential actions as `Required`, `Blocker`, or `Observation`. Include only Required actions; return a source-resolvable Blocker to tracing and turn a genuinely missing user input into the necessary question under Evidence And Clarification. Do not investigate an Observation.
 - State proven facts and identify unknown inputs, boundary behavior, compatibility, contracts, error handling, ownership, and validation.
 - In Precision, recommend the smallest valid change; surface a material tradeoff as a specific question needed for the proposal. In Exploration, compare approaches only when requested or needed for the decision.
-- Form design input with impact, constraints, boundary and error behavior, and validation. Hand it to writing-plans without a generic design-confirmation question.
+- Hand the retained scope, its requirement or evidence basis, and the design with impact, constraints, boundary and error behavior, and validation to writing-plans without a generic design-confirmation question.
 
 ## Revision Evidence
 
@@ -36,7 +43,7 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 5. Map requirement → observable result → value/state definition and calculation → lifecycle point → candidate behavior or expression → final consumer. Existing values require source evidence; proposed new values require an explicit design definition.
 6. A field, expression, simpler edit, or alternate path suggested by the user is a candidate implementation. If its meaning or effect conflicts with the current target, state the discrepancy and impact as a new design decision; do not describe it as equivalent.
 7. If the user explicitly changes the target, record that requirement change and evaluate against the new target. Do not reject it solely because it differs from the original goal.
-8. Give writing-plans the changed decision, source basis, feasibility, semantic comparison, and affected implementation and validation. It presents the complete revised proposal for one confirmation before changed work.
+8. Reapply requirement analysis and scope pruning before revising the affected design. Give writing-plans the retained scope, changed decision, source basis, feasibility, semantic comparison, and affected implementation and validation. It presents the complete revised proposal for one confirmation before changed work.
 9. When the original proposal remains valid, explain the supporting evidence and preserve applicable scope; an unresolved challenged decision is not permission to implement a substitute.
 
 ## Scope
