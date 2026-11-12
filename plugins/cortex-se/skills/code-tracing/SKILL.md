@@ -22,4 +22,4 @@ description: Establish repository behavior and complete relevant call paths from
 
 ## Output
 
-Separate confirmed facts, inferences, and open questions. Cite the key source ranges and show the relevant call path without pasting large files. This skill is read-only. For a requested behavior change, hand the established path to `cortex-se:writing-plans`; for a read-only question, return the supported conclusion to the calling workflow.
+Separate confirmed facts, inferences, and open questions. Cite the key source ranges and show the relevant call path without pasting large files. This skill is read-only for subject files. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); a delegated tracer returns state updates instead, and an explicit user prohibition on writes takes precedence. For a requested behavior change, hand the established path to `cortex-se:writing-plans`; for a read-only question, return the supported conclusion to the calling workflow.

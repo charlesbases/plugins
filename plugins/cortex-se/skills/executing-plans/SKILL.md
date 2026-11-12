@@ -7,6 +7,8 @@ description: Implement a scoped software change using a source-grounded how-to p
 
 ## Entry And Scope
 
+- Read [Current Task Context](../using-cortex/references/task-context.md) before starting or resuming, including after compaction. Reconcile actual files, effective constraints and user-authorized scope. Update meaningful progress, pending cleanup and new unresolved questions, even in clarification-only turns. Complete authorized removal of superseded artifacts without discarding shared or independently owned work; do not turn record maintenance into a new approval gate.
+
 - An explicit user implementation request authorizes its stated scope. Begin after establishing relevant context, a complete relevant call chain for behavior changes, and the how-to plan required by `cortex-se:writing-plans`. Do not require separate design, plan, or execution-mode approvals for a clear request.
 - Resolve a material unanswered outcome, contract, ownership, or scope decision through `cortex-se:brainstorming` before the affected implementation. Once answered, continue without another plan confirmation.
 - For a revised direction, verify the plan includes brainstorming's revision evidence and current outcome-to-value/state/expression mapping before affected writes. Return missing proof to that workflow without adding a generic approval stage.

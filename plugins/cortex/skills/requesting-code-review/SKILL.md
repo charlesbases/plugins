@@ -15,7 +15,7 @@ description: Review a working-tree diff, commit, pull request, merge request, or
 
 ## Review Gate
 
-- Treat code review as read-only. Do not edit files, generate patches, or run Git mutation commands.
+- Treat code review as read-only for the review target. Do not edit target files, generate implementation patches, or run Git mutation commands. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); a delegated reviewer remains read-only and returns findings and state updates to the controller. An explicit user prohibition on writes still takes precedence.
 - Do not run tests, lint, builds, or other validation outside the confirmed review scope.
 - Do not make a formal finding without a realistic trigger, concrete impact, and diff and source evidence.
 - Do not treat unclear requirements, unproven behavior, or style preference as a formal finding.

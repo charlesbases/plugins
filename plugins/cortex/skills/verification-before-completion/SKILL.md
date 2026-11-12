@@ -7,6 +7,8 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 
 ## Verification Gate
 
+- Read [Current Task Context](../using-cortex/references/task-context.md) and reconcile actual results with all effective user requirements and remaining cleanup. Check requirements against their sources when meaning is disputed, rather than using the latest design or its tests as the definition of success. Update observed progress and unresolved items before reporting. Reading/updating the snapshot is not evidence that its contents were obeyed; withdraw unsupported conclusions instead of replacing them with unverified explanations.
+
 - For repository conclusions, finish the [batch evidence checkpoint](../code-tracing/references/evidence-contract.md) using evidence current after the relevant changes. Reuse unchanged receipts; reread only invalidated or missing ranges.
 - Report structural checkpoint status separately from semantic correctness and task completion. An analysis checkpoint may legitimately contain inferred or unresolved claims; do not present those as established facts or use them as a change basis.
 - For implementation governed by an approved call chain and separate pseudocode, compare the final path with both. For a changed observable outcome, value, or state meaning, compare the final behavior or expression and lifecycle point with the confirmed mapping. Structural checkpoints, format checks, and tests alone do not prove semantic equivalence.

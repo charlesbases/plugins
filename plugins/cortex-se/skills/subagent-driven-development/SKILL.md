@@ -7,6 +7,8 @@ description: Coordinate user-requested delegated implementation of independent s
 
 ## Entry
 
+- The controller follows [Current Task Context](../using-cortex/references/task-context.md), recovers its current snapshot and carries applicable requirements, authority and cleanup obligations into each brief. Delegates return state changes and do not edit the controller's snapshot. Reconcile handoffs and existing progress records with that snapshot; an old brief must not reactivate a withdrawn design. This does not require per-task files beyond the recovery needs described below.
+
 - Use this skill only when the user requests delegated implementation and the work has at least two tasks with separable writes and decisions. Otherwise use `cortex-se:executing-plans` without asking the user to choose a mode.
 - Establish the requested outcome, applicable project context, complete relevant call chain, and the how-to plan from `cortex-se:writing-plans` before dispatch. A clear implementation request needs no separate design or plan confirmation.
 - Before dispatch, verify that the plan includes both the required call-chain representation and separate file-by-file pseudocode. Complete missing plan content without another user confirmation, and include the relevant segments in each task brief.

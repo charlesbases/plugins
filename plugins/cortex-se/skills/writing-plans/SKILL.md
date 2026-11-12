@@ -7,11 +7,13 @@ description: Specify how a behavior-changing implementation will work, or produc
 
 ## Entry
 
+- Read [Current Task Context](../using-cortex/references/task-context.md) and reconcile the plan with all effective user requirements, not just the latest message. Keep facts, requirements and design choices separate. Include cleanup of replaced designs and dependent expectations, preserving shared and independently owned work. Save the complete current plan and actual authority without stacking incompatible historical versions; retain SE's clear-request authorization rules.
+
 - Start from brainstorming's retained scope, its requirement or evidence basis, and the design produced within that scope. If scope pruning or necessary design input is missing, return to brainstorming before constructing tasks. Return unsupported additions to requirement analysis; do not establish their necessity by turning them into design decisions or implementation steps. A clear implementation request needs no separate scope or design approval. If a decision would change the outcome, contract, ownership, or scope, use `cortex-se:brainstorming` and ask for that decision before implementing it.
 - Read project instructions and use `cortex-se:code-tracing` to establish existing behavior, configuration, state, and the complete relevant call chain before making source-based plan claims. For new functionality with no existing path, establish its integration points and label the new chain as proposed.
 - Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) when accepting design input. Preserve the distinction between confirmed facts, explicit requirements, hypotheses, external evidence gaps, and proposed behavior throughout the plan.
 - For objections, new directions, narrowed designs, or changed meanings, require brainstorming's [Revision Evidence](../brainstorming/SKILL.md#revision-evidence) before presenting the updated plan. Include its source basis, feasibility, semantic comparison and impact without changing SE's confirmation policy.
-- A request for a plan only ends with the plan. Otherwise, complete the plan and continue to `cortex-se:executing-plans` without a separate plan confirmation or execution-mode question. Create a plan file only when requested.
+- A request for a plan only ends with the plan. Otherwise, complete the plan and continue to `cortex-se:executing-plans` without a separate plan confirmation or execution-mode question. Create a separate plan deliverable only when requested; still update the controller's `context.md` when the current plan, authority or open choices change. This operational update is not implementation and needs no extra confirmation.
 
 ## Describe How, Not Merely What
 

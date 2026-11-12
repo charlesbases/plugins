@@ -7,6 +7,8 @@ description: Check fresh source and validation evidence before reporting a softw
 
 ## Evidence
 
+- Read [Current Task Context](../using-cortex/references/task-context.md) and compare results with all effective user requirements and remaining cleanup, not only the latest plan or its tests. Update actual progress and unresolved items before reporting. Reading or changing the snapshot does not prove compliance; withdraw unsupported conclusions instead of replacing them with unverified explanations.
+
 - Map each final claim to the smallest evidence that can establish it: current source and diff, targeted test, build or static check, reproducible runtime observation, or a requested review.
 - For repository conclusions, finish the relevant [evidence checkpoint](../code-tracing/references/evidence-contract.md) after the final relevant change. A structurally valid checkpoint does not prove the source claim or runtime result; reconcile the actual path and counterexamples.
 - For behavior changes, compare the final entry-to-boundary path with the how-to plan's chain and separate file-level logic. Verify actual value/state definitions, calculations/expressions, lifecycle and final consumer against the requested outcome; successful tests or structural checks alone do not establish semantic equivalence.

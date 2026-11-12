@@ -1,11 +1,13 @@
 ---
 name: using-cortex
-description: Route engineering tasks to the required Cortex workflow skills and enforce their confirmation gates. Use at the start of feature work, source analysis, planning, implementation, debugging, review, or completion verification.
+description: Route engineering tasks and their follow-ups, including objections, unclear change requests and clarification-only turns after completion or recovery. Restore current task context before deciding the next workflow; enforce the existing confirmation gates for design and implementation.
 ---
 
 # Using Cortex
 
 ## Routing Rules
+
+- Before classifying a follow-up to an existing engineering task, read [Current Task Context](references/task-context.md) and that session's `context.md`. This applies even after a completion reply, after recovery, or when the message is too short to tell whether it concerns the implementation, report or record. Do not classify an unclear follow-up as an unrelated ordinary question before recovering its context. If clarification is still needed, record the unresolved target or choice before asking; do not retain a stale "no open questions" state. A confirmed presentation-only request needs no engineering implementation approval or source investigation; update the snapshot only if task state changes. Truly unrelated questions remain outside this workflow.
 
 - Treat a request to verify existing behavior as observation-only unless the user explicitly invokes `$testing`, requests a file change, test-point report, or diagnostic instrumentation. Use `cortex:code-tracing` only when source or configuration evidence is needed, perform only the bounded check requested by the user, then use `cortex:verification-before-completion`.
 - Do not add instrumentation, temporary configuration, test artifacts, or source changes to an observation-only verification. When existing evidence is insufficient, state the evidence gap and wait for the user to confirm the scope expansion.
@@ -20,6 +22,8 @@ description: Route engineering tasks to the required Cortex workflow skills and 
 - Before claiming work is complete, fixed, implemented, validated, reviewed, ready, or passing, use `cortex:verification-before-completion`.
 
 ## Workflow State
+
+- For controller-led Cortex work, read and follow [Current Task Context](references/task-context.md) on entry or recovery, and before reconciling a new instruction. Maintain `$HOME/.sessions/<session_id>/context.md` as the current snapshot of sourced requirements, design, authority, observed progress and open questions. This includes clarification-only turns that change task state; ordinary unrelated questions do not start this workflow.
 
 - For conclusions about existing repository behavior, use the batch evidence contract in [code-tracing](../code-tracing/references/evidence-contract.md). Ordinary translation, naming, and non-source questions do not need evidence records.
 - Register the investigation when source claims begin; reuse current receipts and check at investigation, proposal, and completion boundaries rather than after every tool. Hook coverage applies only to registered investigations.
@@ -41,7 +45,7 @@ description: Route engineering tasks to the required Cortex workflow skills and 
 
 - Skill re-entry and task recovery preserve an applicable approval. Recover the actual proposal, approving instruction, remaining work, mode, and active testing baseline before resuming. Ask only for genuinely missing approval context; do not infer it from an approval flag or existing edits.
 - An SDD implementer receives the approved proposal revision, task scope, and validation authority in its brief. Return missing facts or new decisions to the controller; do not request independent user approval.
-- Keep state in task context unless the approved proposal authorizes persistent records. Routing alone does not authorize recovery files.
+- Maintain the session snapshot under Current Task Context without a separate approval. Other recovery artifacts still require their applicable authority; the snapshot never grants implementation permission. Delegated agents return state changes to their controller.
 
 ## Evidence And Clarification
 

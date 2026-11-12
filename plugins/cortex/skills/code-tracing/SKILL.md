@@ -12,7 +12,7 @@ description: Analyze repository-owned source, call chains, control flow, data fl
 - Use [batch evidence checkpoints](references/evidence-contract.md) for repository conclusions. Register actual ranges in useful batches, reuse fresh receipts, and validate the declared obligations before a definitive conclusion or a proposal based on it.
 - Structural validation does not prove that the cited code supports the claim. Reconcile the evidence with the strongest relevant counterexample before classifying it as confirmed.
 
-- Treat tracing as read-only analysis. Do not edit files, generate patches, or create implementation plans.
+- Treat tracing as read-only analysis of the subject files. Do not change those files, generate implementation patches, or create implementation plans. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); a delegated tracer returns state updates to the controller instead. An explicit user prohibition on writes still takes precedence.
 - Do not claim current behavior, reachability, impact, root cause, regression risk, state, or completion evidence without supporting source evidence.
 - Read every repository-owned implementation, or every execution-relevant range when an implementation exceeds one evidence unit, used as evidence for a conclusion.
 

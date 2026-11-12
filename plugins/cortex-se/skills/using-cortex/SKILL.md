@@ -1,11 +1,13 @@
 ---
 name: using-cortex
-description: Route software development work through Cortex SE while preserving source accuracy and avoiding repeated confirmation gates.
+description: Route software development and its follow-ups through Cortex SE, including planning-only or clarification-only revisions and recovery, while preserving source accuracy and avoiding repeated confirmation gates.
 ---
 
 # Using Cortex SE
 
 ## Route The Request
+
+- Before classifying a follow-up to an existing engineering task, read [Current Task Context](references/task-context.md) and that session's `context.md`, including after completion or recovery. Do not discard an unclear follow-up as unrelated before recovering its context. If a goal, constraint, plan or open choice changes, update the on-disk `context.md` before replying, even when the reply only proposes a plan or asks a question. Do not leave an obsolete "no unresolved items" state. A confirmed presentation-only request needs no engineering approval or source investigation; unchanged task state needs no record rewrite. Truly unrelated questions remain outside this workflow.
 
 - For an existing-behavior question or a change that depends on current behavior, use `cortex-se:code-tracing`.
 - Before designing changes, use `cortex-se:brainstorming` to analyze requirements and prune scope. Resolve scope-critical unknowns before designing the dependent part; design only the retained scope. Ask only for a material behavior, contract, scope, or ownership choice that remains unresolved after Evidence And Clarification. A clear implementation request authorizes work within its stated scope; it does not require a separate scope, design, plan, or execution-mode confirmation.
@@ -16,6 +18,8 @@ description: Route software development work through Cortex SE while preserving 
 - If the user requests analysis, design, or a plan only, deliver that result without implementing it.
 
 ## Source And Scope
+
+- Controllers maintain [Current Task Context](references/task-context.md) at `$HOME/.sessions/<session_id>/context.md`: read it when present, create it directly when missing, and do not search or migrate other note filenames. Preserve sourced requirements, current design and authority, observed progress and open questions, including clarification-only turns. This operational record neither authorizes implementation nor adds a confirmation gate; delegates return state updates to their controller.
 
 - Read applicable project instructions, relevant code, configuration, existing tests, and current changes before making a source-dependent decision. For behavior-changing work, trace the complete relevant repository-owned path from entry and dispatch through key branches and state changes to the observable or error boundary. Include additional entry paths when the requested outcome depends on them. Do not treat a search hit or available API as proof of runtime reachability.
 - Use the [evidence contract](../code-tracing/references/evidence-contract.md) for repository conclusions and change bases. Evidence checkpoints establish structural source coverage, not semantic correctness or user authorization. Continue across bounded read batches until the relevant path is established; a read budget is not a reason to truncate the conclusion.

@@ -18,9 +18,11 @@ description: Directly execute a user-approved complete engineering proposal with
 
 ## Entry And Resume
 
+- Read [Current Task Context](../using-cortex/references/task-context.md) and the controller's snapshot before starting or resuming implementation, including after compaction. Reconcile current files, effective constraints and actual authorization. Update meaningful progress and pending cleanup as work changes; record new questions even when only clarification is possible. Complete authorized removals of superseded artifacts without discarding shared or independently owned work.
+
 - Recover the complete proposal revision, approving user instruction, file and validation scope, execution mode, remaining work, and active testing baseline before the first write or resumed validation.
 - Without a complete proposal, use brainstorming and writing-plans to produce one; with an unapproved proposal, wait for its single confirmation. With approved SDD mode, return to that workflow without switching mode.
-- Use task context or already authorized recovery records. Existing edits or an approval flag do not establish authority; ask only for genuinely missing context. Do not create unplanned recovery files.
+- Use the session snapshot and other authorized recovery records. Existing edits or an approval flag do not establish authority; ask only for genuinely missing context. Do not create other unplanned recovery files.
 - Preserve approval for unchanged scope. Changed decisions follow [Proposal Revision](../using-cortex/SKILL.md#proposal-revision), including the required evidence recheck.
 - A delegated SDD implementer returns to its controller rather than obtaining independent write authority here.
 

@@ -7,10 +7,10 @@ description: Diagnose observed failures and prove their root causes before propo
 
 ## Diagnosis Gate
 
-- Treat diagnosis as read-only. Do not edit files, generate patches, add diagnostic instrumentation, create tests, or apply fixes.
+- Treat diagnosis as read-only for the subject files. Do not edit them, generate implementation patches, add diagnostic instrumentation, create tests, or apply fixes. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); delegated agents return state updates instead. An explicit user prohibition on writes still takes precedence.
 - Limit executable commands, service interactions, and validation to user instructions, an approved complete proposal, or separately approved diagnostic scope.
 - Before any command outside that scope, state its purpose, expected evidence, and side effects, then wait for user confirmation.
-- When required validation fails under an approved complete proposal, including a testing handoff, treat necessary read-only repository analysis and local diagnostic commands within its changed and validation scope as approved diagnostic authority. Commands need not be individually listed when that scope covers them. This does not authorize external-service interaction, destructive actions, file writes during diagnosis, or expanded implementation or validation scope.
+- When required validation fails under an approved complete proposal, including a testing handoff, treat necessary read-only repository analysis and local diagnostic commands within its changed and validation scope as approved diagnostic authority. Commands need not be individually listed when that scope covers them. This does not authorize external-service interaction, destructive actions, writes to subject files during diagnosis, or expanded implementation or validation scope.
 - Do not accept a root cause from correlation, stack location, a recent change, or a plausible explanation alone.
 - Do not propose a fix or stack speculative changes before the root cause is confirmed.
 

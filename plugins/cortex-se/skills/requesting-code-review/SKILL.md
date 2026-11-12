@@ -7,7 +7,7 @@ description: Review a requested code change or a delegated implementation for co
 
 ## Scope
 
-- Use this skill when the user requests review or a user-requested delegated workflow requires it. Review is read-only; do not edit files or run Git mutation commands.
+- Use this skill when the user requests review or a user-requested delegated workflow requires it. Review is read-only for the target; do not edit target files or run Git mutation commands. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); a delegated reviewer remains read-only and returns findings and state updates. An explicit user prohibition on writes takes precedence.
 - Identify the exact working tree, commit, pull request, merge request, or Git range. For a working tree, inspect status and staged and unstaged changes. For a range, confirm base and head, then inspect the complete changed-file list before selected diffs.
 - Review all changed files and the repository-owned paths needed to assess their behavior. Use `cortex-se:code-tracing` for reachability, state, configuration, lifecycle, or error-propagation claims, including its evidence checkpoint.
 

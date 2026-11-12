@@ -36,6 +36,8 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Revision Evidence
 
+Apply [Current Task Context](../using-cortex/references/task-context.md) before this sequence: distinguish supplements, replacements, withdrawals, questions and unresolved conflicts. Preserve unaffected requirements and their sources. Remove superseded designs from the effective snapshot and record any remaining implementation as pending cleanup.
+
 1. On an objection, new direction, narrowed proposal, or changed interpretation, pause affected implementation and recover the original requirement, established constraints, new instruction, and challenged decision.
 2. Reread the affected repository-owned implementation context. Reconcile any still-applicable facts with the new decision; a prior receipt or unchanged file alone cannot prove the revised interpretation.
 3. Recheck the necessary chain from entry and validation through dispatch, production and mutation of values or state, key branches and errors, lifecycle timing, and final output, persistence, or external boundary. Read newly relevant callers and callees; do not expand into unrelated paths.
@@ -43,7 +45,7 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 5. Map requirement → observable result → value/state definition and calculation → lifecycle point → candidate behavior or expression → final consumer. Existing values require source evidence; proposed new values require an explicit design definition.
 6. A field, expression, simpler edit, or alternate path suggested by the user is a candidate implementation. If its meaning or effect conflicts with the current target, state the discrepancy and impact as a new design decision; do not describe it as equivalent.
 7. If the user explicitly changes the target, record that requirement change and evaluate against the new target. Do not reject it solely because it differs from the original goal.
-8. Reapply requirement analysis and scope pruning before revising the affected design. Give writing-plans the retained scope, changed decision, source basis, feasibility, semantic comparison, and affected implementation and validation. It presents the complete revised proposal for one confirmation before changed work.
+8. Reapply requirement analysis and scope pruning before revising the affected design. Explain what changes, which existing constraints remain binding, how the complete affected flow still achieves the outcome, and which prior decisions lose their basis. Give writing-plans the retained scope, changed decision, source basis, feasibility, semantic comparison, and explicit retain/adjust/remove artifact scope. It presents one self-contained current proposal for confirmation before changed implementation; do not require the user to assemble historical versions.
 9. When the original proposal remains valid, explain the supporting evidence and preserve applicable scope; an unresolved challenged decision is not permission to implement a substitute.
 
 ## Scope

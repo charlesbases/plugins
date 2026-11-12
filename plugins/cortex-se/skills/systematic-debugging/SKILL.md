@@ -12,7 +12,7 @@ description: Diagnose observed software failures from reproduction and complete 
 3. Use `cortex-se:code-tracing` to follow the complete relevant entry, preconditions, state and configuration changes, and failure boundary. Check source claims with its [evidence contract](../code-tracing/references/evidence-contract.md).
 4. Compare a known working path when it helps isolate the first divergence. Distinguish a proven local method effect from its runtime invocation and from the cause of the observed failure. A cleanup method or lifecycle declaration alone does not establish that the failing path reaches it; preserve an unproven link as an evidence gap throughout the fix handoff.
 
-Read-only local diagnosis within the requested task needs no separate confirmation. Temporary instrumentation may be used when necessary for an authorized fix, but remove it before completion unless it is part of the requested result. External interactions and irreversible diagnostics require their own authority.
+Read-only local diagnosis within the requested task needs no separate confirmation. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md) while leaving subject files unchanged; delegated agents return updates instead, and an explicit user prohibition on writes takes precedence. Temporary instrumentation may be used when necessary for an authorized fix, but remove it before completion unless it is part of the requested result. External interactions and irreversible diagnostics require their own authority.
 
 ## Fix And Recheck
 

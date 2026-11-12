@@ -24,6 +24,8 @@ description: Build one complete engineering proposal from requirements, design i
 
 ## Plan Construction
 
+Read the controller's [Current Task Context](../using-cortex/references/task-context.md) before constructing or revising a proposal. Map it to all effective user requirements, not only the latest message. Keep facts, user requirements and proposed choices distinct. Include removal of artifacts and expectations made obsolete by a replaced design; preserve shared and independently owned work. Save the complete current design and its actual approval state without appending incompatible historical plans.
+
 For this skill, behavior-changing work includes changes to runtime output (including logs), state, control flow, or external effects.
 
 1. Review the retained scope and its basis before constructing tasks. Verify that the design stays within it and that its key premises remain supported, including whether existing mechanisms already satisfy the requirement. Return scope additions to brainstorming's requirement analysis, critical source gaps to tracing, and genuine user decisions to brainstorming.
