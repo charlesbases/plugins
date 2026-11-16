@@ -13,11 +13,13 @@ description: Apply project-grounded, language-neutral quality rules to code bein
 
 ## General Quality
 
-- Keep responsibilities clear and code as simple as the required behavior permits. Prefer names that explain intent and avoid pass-through abstractions without a real responsibility.
-- Validate inputs at real external or user-facing boundaries. Respect proven internal invariants; do not conceal impossible states through silent defaults, swallowed errors, or unrelated defensive branches.
-- Preserve existing contracts and ownership. Do not add layers, dependencies, concurrency, caches, or global state merely for style. Use `cortex-se:code-tracing` when a boundary or invariant is uncertain.
+- Prefer names that explain intent.
 - For every new or changed API call, check its contract and project compatibility when those facts matter to correctness. Existing local usage is evidence of convention, not proof that an API is suitable for the current change.
 - Add comments where intent, constraints, or non-obvious transitions need explanation; do not narrate straightforward code.
+
+## Architecture Policy
+
+Before generation, including a code-only response, read and apply the shared [Architecture Design](../../references/architecture-design.md) policy within the user-authorized scope. It owns architecture principles and supplements for boundaries, abstractions, delegation and consumer contracts; do not define parallel rules here. Preserve established design decisions and exceptions. Use `cortex-se:code-tracing` when applicability depends on an unproven invariant, consumer or ownership boundary.
 
 ## Unit Test Quality
 
@@ -26,6 +28,6 @@ description: Apply project-grounded, language-neutral quality rules to code bein
 
 ## Targeted Review
 
-Apply these rules while editing and re-read the changed code with its direct context afterward. Check project-defined formatting and relevant diagnostics. Review only the current change and context needed to judge it; `cortex-se:code-tracing` owns the full behavior-path investigation.
+Apply these rules and the shared Architecture Design policy while editing and re-read the changed code with its direct context afterward, checking established design decisions and exceptions. Check project-defined formatting and relevant diagnostics. Review only the current change and context needed to judge it; `cortex-se:code-tracing` owns the full behavior-path investigation.
 
 This skill does not grant file-write authority, replace a how-to plan, or establish completion. Return material behavior or scope decisions to `cortex-se:brainstorming`; return scope-preserving corrections to `cortex-se:executing-plans` or the current delegated task.

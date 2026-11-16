@@ -13,6 +13,8 @@ description: Review a requested code change or a delegated implementation for co
 
 ## Findings
 
+For architecture-relevant changes, read and apply the shared [Architecture Design](../../references/architecture-design.md) policy to the changed code and directly relevant boundaries, including established design decisions and exceptions. Keep architecture definitions in that policy and preserve the evidence threshold below; a principle allegation alone does not establish a formal finding.
+
 - Compare the change with the requested outcome, applicable how-to plan, project contracts, and validation evidence.
 - A formal finding needs a realistic trigger, concrete impact, changed location, and supporting diff and source evidence. Do not report style preference or an unproven scenario as a defect.
 - Classify remaining concerns as open questions when requirements or reachability are unknown, or residual risks when validation is incomplete without a proven defect.

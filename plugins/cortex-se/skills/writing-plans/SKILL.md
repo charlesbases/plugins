@@ -31,6 +31,8 @@ Before the first behavior-changing write or delegated dispatch, present both the
 
 ## Check The Plan's Basis
 
+Apply the shared [Architecture Design](../../references/architecture-design.md) policy to architecture-relevant plans. Connect key principles to concrete decisions, evidence or validation, and explain material tradeoffs and exceptions as that policy requires. Return unresolved material choices to brainstorming; otherwise continue within the explicit implementation request without an additional confirmation. Do not duplicate architecture definitions or require a separate checklist.
+
 - Verify that the design stays within the retained scope and that its key premises remain supported, including whether existing mechanisms already satisfy the requirement. Return scope additions to brainstorming's requirement analysis. Check the mapping from requirement or confirmed problem to design decision to modification step, including each added observable state operation within a step.
 - Reject dependent operations or steps whose critical premises remain inferred or unresolved, whose necessity is unsupported, or whose strongest relevant counterexample has not been reconciled. Structural checkpoint success or a self-declared status does not resolve these gaps; conditional design discussion is not a complete how-to plan.
 - For a migration or rename that must preserve behavior, compare each changed observable assignment with the current path. A required protocol or field migration does not justify an additional state reset. Ambiguous descriptions of an existing action do not override a preservation constraint; preserve the current effect or resolve an explicit conflicting requirement before including that operation.

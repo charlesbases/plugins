@@ -32,6 +32,8 @@ description: Review a working-tree diff, commit, pull request, merge request, or
 
 ## Evidence Review
 
+For architecture-relevant changes, read and apply the shared [Architecture Design](../../references/architecture-design.md) policy to the changed code and directly relevant boundaries, including confirmed design decisions and exceptions. Keep architecture definitions in that policy. Preserve the evidence requirements and Finding Classification below; a principle allegation alone does not establish a formal finding.
+
 1. Read changed implementation and directly relevant repository-owned code.
 2. Compare changes with confirmed requirements, plans, contracts, and behavior that must remain unchanged.
 3. Use `cortex:code-tracing` before a finding that depends on entry points, reachability, initialization, lifecycle, state, configuration timing, data flow, or error propagation.

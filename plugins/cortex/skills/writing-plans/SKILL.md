@@ -82,6 +82,8 @@ Do not use placeholders such as "add appropriate validation", "handle edge cases
 
 ## Proposal Output Review And Confirmation
 
+Apply the shared [Architecture Design](../../references/architecture-design.md) policy to architecture-relevant proposals. Include the key principle-to-decision links, evidence or proposed validation, and material exceptions required by that policy; return unresolved critical conflicts to brainstorming. Keep this within the existing complete proposal and single confirmation, without a separate checklist or approval stage.
+
 1. Map every explicit requirement to a task.
 2. Verify source context, design decisions, files, symbols, order, call chains, data flow, errors, ownership, validation, and constraints. Reject a file-and-action list that omits how the paths connect.
 3. Check the mapping from requirement or confirmed problem to design decision to modification task, including each added observable state operation within a task. Reject dependent operations or tasks whose critical premises remain inferred or unresolved, whose necessity is unsupported, or whose strongest relevant counterexample has not been reconciled. Structural checkpoint success or a self-declared status does not resolve these gaps; conditional design discussion is not a complete implementation proposal.

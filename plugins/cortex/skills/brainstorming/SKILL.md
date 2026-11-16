@@ -27,6 +27,8 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Design Within Retained Scope
 
+- Read and apply the shared [Architecture Design](../../references/architecture-design.md) policy when designing the retained scope. Use its applicability, decision and exception rules; hand the key decisions and tradeoffs to writing-plans. Keep architecture definitions in that policy rather than duplicating them here.
+
 - Design only the retained scope. If design reveals a new behavior or scope addition, return it to requirement analysis and scope pruning before designing the affected part. Implementation details that satisfy the retained scope do not create new requirements.
 - Check key design premises against state transitions, lifecycle timing, consumers, and the strongest relevant counterexample before recommending a change. A missing field or display requirement alone does not prove a missing capability or equivalent business states. Preserve unresolved premises as conditional discussion, not required implementation work.
 - Explain interpreted scope when it can be misread. Default to the smallest repository-owned change that satisfies the requirement; unrelated cleanup or expansion does not enter the proposal without explicit user scope.

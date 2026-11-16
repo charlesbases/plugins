@@ -22,6 +22,8 @@ description: Analyze requirements and prune scope before software design, and re
 
 ## Design Within Retained Scope
 
+Read and apply the shared [Architecture Design](../../references/architecture-design.md) policy to the retained scope. Use its applicability, decision and exception rules, and pass key decisions and tradeoffs to writing-plans. Keep architecture definitions in that policy; this adds no design or plan confirmation.
+
 1. Design only the retained scope. If design reveals a new behavior or scope addition, return it to requirement analysis and scope pruning before designing the affected part. Implementation details that satisfy the retained scope do not create new requirements.
 2. Check key premises against state transitions, lifecycle timing, consumers, and the strongest relevant counterexample; a missing field or display requirement alone does not prove a missing capability or equivalent business states.
 3. Recommend the smallest approach that satisfies the retained scope, explaining behavior, boundaries, error handling, ownership, impact, and how success can be observed. Label new behavior as proposed; preserve unresolved premises as conditional discussion, not required implementation work. Show alternatives and tradeoffs when the decision genuinely requires them.

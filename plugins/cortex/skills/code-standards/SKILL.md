@@ -15,10 +15,7 @@ description: Apply quality rules to code generated or edited by Codex. Use immed
 
 ## General Standards
 
-- Keep code simple, direct, and single-purpose.
 - Prefer early returns over deeply nested control flow.
-- Reuse proven repository patterns and helpers before adding new ones.
-- Do not add defensive handling for inputs that the proven call chain cannot produce.
 - Do not change behavior, data flow, ownership, public contracts, or architecture solely to satisfy style preferences.
 
 ## Unit Test Quality
@@ -28,22 +25,10 @@ description: Apply quality rules to code generated or edited by Codex. Use immed
 - Do not create tautological assertions, tests that merely restate implementation steps, or tests added only to demonstrate that code changed or increase coverage. Do not automatically add tests for logging, formatting, naming, or other low-impact edits without a confirmed behavioral validation need.
 - Review new cases and assertions added to existing test files by the same quality criteria. Do not silently change existing expectations or delete tests to make a run pass.
 
-## Input Validation
+## Architecture Policy
 
-- Validate external inputs at system, API, configuration, persistence, command, and user-facing boundaries.
-- Do not add defensive checks inside internal logic when initialization paths, constructors, invariants, or proven call chains guarantee the required state.
-- Do not silently ignore impossible internal states with empty returns, default values, or swallowed errors.
-- Use `cortex:code-tracing` before adding validation when an internal invariant is unclear.
-- Return to `cortex:brainstorming` or `cortex:writing-plans` when invalid-input handling requires an unconfirmed behavior change.
-
-## Wrappers And Architecture
-
-- Do not add pass-through helpers, proxy methods, or wrapper functions that only forward arguments.
-- Add a wrapper only when it owns real behavior such as validation, normalization, permission checks, state transitions, error translation, resource management, or a stable domain abstraction.
-- Do not hide a direct dependency behind a method unless the wrapper changes semantics or removes proven duplication.
-- Do not remove an existing wrapper merely because it appears thin. First use `cortex:code-tracing` to prove it has no behavior or ownership responsibility, then return to `cortex:brainstorming` or `cortex:writing-plans` before proposing removal.
-- Keep transport, business logic, persistence, configuration, and presentation responsibilities separate.
-- Do not introduce layers, factories, interfaces, adapters, generic helpers, goroutines, caches, global state, or cross-package dependencies without confirmed design need.
+- Before generation, including a code-only response, read and apply the shared [Architecture Design](../../references/architecture-design.md) policy within the authorized scope. It owns architecture principles, boundary validation, abstraction and wrapper rules, and language-specific architecture supplements; do not define parallel rules here.
+- Use the same policy for the after-generation review and preserve the approved design decisions and exceptions. Use code-tracing when applicability depends on an unproven invariant, consumer or ownership boundary. Unconfirmed behavior or design changes return to brainstorming or writing-plans under the existing proposal workflow.
 
 ## Naming, Comments, And Logs
 
@@ -69,12 +54,12 @@ description: Apply quality rules to code generated or edited by Codex. Use immed
 - Do not use deprecated, legacy, reflection-heavy, global-state, or weaker-semantic APIs when a current, typed, safer, or more semantically precise alternative is available within the confirmed scope.
 - Do not select or run a formatter in this skill. Formatter commands and fallback behavior belong to the selected execution workflow.
 - Require changed Go source to follow idiomatic Go, Go Code Review Comments, Google Go Style principles, explicit error handling, and standard Go formatting.
-- Prefer concrete types at Go package boundaries unless the caller consumes an interface, and avoid `panic` outside initialization or truly unrecoverable programmer errors.
+- Avoid `panic` outside initialization or truly unrecoverable programmer errors.
 
 ## After-Generation Review
 
 - Re-read generated or edited code and its direct context after generation; for changed Go source, do this after the formatting step.
-- Check every applicable rule in this skill, including names, ownership, input boundaries, wrappers, comments, architecture, language-specific requirements, and formatting requirements defined for the language.
+- Check applicable rules in this skill and the shared Architecture Design policy referenced above, including approved design decisions and exceptions. Keep naming, comments, language-specific quality and formatting checks in this skill.
 - Verify every newly introduced API call against the API selection rules in this skill.
 - Do not repeat repository-wide analysis or retrace a call chain solely for this review.
 - Use `cortex:code-tracing` only when the review cannot determine whether an invariant, boundary, wrapper responsibility, or ownership rule applies.
