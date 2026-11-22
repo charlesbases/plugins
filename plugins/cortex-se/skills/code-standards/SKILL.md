@@ -1,33 +1,62 @@
 ---
 name: code-standards
-description: Apply project-grounded, language-neutral quality rules to code being generated or edited.
+description: Apply shared quality rules to generated or edited code within the user-requested scope.
 ---
 
 # Code Standards
 
-## Sources Of Standards
+## Workflow Boundary
 
-- Follow the user's requirements and applicable project instructions first. Read repository formatter, linter, compiler, and test configuration and the conventions in directly related code.
-- Use established language and framework conventions where the project has no rule. Check the relevant version's official documentation when an API choice affects semantics, safety, compatibility, or deprecation. Do not invent a language-specific rule or command, and do not build or require a cross-language standards cache.
-- Match the project's conventions for comments, documentation, naming, and log language unless the user directs otherwise.
+- Do not grant file-write authority, define implementation plans, or report completion in this skill.
+- Apply these rules before generation and review only code generated or edited in the current task plus the direct context required to assess it after generation.
+- A code-only response can use this skill directly. Controller-led file writing requires an explicit implementation request and a current plan covering its scope and mode. Missing design input returns to analysis or planning; a plan-only request does not authorize implementation. This skill adds no design, plan or mode confirmation.
+- An SDD implementer instead uses its controller-issued brief bound to a current plan revision, task scope, and validation scope. Return missing facts or any design or planning decision below to the controller, without loading the full parent plan or seeking separate user approval.
+- With valid authority already established, apply the quality rules and return to the current execution step. Reloading this skill does not restart design, planning, or confirmation.
 
-## General Quality
+## General Standards
 
-- Prefer names that explain intent.
-- For every new or changed API call, check its contract and project compatibility when those facts matter to correctness. Existing local usage is evidence of convention, not proof that an API is suitable for the current change.
-- Add comments where intent, constraints, or non-obvious transitions need explanation; do not narrate straightforward code.
-
-## Architecture Policy
-
-Before generation, including a code-only response, read and apply the shared [Architecture Design](../../references/architecture-design.md) policy within the user-authorized scope. It owns architecture principles and supplements for boundaries, abstractions, delegation and consumer contracts; do not define parallel rules here. Preserve established design decisions and exceptions. Use `cortex-se:code-tracing` when applicability depends on an unproven invariant, consumer or ownership boundary.
+- Prefer early returns over deeply nested control flow.
+- Do not change behavior, data flow, ownership, public contracts, or architecture solely to satisfy style preferences.
 
 ## Unit Test Quality
 
-- Apply [Unit Test Selection](../writing-plans/SKILL.md#unit-test-selection); this skill does not authorize new cases. Require a concrete method-level contract, boundary or regression assertion with an independently defined expected result.
-- Reject tautological assertions, implementation-mirroring tests and tests added only because code changed or for coverage. Apply the same rule to assertions added to existing files. Do not weaken expectations or delete cases merely to make a run pass.
+- Apply these rules to unit tests authorized by the current plan under [Unit Test Selection](../writing-plans/SKILL.md#unit-test-selection); this skill does not authorize adding tests.
+- Require a concrete method-level behavior, boundary, contract, or defect-regression assertion with an independently defined expected result. Prefer existing suitable tests.
+- Do not create tautological assertions, tests that merely restate implementation steps, or tests added only to demonstrate that code changed or increase coverage. Do not automatically add tests for logging, formatting, naming, or other low-impact edits without a confirmed behavioral validation need.
+- Review new cases and assertions added to existing test files by the same quality criteria. Do not silently change existing expectations or delete tests to make a run pass.
 
-## Targeted Review
+## Architecture Policy
 
-Apply these rules and the shared Architecture Design policy while editing and re-read the changed code with its direct context afterward, checking established design decisions and exceptions. Check project-defined formatting and relevant diagnostics. Review only the current change and context needed to judge it; `cortex-se:code-tracing` owns the full behavior-path investigation.
+- Before generation, including a code-only response, read and apply the shared [Architecture Design](../../references/architecture-design.md) policy within the authorized scope. It owns architecture principles, boundary validation, abstraction and wrapper rules, and language-specific architecture supplements; do not define parallel rules here.
+- Use the same policy for the after-generation review and preserve the established design decisions and exceptions. Use code-tracing when applicability depends on an unproven invariant, consumer or ownership boundary. Unconfirmed behavior or design changes return to brainstorming or writing-plans under the existing proposal workflow.
 
-This skill does not grant file-write authority, replace a how-to plan, or establish completion. Return material behavior or scope decisions to `cortex-se:brainstorming`; return scope-preserving corrections to `cortex-se:executing-plans` or the current delegated task.
+## Naming, Comments, And Logs
+
+- Use names that express domain intent; avoid vague names such as `data`, `info`, `manager`, `helper`, `util`, and `common` unless the existing domain uses them precisely.
+- Avoid unclear abbreviations; preserve established initialisms such as `ID`, `HTTP`, `URL`, and `API`.
+- Keep local names short only when scope and meaning are obvious.
+- Add comments for intent, constraints, non-obvious behavior, required public documentation, or complex method structure; do not restate code.
+- Write code comments in Chinese. Write log messages in English. Change either language only when the user explicitly requests it.
+
+## Language-Specific Rules
+
+- For language-specific rules not defined by repository configuration or local conventions, apply only established community idioms; do not invent language-specific checks.
+- When adding or replacing a standard-library, framework, or third-party API call, treat existing repository usage as evidence of local convention and compatibility constraints, not as proof that the API is still the best choice.
+- When the API choice affects semantics, safety, compatibility, determinism, concurrency behavior, allocation cost, performance, or long-term maintenance, verify the repository language version, dependency version, local convention, or official documentation before choosing.
+- When more than one API can satisfy the same requirement, choose the current non-deprecated API that best matches the confirmed behavior and repository constraints.
+- Preserve an existing API choice only when changing it would violate confirmed behavior, compatibility, repository policy, or the authorized implementation scope.
+- Do not use deprecated, legacy, reflection-heavy, global-state, or weaker-semantic APIs when a current, typed, safer, or more semantically precise alternative is available within the confirmed scope.
+- Do not select or run a formatter in this skill. Formatter commands and fallback behavior belong to the selected execution workflow.
+
+## After-Generation Review
+
+- Re-read generated or edited code and its direct context after generation and any required formatting.
+- Check applicable rules in this skill and the shared Architecture Design policy referenced above, including established design decisions and exceptions. Keep naming, comments, language-specific quality and formatting checks in this skill.
+- Verify every newly introduced API call against the API selection rules in this skill.
+- Do not repeat repository-wide analysis or retrace a call chain solely for this review.
+- Use `cortex-se:code-tracing` only when the review cannot determine whether an invariant, boundary, wrapper responsibility, or ownership rule applies.
+- When correction changes established behavior, ownership, contracts, data flow, or architecture, return to the complete-proposal revision workflow, including affected context reread and chain and semantic rechecks.
+
+## Scope
+
+Define generated-code quality constraints and targeted generated-code review. Keep file-write authorization and implementation actions in the selected execution workflow or the controller-authorized SDD task, source analysis in `cortex-se:code-tracing`, and completion evidence in `cortex-se:verification-before-completion`.

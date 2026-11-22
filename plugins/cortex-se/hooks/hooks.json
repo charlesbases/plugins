@@ -1,5 +1,5 @@
 {
-  "description": "Cortex SE batch evidence checkpoints; no per-command observation.",
+  "description": "Cortex SE task context loading and batch evidence checkpoints.",
   "hooks": {
     "SessionStart": [
       {
@@ -10,6 +10,18 @@
             "commandWindows": "python \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
             "timeout": 5,
             "statusMessage": "Checking Cortex SE evidence"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/context.py\"",
+            "commandWindows": "python \"${PLUGIN_ROOT}/scripts/context.py\"",
+            "timeout": 5,
+            "statusMessage": "Loading Cortex SE task context",
+            "additionalContextLimit": 0
           }
         ]
       }
@@ -37,6 +49,20 @@
             "commandWindows": "python \"${PLUGIN_ROOT}/scripts/evidence.py\" hook",
             "timeout": 5,
             "statusMessage": "Checking Cortex SE evidence"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/scripts/context.py\"",
+            "commandWindows": "python \"${PLUGIN_ROOT}/scripts/context.py\"",
+            "timeout": 5,
+            "statusMessage": "Loading Cortex SE task context",
+            "additionalContextLimit": 0
           }
         ]
       }

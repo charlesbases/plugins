@@ -1,27 +1,74 @@
 ---
 name: verification-before-completion
-description: Check fresh source and validation evidence before reporting a software change, analysis, fix, or review as complete.
+description: Verify fresh evidence before claiming work is complete, fixed, validated, reviewed, ready, or passing. Use after implementation, debugging, review, documentation updates, or other final conclusions.
 ---
 
 # Verification Before Completion
 
-## Evidence
+## Verification Gate
 
-- Read [Current Task Context](../using-cortex/references/task-context.md) and compare results with all effective user requirements and remaining cleanup, not only the latest plan or its tests. Update actual progress and unresolved items before reporting. Reading or changing the snapshot does not prove compliance; withdraw unsupported conclusions instead of replacing them with unverified explanations.
+- Read [Current Task Context](../using-cortex/references/task-context.md) and reconcile actual results with all effective user requirements and constraints. Check requirements against their sources when meaning is disputed, rather than using the latest design or its tests as the definition of success. Report progress, cleanup, results and unresolved items in the response, not context. Reading/updating the requirements file is not evidence that its contents were obeyed; withdraw unsupported conclusions instead of replacing them with unverified explanations.
 
-- Map each final claim to the smallest evidence that can establish it: current source and diff, targeted test, build or static check, reproducible runtime observation, or a requested review.
-- For repository conclusions, finish the relevant [evidence checkpoint](../code-tracing/references/evidence-contract.md) after the final relevant change. A structurally valid checkpoint does not prove the source claim or runtime result; reconcile the actual path and counterexamples.
-- For behavior changes, compare the final entry-to-boundary path with the how-to plan's chain and separate file-level logic. Verify actual value/state definitions, calculations/expressions, lifecycle and final consumer against the requested outcome; successful tests or structural checks alone do not establish semantic equivalence.
-- Re-read changed artifacts and relevant context after the last change. Read complete command results and exit status. Distinguish a passed check from a check not run, failed, or blocked by the environment.
+- For repository conclusions, finish the [batch evidence checkpoint](../code-tracing/references/evidence-contract.md) using evidence current after the relevant changes. Reuse unchanged receipts; reread only invalidated or missing ranges.
+- Report structural checkpoint status separately from semantic correctness and task completion. An analysis checkpoint may legitimately contain inferred or unresolved claims; do not present those as established facts or use them as a change basis.
+- For implementation governed by an planned call chain and separate pseudocode, compare the final path with both. For a changed observable outcome, value, or state meaning, compare the final behavior or expression and lifecycle point with the confirmed mapping. Structural checkpoints, format checks, and tests alone do not prove semantic equivalence.
+- If a checkpoint fails, correct its specific evidence gap or narrow the claim. Do not add unrelated reads, a new review agent, or repeated automatic review rounds merely to make the gate pass.
 
-## Effective Validation
+- Identify the evidence required for every completion, fix, implementation, validation, review, readiness, or passing claim.
+- Use evidence produced after the final relevant change.
+- Derive scope only from user instructions, current plans, and repository policy.
+- Apply [Validation Environment](../using-cortex/SKILL.md#validation-environment) before executing checks that produce artifacts or change state. Verify the selected isolated or restorable-local route, actual state and output paths, child-process inheritance and effective permissions. For local validation, establish the affected resources' original state and how changes will be restored before execution. Report checks as blocked when neither route is feasible or required execution capabilities remain unavailable.
+- Do not add tests, expand test scope, run full suites, contact external services, or run validation outside that scope.
+- Read complete command results, including exit status, failures, and claim-specific evidence.
+- Do not infer build success from lint, requirement satisfaction from tests, or bug resolution from a code change alone.
+- Do not claim success when evidence is stale, incomplete, failed, or environment-blocked.
+- Use `cortex-se:code-tracing` before claiming behavior, reachability, impact, state, configuration, or compatibility is correct when source evidence does not prove it.
+- For code generated or edited by Codex, confirm the targeted after-generation `cortex-se:code-standards` review and any plan- or project-defined formatting completed.
+- Verify language-specific checks and formatters only when Cortex SE, the current plan, or repository configuration defines them. Do not treat an undefined language-specific step as incomplete verification.
 
-- Follow project-defined required checks and the requested scope. For unit tests use [Unit Test Selection](../writing-plans/SKILL.md#unit-test-selection): exact method-to-case mapping, independently selectable cases and fresh evidence that those cases ran. Report absent, non-isolatable or unproven matches as skipped or insufficient evidence, not passing; do not add cases by default.
-- Select the level that observes the changed behavior. A unit test of an internal helper does not by itself establish an end-to-end claim. A successful build or lint run does not by itself prove runtime behavior.
-- Do not run unrelated full suites or invent language-specific formatter and lint commands. Use project configuration and the requested scope. If a required check fails, use `cortex-se:systematic-debugging`; if it cannot run, report the limitation without claiming success.
-- Confirm the targeted `cortex-se:code-standards` review of generated or edited code and any project-defined formatting completed.
-- Use `cortex-se:code-tracing` for a remaining source-path gap. Return incomplete standalone code review to `cortex-se:requesting-code-review` without creating implementation authority. Return incomplete authorized implementation or its generated-code quality check to `cortex-se:executing-plans` or the current delegated workflow. A new material outcome or scope decision returns to `cortex-se:brainstorming`.
+## Implementation Context
 
-## Report
+- For an implementation completion claim, recover the complete current plan, actual implementation request, resolved material decisions, file and validation scope and execution mode from the conversation or existing authorized records. Check remaining work against actual files. Context supplies only the user's requirements and constraints; this skill does not create write or test authority or another approval stage.
+- Do not require an implementation plan or its approvals merely to verify a read-only analysis, review, or code-only response. Verify the evidence appropriate to that requested result.
+- If implementation state is incomplete, identify the missing fact and the appropriate upstream stage before further writes or tests. A previous `approved` flag or existing source change does not establish the missing authority.
 
-State what was completed, which checks ran and their actual results, and any incomplete work or evidence gap. Use `passed`, `failed`, `not run`, or `insufficient evidence` accurately.
+## Verification Workflow
+
+1. Re-read the request, established constraints, and applicable request-scoped complete plan.
+2. Identify every final claim.
+3. Map each claim to the smallest sufficient evidence: source review, diff review, targeted command, manual verification, or approved external interaction.
+4. Inspect final artifacts and relevant context; inspect status and diffs when relevant.
+5. Run or review every validation in scope.
+   Confirm validation-owned processes have stopped and temporary artifacts are removed. For isolation, verify protected daily resources were unchanged; for local validation, compare affected resources with their original state and verify all validation-induced changes were restored. Preserve authorized implementation edits and unrelated user work. Report restoration failures or residue even if functional checks passed.
+6. Reconcile requirements, implementation, validation results, and unresolved items before reporting.
+
+## Claim Evidence
+
+- Requirement satisfied: Map every confirmed requirement to the delivered artifact or behavior and required validation evidence.
+- Plan semantics satisfied: For work with planned call chain and pseudocode, verify the final path against both; for changed outcomes, values, or state meanings, verify the final behavior or expression at the planned lifecycle point against the confirmed mapping.
+- Implementation complete: Confirm every planned task completed within confirmed scope.
+- Generated-code review complete: Confirm targeted after-generation code-standards review for all code generated or edited by Codex, and completion of any plan- or project-defined formatting.
+- Bug fixed: Confirm the root-cause correction with final evidence required by the user, current plan, or repository policy. Run a deterministic reproduction only when that scope defines or provides one.
+- Unit tests pass: Follow [Unit Test Selection](../writing-plans/SKILL.md#unit-test-selection). Confirm the exact selected cases actually ran after the final relevant code change and passed; a successful command with no matching cases is not passing evidence.
+- Unit tests not run: Report no matching existing test, inability to isolate the relevant case, or insufficient relevance evidence explicitly. This does not authorize adding tests and must not be reported as a pass.
+- Lint passes: Run the required lint command after the final relevant change and confirm it reports no real issues.
+- Build passes: Run the required build command after the final relevant change and confirm it succeeds.
+- Review complete: Confirm the entire requested review scope was assessed and report formal findings, open questions, and residual risks accurately.
+- Documentation complete: Confirm content, scope, format, and referenced artifacts match confirmed requirements.
+
+## Incomplete Verification
+
+- Use `cortex-se:systematic-debugging` when required validation fails and the root cause is not proven.
+- Resume the selected execution workflow for incomplete implementation, formatting, generated-code review or proven in-scope corrections when established decisions and scope remain valid. Pass the incomplete step, reason and applicable user authority; do not add confirmation.
+- Changed decisions follow [Proposal Revision](../using-cortex/SKILL.md#proposal-revision), including affected context reread and necessary chain, feasibility and semantic rechecks. Present the revised complete plan and resolve material unanswered user choices before affected implementation or validation; do not add a generic plan approval.
+- State incomplete validation, failed checks, blocked commands, and residual risk directly.
+
+## Output
+
+Before reporting, verify context contains only the user's explicit current requirements and constraints. Save clarified requirement changes when necessary; unchanged requirements need no rewrite. Do not add completion status, results, remaining work, approval records or plan references. Verify required saves succeeded and report persistence or recovery gaps in the response.
+
+Report only completed or changed work, verification performed and its result, whether the request-scoped complete plan was satisfied, and uncompleted work, failed checks, blocked validation, or residual risk. Distinguish `passed`, `not run`, `failed`, and `insufficient evidence`. Do not paste large logs, source files, diffs, or command output.
+
+## Scope
+
+Define completion evidence and final status reporting. Keep source analysis in `cortex-se:code-tracing`, code-quality rules in `cortex-se:code-standards`, debugging in `cortex-se:systematic-debugging`, planning in `cortex-se:writing-plans`, execution workflows in `cortex-se:subagent-driven-development` or `cortex-se:executing-plans`, and change review in `cortex-se:requesting-code-review`.

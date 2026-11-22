@@ -1,32 +1,53 @@
 ---
 name: using-cortex
-description: Route software development and its follow-ups through Cortex SE, including planning-only or clarification-only revisions and recovery, while preserving source accuracy and avoiding repeated confirmation gates.
+description: Route engineering tasks and follow-ups through shared Cortex rules, using clear-request authority without a separate plan approval. Restore current requirements before choosing the next workflow.
 ---
 
 # Using Cortex SE
 
-## Route The Request
+## Routing Rules
 
-- Before classifying a follow-up to an existing engineering task, read [Current Task Context](references/task-context.md) and that session's `context.md`, including after completion or recovery. Do not discard an unclear follow-up as unrelated before recovering its context. If a goal, constraint, plan or open choice changes, update the on-disk `context.md` before replying, even when the reply only proposes a plan or asks a question. Do not leave an obsolete "no unresolved items" state. A confirmed presentation-only request needs no engineering approval or source investigation; unchanged task state needs no record rewrite. Truly unrelated questions remain outside this workflow.
+- [Current Task Context](references/task-context.md) is mandatory throughout the task. Reconcile every task message, including steering during reasoning or execution, before the next affected decision. Load and check all effective user requirements and constraints at design and recovery boundaries. Save clarified requirement changes promptly and concisely. Recover the actual implementation request and material decisions separately from the conversation or existing authorized records; apply Proposal Revision to material changes.
 
-- For an existing-behavior question or a change that depends on current behavior, use `cortex-se:code-tracing`.
-- Before designing changes, use `cortex-se:brainstorming` to analyze requirements and prune scope. Resolve scope-critical unknowns before designing the dependent part; design only the retained scope. Ask only for a material behavior, contract, scope, or ownership choice that remains unresolved after Evidence And Clarification. A clear implementation request authorizes work within its stated scope; it does not require a separate scope, design, plan, or execution-mode confirmation.
-- For a behavior-changing implementation, use `cortex-se:writing-plans` to establish how the change will work, then `cortex-se:executing-plans`. For a small change with no behavior path to design, keep the implementation approach proportionate.
-- Apply `cortex-se:code-standards` to generated or edited code. Use `cortex-se:systematic-debugging` for an observed failure with an unproven cause.
-- Use `cortex-se:requesting-code-review` when review is requested or needed by the selected workflow. Use `cortex-se:verification-before-completion` before claiming completion, correctness, or a passing check.
-- Use `cortex-se:subagent-driven-development` only when the user requests delegated implementation. Direct execution is the default; do not ask the user to select an execution mode.
-- If the user requests analysis, design, or a plan only, deliver that result without implementing it.
+- Before classifying a follow-up to an existing engineering task, read [Current Task Context](references/task-context.md) and that session's `context.md`. This applies even after a completion reply, after recovery, or when the message is too short to tell whether it concerns the implementation, report or requirements. Do not classify an unclear follow-up as unrelated before recovering the effective requirements. If clarification is still needed, ask in the conversation and leave the affected saved content unchanged until the user clarifies it; do not save the unresolved issue. A confirmed presentation-only request needs no engineering implementation approval or source investigation; update context only if explicit requirements or constraints change. Truly unrelated questions remain outside this workflow.
 
-## Source And Scope
+- Treat a request to verify existing behavior as observation-only unless the user requests implementation, a test-point report or diagnostic instrumentation. Use `cortex-se:code-tracing` only when source or configuration evidence is needed, perform only the bounded check requested by the user, then use `cortex-se:verification-before-completion`.
+- Do not add instrumentation, temporary configuration, test artifacts, or source changes to an observation-only verification. When existing evidence is insufficient, state the evidence gap and wait for the user to confirm the scope expansion.
+- For a file-writing requirement, select the next stage from Workflow State below. Use `cortex-se:code-tracing` first only when current behavior, call chains, state, configuration, ownership, impact, or risk are not already proven.
+- Use `cortex-se:brainstorming` to analyze requirements, resolve scope-affecting unknowns and prune scope before designing changes. Design only the retained scope, then use `cortex-se:writing-plans` to present one complete plan. An explicit implementation request authorizes its stated scope; continue with the plan's execution mode without separate scope, design, plan or mode confirmation. A plan-only request remains plan-only.
+- During implementation, use `cortex-se:code-standards` before generating code and for the targeted review after generation.
+- For an existing-behavior explanation, use `cortex-se:code-tracing`.
+- For an observed failure with an unproven cause, use `cortex-se:systematic-debugging`. After it proves the cause, resume the selected execution workflow for an in-scope correction; otherwise use the Proposal Revision rule below before further implementation.
+- For a requested diff, commit, pull request, merge request, or code-change review, use `cortex-se:requesting-code-review`; use `cortex-se:code-tracing` only when review evidence requires source or runtime-path proof.
 
-- Controllers maintain [Current Task Context](references/task-context.md) at `$HOME/.sessions/<session_id>/context.md`: read it when present, create it directly when missing, and do not search or migrate other note filenames. Preserve sourced requirements, current design and authority, observed progress and open questions, including clarification-only turns. This operational record neither authorizes implementation nor adds a confirmation gate; delegates return state updates to their controller.
+- For a code-only response that does not write files, use `cortex-se:code-standards` directly.
+- Before claiming work is complete, fixed, implemented, validated, reviewed, ready, or passing, use `cortex-se:verification-before-completion`.
 
-- Read applicable project instructions, relevant code, configuration, existing tests, and current changes before making a source-dependent decision. For behavior-changing work, trace the complete relevant repository-owned path from entry and dispatch through key branches and state changes to the observable or error boundary. Include additional entry paths when the requested outcome depends on them. Do not treat a search hit or available API as proof of runtime reachability.
-- Use the [evidence contract](../code-tracing/references/evidence-contract.md) for repository conclusions and change bases. Evidence checkpoints establish structural source coverage, not semantic correctness or user authorization. Continue across bounded read batches until the relevant path is established; a read budget is not a reason to truncate the conclusion.
-- Keep implementation and validation within the user's requested scope and applicable project policy. If a material choice changes the requested outcome, contract, ownership, or scope, present the decision once and wait for the answer. After the answer, continue without a second plan approval. Scope-preserving implementation or root-cause corrections do not reopen confirmation.
-- Only an explicit user requirement or a proven prerequisite may enter the retained scope. Complete this necessity assessment before design; implementation choices cannot establish new requirements. If design reveals additional scope, return it to brainstorming's requirement analysis before designing the affected part.
-- When the user objects, supplies a new direction, or a design narrows or changes meaning, pause affected work and use brainstorming's [Revision Evidence](../brainstorming/SKILL.md#revision-evidence) before evaluating or answering the challenged decision, revising a plan, or continuing implementation. This also applies when the answer recommends keeping the existing design. Rechecking evidence does not introduce a generic approval gate; retain this skill's existing clear-request and material-decision rules.
-- Do not infer permission for unrelated changes, irreversible operations, or external effects from a development request.
+## Workflow State
+
+- For controller-led Cortex SE work, read and follow [Current Task Context](references/task-context.md) on entry or recovery, and before reconciling a new instruction. Maintain `$HOME/.sessions/<session_id>/context.md` with only the user's explicit current requirements and constraints. Clarification updates it after the intended requirement is clear; plans, progress, results and unresolved questions do not belong there. Ordinary unrelated questions do not start this workflow.
+
+- For conclusions about existing repository behavior, use the batch evidence contract in [code-tracing](../code-tracing/references/evidence-contract.md). Ordinary translation, naming, and non-source questions do not need evidence records.
+- Register the investigation when source claims begin; reuse current receipts and check at investigation, proposal, and completion boundaries rather than after every tool. Hook coverage applies only to registered investigations.
+- The installed plugin's evidence store is an authorized operational record for this workflow, not permission to add files to the user's repository. Recover its pending scope after resume; do not interpret a previous check as current design or write approval.
+- If the helper or trusted hooks are unavailable, retain the same source-evidence rules and disclose that programmatic enforcement is unavailable. Do not invent a successful check or repeatedly retry unavailable infrastructure.
+
+- Identify the role and requested scope before routing: an ordinary task uses a controller; an SDD implementer uses a controller-authorized brief; a scoped reviewer remains read-only. Observation-only work and code-only responses do not require an implementation approval.
+- Keep one complete plan containing its revision, requirements, constraints, source context, design decisions, end-to-end call chain, file-by-file changes and pseudocode, impact, validation and execution mode. Keep the actual implementation request and resolved material user decisions establishing its file and validation scope; the plan does not create authority on its own.
+- A clarification answer resolves only the question asked. Continue within an existing implementation request once its material choices are resolved; a plan-only request, helper flag or existing edit cannot establish implementation authority.
+- Put execution mode in the plan before execution. Default to direct execution; use SDD when the user requests it and tasks satisfy that skill's independence requirements. Include its recovery artifacts and writes in the plan within the requested scope. Do not ask for a separate mode confirmation.
+
+| Current state for this scope | Next action |
+| --- | --- |
+| Required user input remains unresolved after evidence triage | Follow Evidence And Clarification, then use brainstorming to ask the necessary specific question. |
+| No complete current plan exists | Use brainstorming to establish and prune scope before design, then use writing-plans to present the complete plan. |
+| The user requests analysis, design or a plan only | Deliver that result without implementation. |
+| An explicit implementation request and complete current plan exist | Execute the requested scope and validation without a plan confirmation. |
+| A proposal decision is challenged or a new direction is supplied | Apply Proposal Revision before presenting a revision or acting on that direction. |
+
+- Skill re-entry and task recovery preserve applicable user authority. Recover the actual implementation request, resolved decisions, current plan and mode from the conversation or existing authorized records; reconcile remaining work with actual files. Context supplies requirements and constraints, not authority or progress. Ask only for genuinely missing outcome-affecting information; do not infer authority from a flag or existing edits.
+- An SDD implementer receives the current plan revision, task scope and validation authority in its brief. Return missing facts or new decisions to the controller; do not request independent user approval.
+- Maintain the requirements file under Current Task Context without a separate approval. Other recovery artifacts still require their applicable authority; context never grants implementation permission. Delegated agents return requirement changes to their controller and task results through their existing authorized workflow.
 
 ## Evidence And Clarification
 
@@ -34,14 +55,51 @@ description: Route software development and its follow-ups through Cortex SE, in
 - For source-resolvable uncertainty, use `cortex-se:code-tracing` on the bounded path needed for the claim. Reuse fresh evidence where it proves that claim. An unread implementation, search miss, missing field, or unverified caller is an evidence gap, not an established defect or a decision to delegate to the user. If authorized tracing cannot close the gap, identify the specific missing path or unavailable evidence.
 - Preserve evidence status through analysis, design, and planning. Inferred or unresolved claims may guide investigation or explicitly conditional design discussion, but cannot become confirmed problems or implementation bases. A method's existence does not prove its runtime invocation; a structural checkpoint or a self-declared `confirmed` status does not prove semantic correctness.
 - Distinguish whether a problem exists from whether a proposed modification is necessary. Before calling a change required, check the current contract, existing mechanisms, and strongest relevant counterexample within the requested scope. A new design choice must be identified as proposed, with its constraints and observable meaning, rather than described as current behavior or a proven correction.
-- An explicit new requirement can justify new behavior without proving an existing defect. Preserve known behavior outside that requirement; do not invent a problem or add an optional behavior change to make a plan appear necessary.
+- An explicit new requirement can justify new behavior without proving an existing defect. Preserve known behavior outside that requirement; do not invent a problem or add an optional behavior change to make a proposal appear necessary.
 - Ask only for remaining outcome-affecting input that requires user intent, access, or external or runtime evidence unavailable within the authorized scope. State the verified context, exact gap, and its effect on the decision. Necessary external information may be requested in parallel with independent tracing; continue work that does not depend on the reply. Do not ask the user to choose among causes or behaviors that available source or established context can determine.
-- A critical unresolved premise blocks the dependent implementation operation from a complete how-to plan. Continue independent analysis and return source gaps to tracing or genuine material decisions to clarification. Evidence rechecking does not add a separate design, plan, or execution-mode approval to an otherwise clear implementation request.
+- A critical unresolved premise blocks the dependent implementation task from a complete proposal. Continue independent analysis and return source gaps to tracing or genuine decision gaps to clarification; do not silently resolve either by assumption.
 
-## Completion
+## Proposal Revision
 
-- Select effective, targeted validation under `cortex-se:verification-before-completion`; do not add tests merely to meet a count or coverage target.
-- Report what changed, what was checked, the result, and any remaining evidence gap. Never claim a check passed when it was not run or did not pass.
+- When the user objects, supplies a new direction, or a proposal narrows or changes meaning, pause affected implementation. Recover the original outcome, established constraints, new instruction, and challenged decision.
+- Use brainstorming's Revision Evidence workflow: reread the affected implementation context and recheck the necessary caller-to-callee chain before proposing a revision. Previously read facts may be reused only where they actually prove the new decision; an unchanged file hash does not prove a new interpretation.
+- Present the changed decision, source basis, feasibility, semantic differences, and impact in one revised complete proposal. An explicit user change to the goal becomes the new requirement; do not silently replace the goal with an implementation suggestion.
+- Changes to target or file scope, key calls, branches, state transitions, output or value meaning, contracts or external boundaries, validation scope or execution mode require an updated complete plan before affected work. Follow an explicit user change within its scope; ask once only when a material outcome, contract, ownership or scope choice remains unresolved. Do not add revised-plan approval.
+- Local implementation details that preserve the established key decisions, execution progress and test-result updates do not create a confirmation gate. For a challenge that leaves the plan unchanged, explain the evidence and recover whether the implementation request still applies; an objection alone does not authorize a replacement.
+- Brainstorming, planning, execution, debugging, review and verification use this same request and material-decision boundary. Do not require serial design, plan or execution-mode confirmations.
+
+## Divergence Control
+
+- Before the first scoped investigation, classify the request using this order. Use `Exploration` when the requested result requires diagnosing an unknown cause, comparing alternatives, designing a solution or making a material choice, even if the user names an exact file or symbol. Otherwise use `Precision` when the target outcome and key decisions are established and the task is to implement or check them.
+- Use `Ambiguous` only while information needed to apply that distinction is missing. Recover available context and source evidence first; ask a specific question only if supported interpretations would change the requested result and available evidence cannot resolve them. Do not ask the user to select a mode.
+- These are the single mode definitions. Pass the active mode to invoked skills; a direct skill invocation without one applies this same rule. Reassess it when the user changes the requested outcome. Mode controls investigation, never implementation approval or permission to expand writes and validation; do not store it as a new context field.
+- Only an explicit user requirement or a proven prerequisite may justify investigation or enter the retained scope. Complete this necessity assessment before designing changes; implementation choices cannot establish new requirements. If design reveals additional scope, return it to brainstorming's requirement analysis before designing the affected part. Writes, tests, and validation must remain within the request-scoped plan or explicit diagnostic authority. A material tradeoff requires a specific question or proposal decision, never silent scope expansion.
+- Treat related findings as observations, not scope. Do not investigate, plan, or fix an observation. Do not surface it in the final response unless it blocks the requested outcome, is an allowed out-of-scope risk, or the user confirms the expansion.
+- In `Precision`, optimize for the smallest safe change. Do not propose alternatives, refactors, abstractions, adjacent cleanup, or future-proofing unless source evidence shows that the smallest change has a material safety, compatibility, or user-visible tradeoff; then surface the specific decision needed to complete the proposal.
+- In `Exploration`, broaden investigation only until the requested decision is supported. Stop when every acceptance criterion is proven; do not continue quality discovery after that point.
+
+## Gates
+
+- Before any engineering response or action, identify and invoke the Cortex SE skill required by the routing rules.
+- After invoking a Cortex SE skill, announce its name and purpose in the user's language before following its instructions or taking an action.
+- After a stable tool or environment failure, retain the failed mechanism, proven cause and compatible fallback in the conversation or existing authorized task records, not context. Use the fallback on later actions; retry only if workspace, path, permissions, version, or inputs materially change. Keep recoverable tool failures and fallbacks out of user-facing updates unless they block the requested result.
+- When a validation tool's default cache is inaccessible, redirect it with a supported process-local setting to a validation-owned temporary directory. Any fallback must follow Validation Environment below, including restoration of local changes and cleanup of new cache artifacts.
+- Every controller-led implementation requires an explicit implementation request covering its scope. A clear request needs no separate plan approval; analysis, design and plan-only requests do not authorize implementation.
+- Analysis, clarification, and writing a proposal in the response do not require a prior design approval. Create a design or plan file only when the user explicitly requests that deliverable; it does not authorize implementation.
+- Do not begin implementation writes or mapped tests without applicable user authority and the required complete plan. A code-only response is not file-writing implementation.
+- Before a write or resumed validation, recover the implementation request and applicable scope. Follow Proposal Revision for changed decisions; route evidence gaps to code-tracing, design questions to brainstorming and plan construction to writing-plans.
+
+## Validation Environment
+
+- Run validation either in an isolated environment or locally with complete restoration afterward. Keep validation side effects separate from authorized implementation edits and existing user work; both routes remain within the authorized validation scope.
+- For isolation, use a source copy and separate installation, configuration, trust, dependency, cache, temporary, evidence and session directories. Set the actual host's home and state paths for the process and its children; `CODEX_HOME` alone does not isolate `HOME/.sessions`. Do not copy daily configuration wholesale into the test host.
+- For local validation, capture the original state of resources that validation may change and identify new artifacts before executing. Restore all validation-induced changes to source, installations, marketplaces, configuration, hook trust, permissions, dependencies, caches and session data, and remove new artifacts afterward. Preserve unrelated user changes; restoring a whole workspace or shared directory is not an acceptable cleanup shortcut.
+- Verify resolved paths, child-process inheritance and effective permissions for the selected route. For plugin validation, prevent other plugins from interfering and restore any temporarily changed enablement afterward. Prefer process-local settings for sandbox or cache problems; authorized reversible local adjustments are allowed. Report blocked checks when neither isolation nor complete restoration is feasible, or required Bash execution or host capabilities remain unavailable.
+- On success, failure or interruption, stop validation-owned processes, restore local changes and remove owned temporary artifacts. Compare affected resources with their pre-validation state and report the validation and cleanup results, including any restoration failure or residue. Instructions alone do not prove isolation or restoration. Delegated validation follows the same rules.
+
+## Scope
+
+Route Cortex SE work and enforce cross-skill boundaries. Keep source evidence in `cortex-se:code-tracing`, design in `cortex-se:brainstorming`, planning in `cortex-se:writing-plans`, execution in `cortex-se:subagent-driven-development` or `cortex-se:executing-plans`, and completion evidence in `cortex-se:verification-before-completion`.
 
 ## Outcome Preservation
 

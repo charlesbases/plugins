@@ -7,7 +7,7 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 
 ## Verification Gate
 
-- Read [Current Task Context](../using-cortex/references/task-context.md) and reconcile actual results with all effective user requirements and remaining cleanup. Check requirements against their sources when meaning is disputed, rather than using the latest design or its tests as the definition of success. Update observed progress and unresolved items before reporting. Reading/updating the snapshot is not evidence that its contents were obeyed; withdraw unsupported conclusions instead of replacing them with unverified explanations.
+- Read [Current Task Context](../using-cortex/references/task-context.md) and reconcile actual results with all effective user requirements and constraints. Check requirements against their sources when meaning is disputed, rather than using the latest design or its tests as the definition of success. Report progress, cleanup, results and unresolved items in the response, not context. Reading/updating the requirements file is not evidence that its contents were obeyed; withdraw unsupported conclusions instead of replacing them with unverified explanations.
 
 - For repository conclusions, finish the [batch evidence checkpoint](../code-tracing/references/evidence-contract.md) using evidence current after the relevant changes. Reuse unchanged receipts; reread only invalidated or missing ranges.
 - Report structural checkpoint status separately from semantic correctness and task completion. An analysis checkpoint may legitimately contain inferred or unresolved claims; do not present those as established facts or use them as a change basis.
@@ -17,6 +17,7 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 - Identify the evidence required for every completion, fix, implementation, validation, review, readiness, or passing claim.
 - Use evidence produced after the final relevant change.
 - Derive scope only from user instructions, confirmed plans, and repository policy.
+- Apply [Validation Environment](../using-cortex/SKILL.md#validation-environment) before executing checks that produce artifacts or change state. Verify the selected isolated or restorable-local route, actual state and output paths, child-process inheritance and effective permissions. For local validation, establish the affected resources' original state and how changes will be restored before execution. Report checks as blocked when neither route is feasible or required execution capabilities remain unavailable.
 - Do not add tests, expand test scope, run full suites, contact external services, or run validation outside that scope.
 - Read complete command results, including exit status, failures, and claim-specific evidence.
 - Do not infer build success from lint, requirement satisfaction from tests, or bug resolution from a code change alone.
@@ -27,7 +28,7 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 
 ## Implementation Context
 
-- For an implementation completion claim, recover the complete proposal revision, actual approving instruction, file and validation scope, execution mode, remaining work, and active testing baseline. Use task context or authorized recovery records; this skill does not create write or test authority or another approval stage.
+- For an implementation completion claim, recover the complete proposal revision, actual approving instruction, file and validation scope, execution mode and active testing baseline from the conversation or existing authorized records. Check remaining work against actual files. Context supplies only the user's requirements and constraints; this skill does not create write or test authority or another approval stage.
 - Do not require an implementation plan or its approvals merely to verify a read-only analysis, review, or code-only response. Verify the evidence appropriate to that requested result.
 - If implementation state is incomplete, identify the missing fact and the appropriate upstream stage before further writes or tests. A previous `approved` flag or existing source change does not establish the missing authority.
 
@@ -38,6 +39,7 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 3. Map each claim to the smallest sufficient evidence: source review, diff review, targeted command, manual verification, or approved external interaction.
 4. Inspect final artifacts and relevant context; inspect status and diffs when relevant.
 5. Run or review every validation in scope.
+   Confirm validation-owned processes have stopped and temporary artifacts are removed. For isolation, verify protected daily resources were unchanged; for local validation, compare affected resources with their original state and verify all validation-induced changes were restored. Preserve approved implementation edits and unrelated user work. Report restoration failures or residue even if functional checks passed.
 6. Reconcile requirements, implementation, validation results, and unresolved items before reporting.
 
 ## Claim Evidence
@@ -73,6 +75,8 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 - State incomplete validation, failed checks, blocked commands, and residual risk directly.
 
 ## Output
+
+Before reporting, verify context contains only the user's explicit current requirements and constraints. Save clarified requirement changes when necessary; unchanged requirements need no rewrite. Do not add completion status, results, remaining work, approval records or testing baseline references. Verify required saves succeeded and report persistence or recovery gaps in the response.
 
 Report only completed or changed work, verification performed and its result, whether the approved complete proposal was satisfied, and uncompleted work, failed checks, blocked validation, or residual risk. Distinguish `passed`, `not run`, `failed`, and `insufficient evidence`. Do not paste large logs, source files, diffs, or command output.
 

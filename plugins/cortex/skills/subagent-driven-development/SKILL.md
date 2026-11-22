@@ -15,7 +15,7 @@ description: Coordinate confirmed implementation plans with two or more independ
 
 ## Entry And Return
 
-- The controller follows [Current Task Context](../using-cortex/references/task-context.md) and reconciles its session snapshot with the SDD records at entry, recovery and handoffs. Keep the effective requirements and actual authority consistent; an old task brief cannot reactivate a withdrawn design. Include applicable constraints and cleanup obligations in each brief. Delegates return state changes to the controller and do not edit its snapshot. The session snapshot does not replace the task records below.
+- The controller follows [Current Task Context](../using-cortex/references/task-context.md) and checks the SDD records against the user's saved requirements and constraints at entry, recovery and handoffs. Recover approval and progress from the authorized SDD records, not context; an old task brief cannot reactivate a withdrawn design. Include applicable constraints and cleanup obligations in each brief. Delegates return requirement changes and task results to the controller without editing context. Only clarified user requirements and constraints belong in context; the existing SDD records retain their recovery responsibilities below.
 
 - Recover the approved complete proposal, its approving instruction, SDD mode, scoped task authority, and handoff reason. Preserve approval for unchanged scope; use the single proposal gate when complete content or approval is absent.
 - Missing recovery artifact paths or their creation tasks require a revised complete proposal before creating them.

@@ -18,15 +18,17 @@ description: Directly execute a user-approved complete engineering proposal with
 
 ## Entry And Resume
 
-- Read [Current Task Context](../using-cortex/references/task-context.md) and the controller's snapshot before starting or resuming implementation, including after compaction. Reconcile current files, effective constraints and actual authorization. Update meaningful progress and pending cleanup as work changes; record new questions even when only clarification is possible. Complete authorized removals of superseded artifacts without discarding shared or independently owned work.
+- Read [Current Task Context](../using-cortex/references/task-context.md) and the controller's saved requirements before starting or resuming implementation, including after compaction. Reconcile them with current files and actual authorization. Save only clarified user requirement or constraint changes in context. Keep progress, pending cleanup and questions in the conversation or existing authorized records. Complete authorized removals of superseded artifacts without discarding shared or independently owned work.
 
 - Recover the complete proposal revision, approving user instruction, file and validation scope, execution mode, remaining work, and active testing baseline before the first write or resumed validation.
 - Without a complete proposal, use brainstorming and writing-plans to produce one; with an unapproved proposal, wait for its single confirmation. With approved SDD mode, return to that workflow without switching mode.
-- Use the session snapshot and other authorized recovery records. Existing edits or an approval flag do not establish authority; ask only for genuinely missing context. Do not create other unplanned recovery files.
+- Use context for user requirements and constraints; recover the proposal and its actual approval from the conversation or existing authorized records, and check progress against actual files. Existing edits or an approval flag do not establish authority; ask only for genuinely missing information. Do not create unplanned recovery files.
 - Preserve approval for unchanged scope. Changed decisions follow [Proposal Revision](../using-cortex/SKILL.md#proposal-revision), including the required evidence recheck.
 - A delegated SDD implementer returns to its controller rather than obtaining independent write authority here.
 
 ## Execution Workflow
+
+Mid-turn user steering must pass the [Current Task Context](../using-cortex/references/task-context.md) reconciliation procedure before the next affected action. Clarify conflicting requirements in the conversation before updating affected context content. Verify that the latest clarified requirements and constraints are saved before controllable compaction; do not save progress or next steps there. After recovery, load those requirements and separately recover actual approval before continuing. Material revisions retain the existing proposal confirmation boundary.
 
 For each confirmed plan step:
 

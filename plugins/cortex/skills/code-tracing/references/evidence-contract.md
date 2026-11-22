@@ -128,8 +128,13 @@ downstream improvement is not proof that an upstream failure is repaired.
 
 - SessionStart exposes the helper prefix and pending scope, including on resume.
 - PreToolUse checks registered investigations before apply_patch/Edit/Write.
-  It requires a current change checkpoint; this is not a general filesystem
-  security boundary and does not intercept shell writes.
+  It requires a current change checkpoint, except for a recognizable
+  `apply_patch` that only adds or updates this session's
+  `$HOME/.sessions/<session_id>/context.md`. Mixed-file patches, other sessions,
+  deletion, moves, redirected context paths and unrecognized inputs retain the
+  existing checks. This exception neither updates evidence state nor grants
+  user or host permission. This is not a general filesystem security boundary
+  and does not intercept shell writes.
 - Stop checks registered investigations once. It asks for one continuation
   when evidence is incomplete. A second unsuccessful stop ends continuation
   with an explicit incomplete message rather than silently passing or looping.

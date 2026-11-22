@@ -24,7 +24,7 @@ description: Build one complete engineering proposal from requirements, design i
 
 ## Plan Construction
 
-Read the controller's [Current Task Context](../using-cortex/references/task-context.md) before constructing or revising a proposal. Map it to all effective user requirements, not only the latest message. Keep facts, user requirements and proposed choices distinct. Include removal of artifacts and expectations made obsolete by a replaced design; preserve shared and independently owned work. Save the complete current design and its actual approval state without appending incompatible historical plans.
+Read the controller's [Current Task Context](../using-cortex/references/task-context.md) before constructing or revising a proposal. Map it to all effective user requirements and constraints, not only the latest message. Keep facts, user requirements and proposed choices distinct. Include removal of artifacts and expectations made obsolete by a replaced design; preserve shared and independently owned work. Context stores only clarified user requirements and constraints, not this proposal or its approval record. Before delivering the proposal or implementing it, check the entire plan against those requirements. Recover the full approved proposal and actual approving instruction from the conversation or existing authorized records when execution requires them; do not create another record automatically.
 
 For this skill, behavior-changing work includes changes to runtime output (including logs), state, control flow, or external effects.
 

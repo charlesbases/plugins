@@ -1,62 +1,90 @@
 ---
 name: writing-plans
-description: Specify how a behavior-changing implementation will work, or produce an implementation plan when the user requests one.
+description: Build a complete engineering plan from requirements, design input and source evidence, then execute within a clear implementation request without separate plan approval.
 ---
 
 # Writing Plans
 
-## Entry
+## Proposal Boundary
 
-- Read [Current Task Context](../using-cortex/references/task-context.md) and reconcile the plan with all effective user requirements, not just the latest message. Keep facts, requirements and design choices separate. Include cleanup of replaced designs and dependent expectations, preserving shared and independently owned work. Save the complete current plan and actual authority without stacking incompatible historical versions; retain SE's clear-request authorization rules.
+- Follow the [request-scoped workflow](../using-cortex/SKILL.md#workflow-state). Start from brainstorming's retained scope, its requirement or evidence basis and the design produced within that scope, without a separate scope or design approval.
+- Do not edit implementation files, generate patches, or execute proposed work. Create a plan file only when explicitly requested as a deliverable.
+- Use code-tracing for missing source proof and brainstorming for outcome-affecting unknowns or its Revision Evidence workflow. Resolve evidence and design questions before presenting a complete proposal.
+- Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) when accepting design input. Preserve the distinction between confirmed facts, explicit requirements, hypotheses, external evidence gaps, and proposed behavior throughout the proposal.
+- Preserve established constraints. Proposed behavior, dependencies, tests, artifacts, validation and scope must map to an explicit requirement or proven prerequisite. A plan-only request does not authorize implementing the plan.
+- Do not silently expand a local request into global rules, broad refactors, shared abstractions, batch updates, or adjacent changes.
 
-- Start from brainstorming's retained scope, its requirement or evidence basis, and the design produced within that scope. If scope pruning or necessary design input is missing, return to brainstorming before constructing tasks. Return unsupported additions to requirement analysis; do not establish their necessity by turning them into design decisions or implementation steps. A clear implementation request needs no separate scope or design approval. If a decision would change the outcome, contract, ownership, or scope, use `cortex-se:brainstorming` and ask for that decision before implementing it.
-- Read project instructions and use `cortex-se:code-tracing` to establish existing behavior, configuration, state, and the complete relevant call chain before making source-based plan claims. For new functionality with no existing path, establish its integration points and label the new chain as proposed.
-- Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) when accepting design input. Preserve the distinction between confirmed facts, explicit requirements, hypotheses, external evidence gaps, and proposed behavior throughout the plan.
-- For objections, new directions, narrowed designs, or changed meanings, require brainstorming's [Revision Evidence](../brainstorming/SKILL.md#revision-evidence) before presenting the updated plan. Include its source basis, feasibility, semantic comparison and impact without changing SE's confirmation policy.
-- A request for a plan only ends with the plan. Otherwise, complete the plan and continue to `cortex-se:executing-plans` without a separate plan confirmation or execution-mode question. Create a separate plan deliverable only when requested; still update the controller's `context.md` when the current plan, authority or open choices change. This operational update is not implementation and needs no extra confirmation.
+## Entry And Return
 
-## Describe How, Not Merely What
+- If scope pruning or complete design input is missing, return to brainstorming before constructing the proposal. Return unsupported additions to requirement analysis; do not establish their necessity by turning them into design decisions or implementation tasks. Do not request a separate scope or design approval.
+- If the complete current plan exists, reuse it. For a plan-only request, discuss or deliver the plan; for an implementation request, continue within its scope without a new approval stage.
+- For objections, new directions, narrowed meaning, or changed proposal decisions, require brainstorming's Revision Evidence before presenting the revised complete proposal. State the revision reason and retain the earlier authorized content while the revision is pending.
+- With an unchanged request-scoped plan, resume its execution workflow without another confirmation. The proposal already specifies its mode.
+- A delegated implementer returns new decisions or missing authority to the controller rather than replacing the proposal or requesting user approval.
 
-For behavior-changing work, the plan must include:
+## Plan Construction
 
-1. The requested observable outcome and the point in the lifecycle where it must hold. For changed output, values or state meaning, connect the source-proven or explicitly proposed definition and calculation to the planned behavior/expression and expected result; do not treat a different meaning as equivalent.
-2. An end-to-end, code-level chain from source-supported entry and dispatch through relevant branches, calls, state changes, and error or output boundary. Mark proposed symbols and links as proposals.
-3. Separate file-by-file pseudocode grouped by responsible symbol. Show the planned additions, changes, or removals; key conditions, expressions, calls, returns, and state transitions. This is implementation logic, not complete source code.
-4. Relevant configuration, ownership, compatibility, and error-handling constraints, including behavior that must remain unchanged.
-5. An ordered implementation sequence where dependencies matter, plus targeted validation and the evidence expected from each check.
+Read the controller's [Current Task Context](../using-cortex/references/task-context.md) before constructing or revising a proposal. Map it to all effective user requirements and constraints, not only the latest message. Keep facts, user requirements and proposed choices distinct. Include removal of artifacts and expectations made obsolete by a replaced design; preserve shared and independently owned work. Context stores only clarified user requirements and constraints, not this proposal or its approval record. Before delivering the proposal or implementing it, check the entire plan against those requirements. Recover the full request-scoped plan and actual authorizing user request from the conversation or existing authorized records when execution requires them; do not create another record automatically.
 
-A list such as "edit these files, add tests, run checks" is not an implementation plan. Map each step to the explicit requirement or proven prerequisite, with the source and evidence status of its key premises; omit unrelated cleanup. A corrective step must identify the confirmed problem and why the modification is necessary. A new feature step must identify the explicit requirement without inventing an existing defect.
+For this skill, behavior-changing work includes changes to runtime output (including logs), state, control flow, or external effects.
 
-Before the first behavior-changing write or delegated dispatch, present both the call-chain representation and a separate fenced pseudocode block grouped by changed file and responsible symbol. This is a concrete execution reference, not a confirmation request. Do not replace the pseudocode with prose, a file list, or the call-chain diagram, even for a small behavior change. If either representation is missing, complete the plan and then continue without waiting for another approval.
+1. Review the retained scope and its basis before constructing tasks. Verify that the design stays within it and that its key premises remain supported, including whether existing mechanisms already satisfy the requirement. Return scope additions to brainstorming's requirement analysis, critical source gaps to tracing, and genuine user decisions to brainstorming.
+2. Identify affected files or packages, responsible symbols, entry points, ownership boundaries, state dependencies, and configuration dependencies.
+3. Build an ordered task list with one coherent change per task. For behavior-changing work, build both an end-to-end code-level call chain and separate file-by-file pseudocode across the affected tasks; split only when files, dependencies, or ordering require it.
+4. Define exact implementation boundaries, behavior that must remain unchanged, and validation evidence for every task.
+5. Stop planning when every explicit requirement and proven prerequisite is covered. Present one proposal with context, design decisions, call chain, file changes and pseudocode, impact, validation, and execution mode.
 
-## Check The Plan's Basis
+## Required Detail
 
-Apply the shared [Architecture Design](../../references/architecture-design.md) policy to architecture-relevant plans. Connect key principles to concrete decisions, evidence or validation, and explain material tradeoffs and exceptions as that policy requires. Return unresolved material choices to brainstorming; otherwise continue within the explicit implementation request without an additional confirmation. Do not duplicate architecture definitions or require a separate checklist.
+For every task, specify:
 
-- Verify that the design stays within the retained scope and that its key premises remain supported, including whether existing mechanisms already satisfy the requirement. Return scope additions to brainstorming's requirement analysis. Check the mapping from requirement or confirmed problem to design decision to modification step, including each added observable state operation within a step.
-- Reject dependent operations or steps whose critical premises remain inferred or unresolved, whose necessity is unsupported, or whose strongest relevant counterexample has not been reconciled. Structural checkpoint success or a self-declared status does not resolve these gaps; conditional design discussion is not a complete how-to plan.
+- The explicit requirement or proven prerequisite the task satisfies, with the source and evidence status of its key premises. A corrective task must identify the confirmed problem and why the modification is necessary; a new feature task must identify the explicit requirement without inventing an existing defect.
+- Exact files or packages and affected symbols.
+- Required behavior and unchanged behavior.
+- Similar files, call sites, log points, adjacent paths, global rules, or shared abstractions that remain unchanged when they could be mistaken as included.
+- For behavior-changing work, this task's segment of the separate call chain and file-by-file pseudocode. Mark applicable additions, changes, and removals; trace the source-supported entry and dispatch through key calls and branches to the changed state, output, persistence, or external boundary. Label new symbols as proposals and omit incidental local details.
+- For a changed observable outcome, value, or state meaning, map the requested outcome and lifecycle point to the planned behavior or expression and expected result. If a narrowed proposal conflicts with that mapping, return to `cortex-se:brainstorming` rather than presenting it as equivalent.
 - For a migration or rename that must preserve behavior, compare each changed observable assignment with the current path. A required protocol or field migration does not justify an additional state reset. Ambiguous descriptions of an existing action do not override a preservation constraint; preserve the current effect or resolve an explicit conflicting requirement before including that operation.
-- Return source gaps to `cortex-se:code-tracing` and genuine material user decisions to `cortex-se:brainstorming`. Continue authorized independent work; once the required premises and decisions are established, continue execution without a separate plan confirmation or execution-mode question.
+- Relevant configuration, contract, ownership, and error-handling constraints.
+- Dependencies on earlier tasks.
+- Proposed validation scope, exact commands when required, and expected evidence. For unit tests, include the method-to-case mapping or skip decision required by Unit Test Selection below.
+- Required restoration artifacts and their paths and ownership. When the user requests SDD, include its progress and task-record work within that request's scope. Specify enough task content and constraints to recover all remaining tasks; a conversation-only plan reference is insufficient for that recovery.
 
-## Call-Chain Form
+Do not use placeholders such as "add appropriate validation", "handle edge cases", "update related code", or "similar to the existing implementation".
 
-- Apply these cases in order to the proposed production changes: when at least two production implementation files change, or a cross-package or external-service call is added or changed, use a Mermaid sequence diagram for the end-to-end path.
-- Otherwise, when a single production file adds, changes, or removes a condition, loop, or state transition, use a Mermaid flowchart for the branches.
-- For all other changes, use a fenced code block for the end-to-end chain and no diagram. Existing conditions or state mutations merely traversed by the chain do not meet the flowchart trigger; changing only a logged value or output expression follows this case. In every case keep file-by-file pseudocode separate from the call-chain representation.
-- Do not choose a diagram based on files merely read for evidence. Show source-supported files and symbols, key predicates and values, and the changed boundary. A diagram with only file names or task labels does not satisfy the call-chain requirement.
+## Call Chain And Pseudocode Output
 
-## Validation Planning
-
-- Apply Unit Test Selection below to unit tests. Keep formatting, lint, build, integration checks and requested manual methods in their own project-defined and requested scope; broader observation does not authorize unrelated unit cases.
-- Prefer the check that observes the changed contract at the right level; a cross-boundary behavior may need a broader check than a private-function unit test. State what each validation proves and what it cannot prove.
-- If the environment cannot perform a required check, plan to report that gap accurately rather than substituting an unrelated passing command.
+- For behavior-changing work defined above, select the call-chain form from planned modifications, not files read for evidence. Count only production implementation files planned for modification; exclude tests and documentation.
+  1. If the plan modifies at least two production implementation files, or adds or changes a cross-package or external-service call, use a Mermaid sequence diagram.
+  2. Otherwise, if one production implementation file adds, changes, or removes a condition, loop, or state transition, use a Mermaid flowchart.
+  3. Otherwise, use a fenced code block for the end-to-end call chain.
+- An existing cross-package or external-service call encountered during tracing does not select a sequence diagram unless the plan adds or removes the call, changes its callee or dispatch, or changes the cross-boundary operation or contract. Editing only the text or arguments of an existing logging call does not by itself meet this rule.
+- Make the call chain code-dominant: show source-supported files and symbols, proposed new symbols marked as such, relevant calls and arguments, predicates, returns or errors, and state or external boundaries. Keep prose secondary and reserve it for constraints, unchanged behavior, reasons, and validation.
+- Put file-by-file pseudocode in a separate fenced code block grouped by file and responsible function. Mark additions, changes, and removals that apply; show key expressions, conditions, calls, returns, and state changes without writing complete implementation code.
 
 ## Unit Test Selection
 
-- Start from the methods/functions actually changed, and recheck that mapping against the final diff. A file, directory, package or repository is not the unit-test selection boundary; a runner's package path only locates the cases.
-- Search outward from the changed symbol using references and nearby test conventions under code-tracing's tool rules. Read only candidate assertions and necessary helpers. Names, locations or incidental calls locate candidates but do not establish relevance; do not read every test before matching.
-- Select the smallest independently runnable existing case or subtest whose assertions verify the changed method behavior. Record method → case/subtest → assertion purpose → exact selector/command → expected evidence.
-- With no matching existing case, stop the bounded search and skip unit tests for that method. Skip a case inseparable from unrelated cases; report insufficient evidence when relevance cannot be established. Do not compensate by running a file, package or full suite.
-- Do not add unit tests by default. New cases need an explicit request, uncovered validation of a requested new/changed method contract, or a proven defect-regression need. State the method, independently defined expected result and reason as a distinct how-to-plan task before implementation. Missing tests, a code edit or coverage alone does not justify additions; SE's existing authorization rules still apply.
-- After the final relevant change, verify the selected cases actually executed and passed. A zero exit with no matching tests is not a test pass.
-- Broader unit-test runs require an explicit user instruction. Surface a conflicting project-wide unit-test requirement rather than silently expanding scope; this rule does not change separately required build, lint, integration or manual validation.
+- Default to existing unit tests for the methods or functions actually changed by the planned work, then recheck against the final diff. Do not expand selection to a file, directory, package, or repository. A runner's package path is only a location argument, not the test scope.
+- Search outward from the changed symbol using references and nearby test naming conventions; follow `cortex-se:code-tracing` tool selection. Read only candidate tests, their assertions, and necessary helpers. Do not inventory and read every test before matching. Names and locations only locate candidates; actual exercised behavior and assertions establish relevance. An incidental call to the method does not establish relevance.
+- Map each changed method to the smallest independently selectable existing test or subtest that validates its changed behavior. Do not run unrelated cases alongside it. If no matching case exists, stop the bounded search and skip unit tests for that method. If a candidate cannot be isolated from unrelated cases, skip it; if dynamic calls prevent proving relevance, report insufficient evidence rather than running a broad suite.
+- Record each method, matched case or subtest, what it verifies, the exact selection command, and expected evidence; otherwise record the objective skip reason. After execution, confirm selected cases actually ran. A successful command with no matching tests is not a test pass. Use fresh execution evidence after the final relevant code change.
+- Do not add unit tests by default. New tests may be planned only for an explicit user request, a requested new or changed method behavior or contract requiring uncovered validation, or an established defect-regression need. State the method, independent expected result, and reason as a separate plan task; apply `cortex-se:code-standards` test-quality rules. Missing tests, a code edit, or a coverage target alone does not justify new tests. Once an authorized new test is implemented, apply the same method-level selection and execution checks to it.
+- A previously authorized broad command does not establish method-level relevance. Broader unit-test execution requires a separate explicit user instruction; surface a conflicting repository-wide requirement rather than silently expanding the run.
+- This policy governs unit tests. Keep formatting, lint, build, plugin/schema validation, and explicitly requested manual test methods under their own confirmed scope.
+
+## Proposal Output Review And Handoff
+
+Apply the shared [Architecture Design](../../references/architecture-design.md) policy to architecture-relevant proposals. Include the key principle-to-decision links, evidence or proposed validation, and material exceptions required by that policy; return unresolved critical conflicts to brainstorming. Keep this within the current complete plan, without a separate checklist or approval stage.
+
+1. Map every explicit requirement to a task.
+2. Verify source context, design decisions, files, symbols, order, call chains, data flow, errors, ownership, validation, and constraints. Reject a file-and-action list that omits how the paths connect.
+3. Check the mapping from requirement or confirmed problem to design decision to modification task, including each added observable state operation within a task. Reject dependent operations or tasks whose critical premises remain inferred or unresolved, whose necessity is unsupported, or whose strongest relevant counterexample has not been reconciled. Structural checkpoint success or a self-declared status does not resolve these gaps; conditional design discussion is not a complete implementation proposal.
+4. Reject a behavior-changing proposal without both the selected code-level call-chain form and separate file-by-file pseudocode, or with a mismatched outcome, expression, value definition, or lifecycle point.
+5. For a revised direction, check its reread context, necessary chain, feasibility, semantic comparison, and impact. A previously valid receipt does not establish these conclusions by itself.
+6. Resolve unclear implementation decisions; return evidence gaps to code-tracing and design gaps to brainstorming. Keep proposals within the stated scope.
+7. State execution mode before execution: direct execution by default; user-requested SDD only for tasks satisfying that skill's requirements, with all scoped recovery writes included.
+8. Present the complete current plan. A clear implementation request authorizes its stated scope; execute without separate design, plan or mode confirmation. Ask only for a material unresolved user decision. A plan-only request produces the plan and does not authorize execution.
+
+## Scope
+
+Define complete plans and execution handoff within the user-requested scope. Keep design analysis in `cortex-se:brainstorming`, source evidence in `cortex-se:code-tracing`, execution workflows in `cortex-se:subagent-driven-development` or `cortex-se:executing-plans`, code quality in `cortex-se:code-standards`, and completion evidence in `cortex-se:verification-before-completion`.

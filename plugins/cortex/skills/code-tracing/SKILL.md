@@ -28,7 +28,7 @@ description: Analyze repository-owned source, call chains, control flow, data fl
 
 - Start from the user question, symptom, diff hunk, failing command, or target requirement.
 - Trace only the files and functions required to prove or reject the current claim.
-- Use the mode supplied by the invoking Cortex skill. If none is supplied, treat an explicit target and outcome as `Precision`, and a request to diagnose, compare, design, or choose as `Exploration`; ask one clarifying question only when the classification changes the user-visible outcome, otherwise use `Precision`.
+- Inherit the mode supplied by the invoking Cortex skill. When invoked directly without one, use the single [Divergence Control](../using-cortex/SKILL.md#divergence-control) definition; an exact symbol does not override its diagnosis/design precedence. Do not request a separate mode confirmation.
 - In `Precision` mode, begin with the requested target and only the direct callers or callees required to prove the requested impact. Expand a path only when it is a proven prerequisite for an acceptance criterion, and state that criterion before expanding.
 - In `Exploration` mode, broaden only until the requested diagnosis, comparison, or design decision is supported. Default to one complete repository-owned path from entry point through business logic to the relevant state, configuration, persistence, or external boundary.
 - In `Exploration` mode, prefer three to seven repository-owned functions and one to two entry paths for ordinary tracing.

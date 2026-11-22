@@ -1,25 +1,62 @@
 ---
 name: code-tracing
-description: Establish repository behavior and complete relevant call paths from source, configuration, and runtime evidence before development conclusions.
+description: Analyze repository-owned source, call chains, control flow, data flow, state, and configuration. Use whenever current code-path evidence is needed for engineering decisions or claims.
 ---
 
 # Code Tracing
 
-## Evidence Standard
+## Evidence Rules
 
-- Define the claim and the conditions that would prove or reject it. Read relevant implementation, not only search results, symbol metadata, or a downstream symptom.
-- Trace every repository-owned link needed for the claim: entry point, validation and dispatch or registration, caller-to-callee values, branches, initialization and state mutation, configuration timing, lifecycle callbacks, errors, side effects, and the resulting observable boundary. Include multiple entry or failure paths when the conclusion depends on them.
-- For a behavior-changing proposal, establish the complete relevant existing path before planning the change. When a path is new, establish the integration points and state that the proposed segment does not exist yet.
-- An available API does not prove the current project calls it. A text-search miss does not exclude dynamic dispatch. Reconcile the strongest relevant counterexample before confirming a claim.
-- Stop at framework, generated, vendor, or standard-library internals when their public contract and local use suffice. Do not impose a fixed function count, path count, or hop limit on the relevant repository-owned chain.
+- Before a source conclusion, identify the claim and the conditions that would make it true or false. An available API is not evidence that the current project invokes it; a downstream fix is not evidence that the failing path reaches it.
+- For each relevant entry, inspect upstream validation, dispatch/registration, state initialization and mutation, and lifecycle callbacks needed by the claim. A text-search miss does not prove the absence of dynamic dispatch.
+- Use [batch evidence checkpoints](references/evidence-contract.md) for repository conclusions. Register actual ranges in useful batches, reuse fresh receipts, and validate the declared obligations before a definitive conclusion or a proposal based on it.
+- Structural validation does not prove that the cited code supports the claim. Reconcile the evidence with the strongest relevant counterexample before classifying it as confirmed.
 
-## Tools And Batches
+- Treat tracing as read-only analysis of the subject files. Do not change those files, generate implementation patches, or create implementation plans. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); a delegated tracer returns state updates to the controller instead. An explicit user prohibition on writes still takes precedence.
+- Do not claim current behavior, reachability, impact, root cause, regression risk, state, or completion evidence without supporting source evidence.
+- Read every repository-owned implementation, or every execution-relevant range when an implementation exceeds one evidence unit, used as evidence for a conclusion.
 
-- Use a language-aware index or language server for known symbols when available; use repository search to discover entry points, configuration, registration, generated paths, and dynamic calls. Fall back to source search and reading when indexing is unavailable or incomplete.
-- Use [batch evidence checkpoints](references/evidence-contract.md) for repository conclusions and change bases. The helper's per-range and per-batch limits control reading size, not the number of batches allowed for a named relevant gap. A receipt proves a range was returned, not that its content supports a claim.
-- Determine actual file lengths and execution-relevant ranges before a batch read; do not use guessed end lines. If the helper cannot run because of sandbox permissions, missing runtime, or unavailable hook context, use direct source reading under the same evidence standard and report that programmatic enforcement was unavailable. Do not repeatedly retry unchanged infrastructure or weaken the conclusion to hide the gap.
-- Preserve uncertainty when runtime identity, external configuration, timing, or an unexamined branch prevents a conclusion. State the missing evidence instead of inferring it.
+## Tool Selection
+
+- Use an available language-aware index or language server to resolve known symbols, references, implementations and static calls. Use repository search to locate entry points, configuration, registration and dynamic paths, or when no index is available.
+- When indexing cannot analyze the target configuration or resolve a relevant relation, state the specific gap and fall back to repository search and source reading.
+
+## Trace Boundary
+
+- Start from the user question, symptom, diff hunk, failing command, or target requirement.
+- Trace only the files and functions required to prove or reject the current claim.
+- Inherit the mode supplied by the invoking Cortex SE skill. When invoked directly without one, use the single [Divergence Control](../using-cortex/SKILL.md#divergence-control) definition; an exact symbol does not override its diagnosis/design precedence. Do not request a separate mode confirmation.
+- In `Precision` mode, begin with the requested target and only the direct callers or callees required to prove the requested impact. Expand a path only when it is a proven prerequisite for an acceptance criterion, and state that criterion before expanding.
+- In `Exploration` mode, broaden only until the requested diagnosis, comparison, or design decision is supported. Default to one complete repository-owned path from entry point through business logic to the relevant state, configuration, persistence, or external boundary.
+- In `Exploration` mode, prefer three to seven repository-owned functions and one to two entry paths for ordinary tracing.
+- Expand one additional hop only when the conclusion depends on the callee's internal behavior.
+- Stop at generic SDK, framework, generated, vendor, or standard-library internals; use their public contract, type signature, local wrapper usage, official documentation, or repository usage instead.
+- Stop when evidence proves the claim. Do not continue solely to increase confidence.
+- State why each additional path is required before tracing more than one independent path.
+
+## Context Budget
+
+- Read source, diff, and report content in units of at most 4 KiB.
+- Load no more than 16 KiB of that content for one trace or recovery pass; symbol metadata, file names, and type signatures do not count toward this limit.
+- For an implementation larger than one unit, read only the execution-relevant ranges and state any unexamined range that prevents a broader conclusion.
+- When the evidence budget cannot prove the claim, state the next required range or path as an evidence gap. Do not continue into unbounded context or infer the missing behavior.
+- Treat these limits as per-pass reading limits, not proof of completeness. Continue with another bounded pass only for a named, claim-relevant gap within the authorized investigation; otherwise narrow the conclusion.
+
+## Tracing Workflow
+
+1. Identify the target language, entry point, known symbols, and current claim.
+2. Resolve static relationships with the selected tool and identify unproven dynamic paths.
+3. Read the repository-owned implementation for every function used as evidence.
+4. Trace caller-to-callee parameters, return values, errors, side effects, state changes, initialization order, configuration timing, ownership, and lifecycle boundaries when relevant.
+5. List key state variables and possible values when state affects behavior; identify reachable, impossible, and unproven branches.
 
 ## Output
 
-Separate confirmed facts, inferences, and open questions. Cite the key source ranges and show the relevant call path without pasting large files. This skill is read-only for subject files. A controller may maintain its own [session snapshot](../using-cortex/references/task-context.md); a delegated tracer returns state updates instead, and an explicit user prohibition on writes takes precedence. For a requested behavior change, hand the established path to `cortex-se:writing-plans`; for a read-only question, return the supported conclusion to the calling workflow.
+- State whether the conclusion is confirmed or inferred.
+- Separate confirmed facts, reasoned inferences, and open questions.
+- Provide only the key source references and call-chain nodes.
+- Do not paste large source, diff, log, or test output.
+
+## Scope
+
+Provide source and call-chain evidence. Keep design in `cortex-se:brainstorming`, planning in `cortex-se:writing-plans`, debugging diagnosis in `cortex-se:systematic-debugging`, review conclusions in `cortex-se:requesting-code-review`, and completion claims in `cortex-se:verification-before-completion`.

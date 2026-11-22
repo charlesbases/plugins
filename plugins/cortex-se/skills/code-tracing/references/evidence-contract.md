@@ -2,14 +2,13 @@
 
 Use this contract for claims about repository behavior, defects, root causes,
 or necessary changes. It does not apply to ordinary naming, translation, or
-questions that make no repository claim. It supplements the user's requested
-scope and any material decisions resolved through Cortex SE; it never grants
-authority to expand that scope.
+questions that make no repository claim. It supplements the user's requested scope
+and resolved material decisions; it never grants implementation authority.
 
 ## Minimal workflow
 
 1. State the claim and its necessary conditions. Resolve known symbols with
-   an available language-aware index or server under code-tracing's tool rules.
+   an available language-aware index under code-tracing's tool rules.
 2. Replace ordinary source-range reads with one useful batch through the
    evidence helper. SessionStart supplies the actual script path, data directory,
    and session id; append the command read and send a JSON object on stdin.
@@ -41,11 +40,6 @@ Use at most 4 KiB per range and 16 KiB of source per batch. Leave enough tool
 output budget for the returned content and metadata; truncated output must not
 be treated as inspected evidence. A receipt proves that the helper read and
 returned a range, not that the model understood it.
-
-Determine the actual file length before choosing ranges; do not use oversized
-placeholder end lines. If a sandbox prevents writes to the supplied plugin data
-directory, do not change the directory to bypass enforcement. Use direct source
-reads under the same semantic standard and disclose the unavailable checkpoint.
 
 The response supplies receipt ids, exact paths, line ranges, whole-file hashes,
 and the source text. A new scope clears earlier scope receipts; additional
@@ -96,9 +90,11 @@ Passing that checkpoint does not promote them to confirmed.
 For a proposal or impending write, use purpose change and identify confirmed
 claim ids in basis. For a new feature based solely on an explicit user request,
 user_requirement may quote that request instead. The program cannot establish
-that this quotation is authentic or that a material choice was resolved:
-recover the actual request and any subsequent user decision from task context.
-Do not fabricate a defect or requirement to obtain a passing check.
+that this quotation is authentic or that a material choice was resolved. Recover
+the actual user request and subsequent explicit decisions from the conversation
+or existing authorized records. Use context.md only to reconcile current
+requirements and constraints, not to establish implementation authority. Do not
+fabricate a defect or requirement to obtain a passing check.
 
 When a previously established design choice applies, include constraints:
 
@@ -113,10 +109,10 @@ When a previously established design choice applies, include constraints:
 
 The constraints array belongs on the checkpoint object. A mismatch fails.
 The helper compares declared values; it cannot extract or authenticate every
-natural-language decision. Before updating a changed constraint, follow
-brainstorming's revision evidence workflow and resolve any material unanswered
-behavior or scope decision with the user; do not silently rewrite expected
-values. A scope-preserving implementation detail needs no new approval.
+natural-language decision. A proposed constraint change must first follow brainstorming's revision
+evidence workflow and enter the updated complete plan. Resolve material
+unanswered user choices before affected work, without adding plan approval;
+do not silently rewrite expected values.
 
 ## What the program does and does not establish
 
@@ -135,8 +131,13 @@ downstream improvement is not proof that an upstream failure is repaired.
 
 - SessionStart exposes the helper prefix and pending scope, including on resume.
 - PreToolUse checks registered investigations before apply_patch/Edit/Write.
-  It requires a current change checkpoint; this is not a general filesystem
-  security boundary and does not intercept shell writes.
+  It requires a current change checkpoint, except for a recognizable
+  `apply_patch` that only adds or updates this session's
+  `$HOME/.sessions/<session_id>/context.md`. Mixed-file patches, other sessions,
+  deletion, moves, redirected context paths and unrecognized inputs retain the
+  existing checks. This exception neither updates evidence state nor grants
+  user or host permission. This is not a general filesystem security boundary
+  and does not intercept shell writes.
 - Stop checks registered investigations once. It asks for one continuation
   when evidence is incomplete. A second unsuccessful stop ends continuation
   with an explicit incomplete message rather than silently passing or looping.

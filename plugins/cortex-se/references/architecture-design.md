@@ -77,22 +77,18 @@ These are applications of the named principles, not an independent architecture 
 
 - Introduce layers, factories, interfaces, adapters, generic helpers or cross-package dependencies only for a confirmed responsibility or design need. Apply the same necessity assessment to concurrency, caches and global state; define their state and resource owners under U1 and U3.
 - A wrapper can own validation, normalization, permission checks, state transitions, error translation, resource management, a stable domain contract or isolation of internal structure. Explain the actual consumer and boundary it protects. Delegating unchanged arguments can be valid when that boundary has an evidenced responsibility; forwarding alone, a pattern name or hypothetical reuse is insufficient.
-- Do not remove an existing wrapper merely because it is thin. Trace its behavior, consumers and ownership first; any removal must stay within the explicit user request and current how-to plan. Resolve a material undecided change through SE revision analysis rather than adding a generic approval stage.
+- Do not remove an existing wrapper merely because it is thin. Trace its behavior, consumers and ownership first; any removal must remain within the established design or return to the complete-proposal revision workflow.
 
 ### Validation And Failure Boundaries — D1, U1, U7, U8
 
 - Validate external inputs at system, API, configuration, persistence, command and user-facing boundaries. Keep the responsibility at the appropriate boundary rather than duplicating it throughout internal logic.
 - Do not add defensive handling for inputs or states excluded by proven initialization, constructors, invariants or call chains. Trace an unclear invariant before deciding; an unproven guarantee does not justify removing validation.
-- Do not silently ignore impossible internal states with empty returns, default values or swallowed errors. Define failure behavior consistently with the contract; changing that behavior must remain within the user-authorized scope, with any material undecided behavior resolved through the SE workflow.
-
-### Consumer Contracts And Language Conventions — D4, D5, U5, U6
-
-Use the project's language and framework conventions to express consumer contracts. When isolation or replacement requires an abstraction, derive its capabilities from the consumer's actual needs, using interfaces, protocols or equivalent mechanisms appropriate to that project. Do not impose provider-wide abstractions or wrap every concrete implementation. Without an abstraction need, keep the direct implementation; this supplement does not impose a language-specific type, tool or formatting rule.
+- Do not silently ignore impossible internal states with empty returns, default values or swallowed errors. Define failure behavior consistently with the contract; changing that behavior requires the request-scoped proposal workflow.
 
 ## Decisions, Exceptions And Verification
 
 - For each applicable principle, connect the relevant design decision to a concrete responsibility, dependency direction, contract or state boundary. Record justified inapplicability where it matters to the decision; do not use it to dismiss a relationship that actually exists.
 - Evaluate interacting principles together. For example, dependency inversion may justify an interface while simplicity and parsimony constrain its size and necessity; neither an automatic interface nor an automatic ban resolves the tradeoff.
-- Resolve material conflicts before the affected implementation. Explain the requirement, competing principles, chosen design, consequences, validation and any necessary exception in the how-to plan. Return unresolved material choices to brainstorming and ask for the missing decision once. A clear implementation request authorizes its stated scope; do not add architecture, exception, design or plan approval stages. A plan-only request remains plan-only.
-- Carry key decisions and exceptions into implementation and relevant review. Check the actual responsibilities, dependencies, substitution contracts, errors and state transitions against them. Changes of direction follow SE revision evidence and planning; only genuinely unresolved material choices require user input.
+- Resolve material conflicts before the affected implementation. Explain the requirement, competing principles, chosen design, consequences and validation in the complete plan. Make any necessary exception explicit there; unresolved material choices return to brainstorming. Continue within a clear implementation request without adding architecture, exception, design or plan approvals.
+- Carry key decisions and exceptions into implementation and relevant review. Check the actual responsibilities, dependencies, substitution contracts, errors and state transitions against them. Scope-changing corrections follow the existing proposal revision workflow.
 - Select validation that demonstrates the affected contract or decision. Rule names, checklists and structural checks do not prove architecture quality or correct runtime behavior. In a code-change review, retain its evidence and finding-classification requirements; a preference or unsupported principle allegation is not a proven runtime defect.

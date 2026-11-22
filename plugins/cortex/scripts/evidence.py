@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import sqlite3
 import sys
@@ -263,6 +264,59 @@ def validate_checkpoint(state, document):
     }
 
 
+def is_context_only_patch(event):
+    """仅识别当前会话需求文件的新增或更新，不执行补丁。"""
+    if event.get("tool_name") != "apply_patch":
+        return False
+    session_id = event.get("session_id")
+    if not isinstance(session_id, str) or not re.fullmatch(r"[A-Za-z0-9_-]+", session_id):
+        return False
+    tool_input = event.get("tool_input")
+    patch = tool_input.get("command") if isinstance(tool_input, dict) else None
+    if not isinstance(patch, str):
+        return False
+    # 与宿主补丁的 LF/CRLF 分行一致，不能把文件名中的 Unicode 分隔符当换行。
+    lines = patch.strip(" \t\r\n").replace("\r\n", "\n").split("\n")
+    if len(lines) < 3 or lines[0] != "*** Begin Patch" or lines[-1] != "*** End Patch":
+        return False
+    operation = next((prefix for prefix in ("*** Add File: ", "*** Update File: ")
+                      if lines[1].startswith(prefix)), None)
+    if operation is None:
+        return False
+    filename = lines[1][len(operation):]
+    if not filename or filename != filename.strip():
+        return False
+    body = lines[2:-1]
+    if operation == "*** Add File: ":
+        if any(not line.startswith("+") for line in body):
+            return False
+    else:
+        if not body:
+            return False
+        for index, line in enumerate(body):
+            if line == "*** End of File" and index == len(body) - 1:
+                continue
+            if not line.startswith(("@@", " ", "+", "-")):
+                return False
+    try:
+        home = Path(os.environ.get("HOME") or Path.home())
+        if not home.is_absolute():
+            return False
+        expected = home.resolve() / ".sessions" / session_id / "context.md"
+        # 需求文件或其下级目录若重定向到别处，不扩大豁免范围。
+        if expected.resolve() != expected:
+            return False
+        target = Path(filename)
+        if not target.is_absolute():
+            cwd = event.get("cwd")
+            if not isinstance(cwd, str) or not Path(cwd).is_absolute():
+                return False
+            target = Path(cwd) / target
+        return target.resolve() == expected
+    except (OSError, ValueError, RuntimeError):
+        return False
+
+
 def handle_hook(event, data_dir):
     name = event.get("hook_event_name")
     if name not in {"SessionStart", "PreToolUse", "Stop"}:
@@ -271,6 +325,9 @@ def handle_hook(event, data_dir):
         return {}
     session_id = require_text(event.get("session_id"), "session_id")
     workspace = require_text(event.get("cwd"), "cwd")
+    if name == "PreToolUse" and is_context_only_patch(event):
+        # 仅免除实施证据检查；宿主权限、用户禁写及调查状态保持不变。
+        return {}
     path = database_path(data_dir, session_id)
     if name != "SessionStart" and not path.exists():
         return {}

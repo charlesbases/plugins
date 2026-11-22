@@ -93,8 +93,10 @@ Cortex SE 使用 `cortex-se@rning`。重新安装会改变本机安装状态，�
 
 ### 修改本地源码后更新
 
+本节用于明确要求更新安装的场景。仅做插件验证时，按下文选择隔离环境或可完整恢复的本地环境；验证引起的安装、市场或 Hook 信任变更必须在结束后恢复，不能作为永久升级保留。
+
 1. 明确改动范围，执行下文的通用插件验证流程。
-2. 更新实际修改插件的清单版本；Codex 兼容格式的本地迭代可使用 `plugin-creator` 的缓存标记辅助脚本，具体示例见“本地安装与版本核对”。
+2. 更新实际修改插件的清单版本；Codex 兼容格式的本地迭代可使用 `plugin-creator` 的缓存标记辅助脚本，相关边界见“安装与版本核对”。
 3. 确认市场配置指向待验证的源码，再从本地市场重新安装并核对安装资源。`marketplace upgrade` 针对 Git 市场快照，不能替代本地源码的版本更新。
 4. 在新会话中验证安装版的发现、触发及实际行为。
 5. 发布到 GitHub 时提交源码、版本及必要的市场配置，并推送仓库。其他设备再执行上述 GitHub 更新步骤。
@@ -156,9 +158,9 @@ Cortex 是用于工程设计、源码追踪、计划、实施和验证的技能�
 
 技能切换和任务恢复保留可恢复的有效批准。局部实施细节、进度和测试结果更新不重置批准；文件或目标范围、关键调用/分支/状态、输出口径、接口或外部边界、验证范围、执行方式变化则更新完整方案后确认。验证失败先证明根因；符合批准关键决定与范围的修正直接实施并重验，改变方案的修正重新取证和出方案。
 
-Cortex 主会话在 `$HOME/.sessions/<session_id>/context.md` 维护一份当前有效状态，路径使用用户 HOME 和宿主真实会话 ID，不随项目或工作目录变化。记录有来源的目标与约束、当前设计和批准范围、事实与证据、实际进度、待清理产物及未决事项；用户要求、助手设计和观察事实分别记录。具体规则见 [Current Task Context](plugins/cortex/skills/using-cortex/references/task-context.md)。
+Cortex 主会话在 `$HOME/.sessions/<session_id>/context.md` 仅保存用户明确提出、当前仍有效的需求和约束，路径使用用户 HOME 和宿主真实会话 ID，不随项目或工作目录变化。AI 可以总结和去重，但不得改变含义、补充推导出的要求或自动增加验收要求。方案、进度、结果、下一步、审批记录、待清理事项、未决问题及历史记录均不写入 context。具体规则见 [Current Task Context](plugins/cortex/skills/using-cortex/references/task-context.md)。
 
-需求补充保留其他有效约束；替换或撤销移除旧设计及其依赖步骤，实际仍存在的旧代码和文件列为待清理。问题或异议先触发重新分析，不能当成修改授权。修订须说明改变什么、哪些约束继续成立、完整流程如何满足目标，以及保留、调整、删除哪些产物。状态在需求变化、设计与执行交接、恢复或压缩后读取，在决策、进度和未决事项变化时更新；只做澄清也可能需要更新，没有状态变化则无需改写。纪要维护不增加确认步骤，也不证明模型已正确执行约束。本功能由技能规则落实，不新增自动改写纪要或检查文件变化的 Hook。
+收到新输入时先读取并对照既有需求和约束。明确的补充、替换或撤销只更新相应内容，保留其他有效约束；有冲突或歧义时在对话中询问，明确前保持受影响的已保存内容不变，不记录待决问题或猜测的解决方式。问题或异议不授予实施权限。设计和执行前对照 context；仅进度、测试结果或普通问答变化时不改写。可控压缩前确认需求约束已保存，恢复后重新读取。SessionStart 和 UserPromptSubmit Hook 通过脚本读取并注入文件，AI 负责需求分析、总结和更新；加载不证明正确理解或遵守。实际方案、批准和进度从原对话、实际文件或已有授权记录核对，不从 context 推断，也不自动新建替代记录。完整方案的一次批准规则保持不变；自动压缩前语义保存的宿主边界详见任务上下文规则。
 
 `testing` 保留显式调用入口。测试点、操作、预期、命令映射、报告和可读批准基线任务应在完整方案确认前呈现；已纳入批准内容的测试直接执行，独立发起 testing 则呈现完整测试方案并确认一次。报告语义与命令映射变化必须更新方案，结果及勾选更新不改变批准基线。
 
@@ -166,16 +168,18 @@ Cortex 主会话在 `$HOME/.sessions/<session_id>/context.md` 维护一份当前
 
 #### 概述
 
-Cortex SE 是工程开发流程技能插件；具体职责和约束见 [skills](plugins/cortex-se/skills/) 目录。
+Cortex SE 是 Cortex 的便捷版：保留公共工程规则，减少部分技能，取消额外方案批准，并移除内置 Go 专属要求。共有规则以 Cortex 为基准保持一致；中文注释、英文日志属于公共规则，两版均保留。具体职责和约束见 [skills](plugins/cortex-se/skills/) 目录。
 
 Cortex SE 同样要求基于源码证据、明确实施路径并验证结果。明确的实施请求可以在建立相关上下文和具体计划后继续执行；只有影响结果、契约、归属或范围的实质选择需要询问。用户只要求分析、设计或计划时，交付对应结果，不进入实施。
 
-Cortex SE 同样在 `$HOME/.sessions/<session_id>/context.md` 保存当前有效任务状态；文件存在就读，缺失直接新建，不查找旧名、不做迁移或回退。修订时保留未改变的约束、移除失效设计并清理对应产物，恢复和澄清时维护实际状态。详见 [Current Task Context](plugins/cortex-se/skills/using-cortex/references/task-context.md)。纪要维护不增加确认步骤，SE 仍按明确实施请求直接推进，只对未决实质选择询问一次。
+Cortex SE 通过 SessionStart 和 UserPromptSubmit Hook 自动加载当前会话的需求与约束。AI 负责结合既有约束理解新输入、澄清冲突并更新文件；context 仅保留用户明确的当前有效需求和约束，不保存方案、进度、结果、授权记录、未决问题或历史。需求未变时无需改写；恢复后先读取，可控压缩前确认最新需求已保存。自动压缩前语义保存的宿主限制见任务上下文规则。
+
+Cortex SE 同样使用 `$HOME/.sessions/<session_id>/context.md`；文件存在就读，缺失直接新建，不查找旧名、不做迁移或回退。新需求只替换受影响内容，保留其他有效约束；冲突先在对话中澄清，明确前不覆盖受影响的已存需求。方案、实际授权及进度从对话、实际文件或已有授权记录恢复，不从 context 推断，也不自动新增替代记录。详见 [Current Task Context](plugins/cortex-se/skills/using-cortex/references/task-context.md)。SE 仍按明确实施请求直接推进，只对未决实质选择询问一次；验证可隔离进行，也可本地执行后完整恢复。
 
 ```text
 需求 → using-cortex 路由
      → 按需 code-tracing / systematic-debugging
-     → 有实质未知项时 brainstorming 澄清
+     → brainstorming 分析需求、明确范围并设计；必要时澄清实质未知项
      → 行为改动先 writing-plans 明确如何实施
      → executing-plans 直接执行；用户指定时使用 subagent-driven-development
      → code-standards / requesting-code-review
@@ -187,7 +191,7 @@ Cortex SE 同样在 `$HOME/.sessions/<session_id>/context.md` 保存当前有效
 | 技能 | 职责 |
 | --- | --- |
 | [using-cortex](plugins/cortex-se/skills/using-cortex/SKILL.md) | 请求路由、来源证据、范围与完成要求 |
-| [brainstorming](plugins/cortex-se/skills/brainstorming/SKILL.md) | 处理影响结果的未知项和设计选择 |
+| [brainstorming](plugins/cortex-se/skills/brainstorming/SKILL.md) | 分析需求、明确范围并设计；仅对未解决的实质选择询问 |
 | [code-tracing](plugins/cortex-se/skills/code-tracing/SKILL.md) | 追踪与当前结论有关的源码路径 |
 | [writing-plans](plugins/cortex-se/skills/writing-plans/SKILL.md) | 明确行为改动的实施路径，或交付用户请求的计划 |
 | [executing-plans](plugins/cortex-se/skills/executing-plans/SKILL.md) | 执行已获授权的工作 |
@@ -199,7 +203,7 @@ Cortex SE 同样在 `$HOME/.sessions/<session_id>/context.md` 保存当前有效
 
 ## 通用插件验证流程
 
-本节适用于本仓库的两个插件，也可作为其他插件的验证指南。在仓库根目录选择待验证插件后，进入该插件目录，再运行下面的组件校验示例：
+本节适用于本仓库的两个插件，也可作为其他插件的验证指南。先按下文准备隔离环境或可完整恢复的本地环境，再在所选源码根目录选择待验证插件，进入该插件目录运行组件校验示例：
 
 ```bash
 cd plugins/cortex
@@ -225,9 +229,39 @@ cd plugins/cortex
 
 新建或修改插件后请求“验证插件”，默认执行本节完整流程。不能由执行者自行缩小为源码检查、脚本检查或工具结构校验，也不能因为换了会话而省略步骤。
 
-独立子会话审查、本地安装及资源核对、新会话中的安装版行为验证均是必需阶段。已安装版本与待验证源码一致时，可核验现有安装；否则应安装或刷新后再测试。组件未声明可记为不适用，但不能把必需阶段标为不适用。
+独立子会话审查、所选环境内安装及资源核对、新会话中的安装版行为验证均是必需阶段。已安装版本与待验证源码一致时，可核验该安装；否则在所选环境内安装或刷新。本地验证须在结束后恢复验证前的安装及配置状态。组件未声明可记为不适用，但不能把必需阶段标为不适用。
 
 开始前明确所需工具、目标宿主、安装来源和测试环境。若子会话工具、安装权限、Hook 信任、外部依赖或目标宿主能力不可用，应记录阻塞和具体缺口，报告“完整验证未完成”，而不是改称另一种验证范围或笼统报告通过。外部写入和不可逆操作仍须其自身授权。
+
+### 验证环境与恢复
+
+- 验证可以使用隔离环境，也可以使用本地环境并在结束后完整恢复。两种方式均须遵守已授权的验证范围；正式源码的已批准修改和用户既有工作不属于应回退的验证副作用。
+- 隔离验证使用源码副本，将安装、市场、配置、Hook 信任、依赖、缓存、临时文件、证据库和会话 context 放在独立目录。仅设置 `CODEX_HOME` 不足以隔离 `$HOME/.sessions`；核对实际宿主及子进程的 HOME、用户目录和其他状态路径，不直接复制整份日常配置。
+- 本地验证前保存受影响资源的原始状态，并明确新增产物及恢复方式。结束后恢复验证引起的源码、安装、市场、配置、Hook 信任、权限、依赖、缓存和会话数据变更，清理新增产物；不得整体回退工作区或清空共享目录来代替精确恢复。
+- 启动前核实解析后的路径、子进程继承环境及有效权限，排除其他插件对待验证插件的干扰；临时改变的插件启用状态也须恢复。沙箱或缓存问题优先使用进程局部设置处理，也允许在授权范围内进行可恢复的本地调整。两种方式均不可行，或仍缺少 Bash 执行、宿主能力时，才将相应检查记为阻塞。认证按宿主支持方式提供，不把凭证写入报告。
+- 无论验证成功、失败或中断，都须停止本次进程、恢复本地变更并清理新增产物。隔离方式核对日常资源未改变；本地方式核对受影响资源已恢复原始状态，保留无关用户改动。最终报告列明验证及清理结果，恢复失败或残留不能被功能检查通过掩盖。子会话及子代理遵守相同规则。
+
+以下是隔离方式的 Bash 前缀示例。`validation_root` 是本次创建的隔离根，`validation_source` 是其中的源码副本；先按上述规则核实路径与权限。路径必须是宿主可识别的绝对路径，Windows Git Bash 可用 `cygpath -am` 转换，不能把 MSYS 路径直接用作原生 Windows 进程的 HOME。
+
+```bash
+: "${validation_root:?Set the verified isolated root}"
+: "${validation_source:?Set the isolated source copy}"
+mkdir -p "$validation_root"/{home,codex,tmp,cache,appdata,localappdata}
+validation_codex_dir="$validation_root/codex"
+validation_env=(env
+  HOME="$validation_root/home" USERPROFILE="$validation_root/home"
+  CODEX_HOME="$validation_root/codex"
+  APPDATA="$validation_root/appdata" LOCALAPPDATA="$validation_root/localappdata"
+  XDG_CONFIG_HOME="$validation_root/home/.config" XDG_DATA_HOME="$validation_root/home/.local/share"
+  TEMP="$validation_root/tmp" TMP="$validation_root/tmp" TMPDIR="$validation_root/tmp"
+  XDG_CACHE_HOME="$validation_root/cache"
+  PIP_CACHE_DIR="$validation_root/cache/pip" UV_CACHE_DIR="$validation_root/cache/uv"
+  PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1)
+```
+
+该前缀不自动创建受限宿主权限，也不能阻止工具忽略环境变量；有效隔离和实际行为必须单独核实。
+
+采用本地方式时，先完成原始状态记录，将 `validation_source` 和 `validation_codex_dir` 分别设为实际源码根目录和宿主配置目录；可使用 `validation_env=(env PYTHONDONTWRITEBYTECODE=1 PYTHONUTF8=1)`，按实际需要补充进程局部设置。后续命令共用该前缀，不能误用隔离方式的目录或遗漏本地恢复。
 
 ### 等待与无进展处理
 
@@ -272,7 +306,7 @@ git diff --cached --stat -- .
 
 ```bash
 plugin_root="$PWD"
-plugin_codex_dir="${CODEX_HOME:-$HOME/.codex}"
+plugin_codex_dir="$validation_codex_dir"
 plugin_skill_creator="$plugin_codex_dir/skills/.system/skill-creator"
 plugin_plugin_creator="$plugin_codex_dir/skills/.system/plugin-creator"
 ```
@@ -281,10 +315,10 @@ plugin_plugin_creator="$plugin_codex_dir/skills/.system/plugin-creator"
 
 ```bash
 if test -f "$plugin_root/plugin.json"; then
-  PYTHONUTF8=1 python -m json.tool "$plugin_root/plugin.json" > /dev/null || exit 1
+  "${validation_env[@]}" python -m json.tool "$plugin_root/plugin.json" > /dev/null || exit 1
   printf '%s\n' 'JSON syntax passed; validate the declared portable schema separately.'
 elif test -f "$plugin_root/.codex-plugin/plugin.json"; then
-  PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
+  "${validation_env[@]}" python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
 else
   printf '%s\n' 'No supported plugin manifest found.' >&2
   exit 1
@@ -298,8 +332,8 @@ plugin_skill_count=0
 for plugin_skill in "$plugin_root"/skills/*; do
   test -f "$plugin_skill/SKILL.md" || continue
   plugin_skill_count=$((plugin_skill_count + 1))
-  PYTHONUTF8=1 python "$plugin_skill_creator/scripts/quick_validate.py" "$plugin_skill" || exit 1
-  PYTHONUTF8=1 skills-ref validate "$plugin_skill" || exit 1
+  "${validation_env[@]}" python "$plugin_skill_creator/scripts/quick_validate.py" "$plugin_skill" || exit 1
+  "${validation_env[@]}" skills-ref validate "$plugin_skill" || exit 1
 done
 if test "$plugin_skill_count" -eq 0; then
   printf '%s\n' 'Skill validation: not applicable, or verify a custom declared skill path.'
@@ -309,8 +343,8 @@ fi
 **改动格式检查。** 对 Git 项目分别检查已暂存和未暂存差异。范围外问题单独归属，不擅自修改，也不将失败的全树检查报告为通过。
 
 ```bash
-git diff --check -- . || exit 1
-git diff --cached --check -- . || exit 1
+"${validation_env[@]}" git diff --check -- . || exit 1
+"${validation_env[@]}" git diff --cached --check -- . || exit 1
 ```
 
 工具检查只覆盖其支持的格式、配置或结构，不能证明指令语义正确、功能可用、模型实际遵循，或发布审核已经通过。
@@ -346,29 +380,29 @@ git diff --cached --check -- . || exit 1
 
 代码测试根据组件的实际契约和改动选择有验证价值的用例，优先复用相关既有测试；不要用无关测试通过代替当前能力验证，也不要为了凑校验数量创建恒真断言或复述实现的测试。
 
-### 6. 本地安装与版本核对（有副作用）
+### 6. 安装与版本核对（有副作用）
 
-新插件先按目标宿主支持的方式配置本地源码和 marketplace，再安装。修改既有插件时，先验证源码，再按其包格式和工具支持情况更新版本或缓存标记。版本更新和安装会改变文件及本地状态，只在相关操作已获授权时执行。
+在所选宿主配置待验证源码和 marketplace，再安装待验证插件。正式源码的版本更新应属于已批准的开发修改，不混入验证操作。隔离方式安装最终源码的副本；本地方式先保存原安装、市场和配置状态，结束后恢复。安装和状态变更均须属于已批准的验证范围。
 
 Codex 本地 marketplace 安装示例：将名称替换为已经配置并校验过的实际名称，不复制某个具体插件的标识。
 
 ```bash
 plugin_name='my-plugin'
 plugin_marketplace='my-marketplace'
-codex plugin add "${plugin_name}@${plugin_marketplace}"
-codex plugin list
+"${validation_env[@]}" codex plugin marketplace add "$validation_source"
+"${validation_env[@]}" codex plugin add "${plugin_name}@${plugin_marketplace}"
+"${validation_env[@]}" codex plugin list
 ```
 
-对于已有 Codex 兼容格式的本地插件，可以使用 `plugin-creator` 的辅助流程。下列命令是有副作用的示例，不属于只读结构校验；portable 包不能假设该兼容格式辅助脚本适用。
+对于已有 Codex 兼容格式的插件，在所选源码目录中核对市场名称并校验清单。需要更新版本或缓存标记时，在开发阶段按获批文件范围处理，不把该写入混入验证命令；portable 包不能假设该兼容格式辅助脚本适用。
 
 ```bash
 plugin_marketplace_path="$(cd "$plugin_root/../.." && pwd)/.agents/plugins/marketplace.json"
-plugin_marketplace=$(PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/read_marketplace_name.py" --marketplace-path "$plugin_marketplace_path") || exit 1
-PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/update_plugin_cachebuster.py" "$plugin_root" || exit 1
-PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
+plugin_marketplace=$("${validation_env[@]}" python "$plugin_plugin_creator/scripts/read_marketplace_name.py" --marketplace-path "$plugin_marketplace_path") || exit 1
+"${validation_env[@]}" python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin_root" || exit 1
 ```
 
-上面的示例使用本仓库的市场配置位置；其他插件应按实际目录设置 `plugin_marketplace_path`。非默认 marketplace 应向辅助脚本提供其实际路径，并确认安装来源确实指向待验证源码。更新后重新检查清单及 diff，再执行已授权的安装；不要手工修改 marketplace 配置来掩盖来源不一致。
+上面的示例使用本仓库的市场配置位置；其他插件应按所选源码实际目录设置 `plugin_marketplace_path`。非默认 marketplace 应向辅助脚本提供其实际路径，并确认来源指向待验证源码。检查最终清单及 diff 后执行已授权的安装；本地市场变更须恢复，不得用手工配置掩盖来源不一致。
 
 安装完成后核对：
 
@@ -417,8 +451,8 @@ PYTHONUTF8=1 python "$plugin_plugin_creator/scripts/validate_plugin.py" "$plugin
 
 - 创建产物时集中使用自有临时目录，记录路径、归属及用途；将临时文件与源码、用户既有文件、实际安装资源和正式工具分开。
 - 校验结束且相关任务及实际进程不再使用产物后，将插件版本、校验工具和命令、会话标识、请求与结果、失败或缺口、必要输入输出摘要及清理结果归入最终报告。保留最终报告；临时日志、快照和报告草稿不作为永久交付物。未完成或失败的校验也应先记录实际状态，再清理已停止任务的产物。
-- 删除本次创建的全部过程产物，包括隔离测试项目、临时脚本和配置、原始日志、查询清单、模拟数据与临时证据库、子代理恢复记录、临时依赖环境及下载包。需保留的复用工具必须明确为正式工具；仅因未来可能使用，不得默认保留临时目录中的工具环境。宿主管理的原生会话历史、用户既有数据及实际安装插件不作为临时文件擅自删除。
-- 删除前核实目标的解析后绝对路径及归属，确认其位于已识别的临时目录内；外置临时证据库只能按已核实的隔离项目关联逐个删除，不得清空共享数据目录。只删除清单内产物；无归属依据的文件保持原样并记录。
+- 删除本次创建的全部过程产物，包括测试项目、临时脚本和配置、原始日志、查询清单、模拟数据与临时证据库、子代理恢复记录、临时依赖环境及下载包。隔离宿主中的测试安装、信任配置和测试会话数据随隔离目录清理；本地验证则恢复原有安装和状态，精确删除本次新增的测试数据，保留既有会话、用户数据和无关改动。需保留的复用工具必须明确为正式工具；仅因未来可能使用，不得默认保留临时目录中的工具环境。
+- 删除前核实目标的解析后绝对路径及归属；临时目录内产物核对目录边界，外置或本地宿主中的产物按已记录的本次验证关联逐项处理，不得清空共享数据目录。只删除清单内产物；无归属依据的文件保持原样并记录。
 - 清理后重新检查目录、文件及外置临时记录是否仍有残留，更新最终报告中的临时路径引用，避免留下失效链接。报告实际清理范围和结果；失败或残留应明确列出，不能只凭删除命令返回成功宣称清理完成。
 
 ### 参考规范与工具范围

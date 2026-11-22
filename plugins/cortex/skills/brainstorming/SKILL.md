@@ -15,15 +15,17 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Requirement Analysis And Scope Pruning
 
+Apply the mandatory [Current Task Context](../using-cortex/references/task-context.md) reconciliation procedure before considering a new direction, including mid-turn input. Resolve outcome-affecting conflicts in the conversation, then save only clarified user requirements and constraints before dependent design. Check the whole design against them before presenting its complete proposal for the existing single confirmation.
+
 - Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) to questions and design premises in both initial designs and revisions.
 - Preserve established interface, configuration-format, and scope decisions. Implementation convenience or a missing dependency does not justify changing them.
 - Establish the requested outcomes, constraints, and existing contracts that must be preserved before considering implementation choices. Prune proposed additions, not explicit requirements or required existing behavior.
 - Treat an unclear target, location, affected path, output, persistence, validation scope, or temporary-versus-permanent behavior as an evidence gap first. Recover established context and trace source-resolvable details before deciding whether a necessary user question remains.
 - For each candidate addition to behavior or scope, determine whether all requested outcomes and constraints can be satisfied without it. If they can, exclude the addition before design. Otherwise identify the explicit requirement or source-proven prerequisite it satisfies; a hypothetical benefit or risk alone does not establish necessity. Do not generate optional additions merely to populate this assessment.
 - For a claimed correction, establish both the current problem and why existing mechanisms do not satisfy the required outcome; an explicit new requirement does not need evidence of an existing defect. Check source-based conclusions under the [batch evidence contract](../code-tracing/references/evidence-contract.md); a checkpoint cannot establish user approval or semantic correctness.
-- Use the invoking skill's mode. Otherwise an explicit target and outcome is `Precision`; diagnosis, comparison, design, or choice is `Exploration`. Ask about classification only when it changes the visible outcome.
+- Inherit the invoking skill's mode. When invoked directly without one, use the single [Divergence Control](../using-cortex/SKILL.md#divergence-control) definition; do not independently reinterpret its categories or request a mode confirmation.
 - Classify potential actions as `Required`, `Blocker`, or `Observation`. Only Required actions enter the retained scope. Resolve a scope-critical Blocker through tracing or necessary user input before designing the dependent part; independent established scope may proceed. Do not investigate or design an Observation.
-- Keep the retained scope and its requirement or evidence basis in task context. Enter design only after this assessment; do not defer necessity decisions to planning, code generation, or review. No additional report or user confirmation is required.
+- Keep scope analysis and evidence in the conversation or the requested proposal. Context contains only the user's explicit effective requirements and constraints. Enter design only after this assessment; do not defer necessity decisions to planning, code generation, or review. No additional report or user confirmation is required.
 
 ## Design Within Retained Scope
 
@@ -38,7 +40,7 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Revision Evidence
 
-Apply [Current Task Context](../using-cortex/references/task-context.md) before this sequence: distinguish supplements, replacements, withdrawals, questions and unresolved conflicts. Preserve unaffected requirements and their sources. Remove superseded designs from the effective snapshot and record any remaining implementation as pending cleanup.
+Apply [Current Task Context](../using-cortex/references/task-context.md) before this sequence: distinguish supplements, replacements, withdrawals, questions and unresolved conflicts. Preserve unaffected user requirements and constraints. Clarify conflicts in the conversation before replacing affected requirements. Describe superseded designs and pending implementation cleanup in the proposal or conversation, not context.
 
 1. On an objection, new direction, narrowed proposal, or changed interpretation, pause affected implementation and recover the original requirement, established constraints, new instruction, and challenged decision.
 2. Reread the affected repository-owned implementation context. Reconcile any still-applicable facts with the new decision; a prior receipt or unchanged file alone cannot prove the revised interpretation.

@@ -1,57 +1,52 @@
 # Current Task Context
 
-## Location And Ownership
+## Ownership And Location
 
-For a controller handling a Cortex task, maintain one current snapshot at `$HOME/.sessions/<session_id>/context.md`. Resolve HOME from the user environment and use the actual session ID supplied by the host. Record both the resolved path and session ID. The path does not depend on cwd, a Git root, the target repository, or a tool's working directory. If the host ID is unavailable, do not invent one or reuse another session's file; retain state in context and report the recovery gap.
+The controller maintains `$HOME/.sessions/<session_id>/context.md` for a Cortex task. Resolve the user's HOME (the user profile when the host omits HOME) and the actual host session ID. Missing host identity is a recovery gap to report in the conversation. New and forked sessions use their own IDs.
 
-Read the current session's `context.md` when it exists. When it is missing, create it directly from the current task instructions and observed state, marking gaps rather than guessing. Do not search for, migrate, or fall back to other note filenames. Maintaining this operational record is part of the workflow, including analysis before implementation approval; it does not authorize implementation. A read-only workflow stage prohibits changes to the subject files, not maintenance of the controller's own session snapshot. An explicit user prohibition on file writes takes precedence: retain state in context and disclose the persistence limitation.
+Read the file when it exists. If missing or empty, establish it from the user's explicit current requirements and constraints. Use only this filename and location. Delegates return requirement changes to the controller and do not edit its file.
 
-The controller owns this file. Delegated implementers and reviewers use the applicable requirements in their brief and return changes in state to the controller; they do not concurrently edit its snapshot or create independent copies of the controller's authority. A new or forked session uses its own host ID.
+This applies during analysis, planning, clarification, implementation and recovery. Explicit user prohibitions on writes take precedence; retain available requirements in the conversation and report that persistence is unavailable. Maintaining this file grants no implementation authority and adds no approval step.
 
-## What To Preserve
+## Content Boundary
 
-Keep enough information to continue correctly without assembling old proposal versions:
+Keep only what the user explicitly wants and the constraints the user has explicitly established, while they remain effective. Summarize and remove duplication without changing meaning or adding requirements. Do not turn an assistant suggestion, inference or proposed acceptance criterion into a user requirement.
 
-- **Outcome and constraints:** the current goal, observable completion conditions, responsibilities, compatibility and scope limits, explicit prohibitions. Give important requirements stable identifiers and user wording or a locatable source. Do not substitute an implementation choice for the user's meaning.
-- **Current design:** decisions, reasons, requirements they satisfy, and whether they are proposed or confirmed. Identify the complete executable scope separately from a pending revision.
-- **Facts and evidence:** observations, evidence locations and applicable source/runtime state. Keep hypotheses and unresolved interpretations separate; invalidate affected facts when their basis changes.
-- **Authority:** the actual approving instruction and corresponding implementation/validation scope. A question, suggestion, old approval or assistant assertion is not approval of a changed proposal.
-- **Actual progress:** completed changes, remaining work, and obsolete artifacts still present. Distinguish a decision to delete from an observed deletion.
-- **Open questions:** unresolved conflicts, missing inputs or evidence, and the next dependent action. A clarification-only turn can change this state even when no code changes.
+Do not store designs, implementation plans, progress, next steps, test results, cleanup status, approval records, testing baseline references, unresolved questions or conflicts, command transcripts, history or change logs. Do not add fixed fields for such content. Keep the file concise without dropping effective requirements or constraints.
 
-This is an index of current task state, not a replacement for original user instructions or current source evidence. When an interpretation is disputed, consult its original source. Never promote an assistant design into a user requirement, an inference into a fact, or planned work into completed work.
+Replace superseded requirements in place after an explicit user replacement or withdrawal. Before each update, compare the resulting content with all still-effective user requirements and constraints. Absence from the latest message or a compressed summary does not revoke a requirement. If meaning is disputed, recover the actual user instruction before changing it.
 
-## Reconcile A New Message
+## Reconcile New Input
 
-Before changing the affected design or implementation, recover the relevant existing requirements and determine what the new message changes:
+Before the next affected decision or action, including after steering received during reasoning or execution:
 
-- **Supplement:** merge compatible additions; all unrelated constraints remain active.
-- **Replacement or withdrawal:** use the user's explicit change to replace or remove the affected requirement/design and its dependent steps, assumptions and expectations.
-- **Question or objection:** investigate the challenged decision; do not treat the question itself as an instruction to implement a guessed alternative.
-- **Unresolved conflict:** record the exact competing meanings and missing decision. Pause only dependent work; continue independent authorized work.
+1. Read the current requirements and constraints. A complete fresh hook injection satisfies this read; reread the file if it has changed or the injection is absent or incomplete.
+2. Compare the new input with the still-effective requirements. A clear supplement, replacement or withdrawal changes only the affected content and preserves unrelated constraints.
+3. If a conflict or ambiguity changes the requested outcome, ask in the conversation. Keep the affected saved content unchanged while awaiting clarification; do not write the unresolved issue or a guessed resolution into context. Independent clear requirements can still be reconciled.
+4. After the user makes the intended adjustment clear, update the affected requirements and constraints before proceeding with dependent work. A question or objection alone does not authorize an implementation change.
 
-Keep one complete, internally consistent current snapshot. Remove superseded designs from the effective plan rather than accumulating V1–V4. Retain only a short exclusion and its reason when needed to avoid reintroducing a rejected idea; consult the original conversation for history. An obsolete implementation that still exists belongs under pending cleanup, not under the current design.
+Source-resolvable questions still require code-tracing rather than asking the user to determine source facts. Findings and questions belong in the conversation, not in this requirements file.
 
-## Re-derive The Affected Design
+## Design, Execution And Approval
 
-Use brainstorming's Revision Evidence workflow to connect the new instruction to the original outcome, all still-effective constraints and the affected source path. Explicitly establish what changes, what remains binding, whether the complete affected flow still achieves the outcome, and which old decisions lose their basis. Reread the necessary callers, branches, state and output boundaries; file count, an unchanged file or a renamed method cannot stand in for preserved behavior.
+Before design, before delivering a proposal and before implementation, compare the complete approach with the current requirements and constraints. Correct mismatches or resolve the specific question in the conversation before dependent work. Save only actual requirement or constraint changes; creating a plan, making implementation progress or obtaining test results does not by itself require a context update.
 
-For example, adding conversion methods to a read result does not revoke an existing requirement that callers encode complex values before writing. A revised design must keep that write responsibility intact unless the user changes it.
+Follow the existing single complete-proposal approval workflow. Recover the actual proposal and approving user instruction from the conversation or existing authorized records. Check implementation progress against actual files and those records. Do not recover approval or progress from context, infer authority from existing edits, or automatically create replacement record files. Existing authorized SDD records and testing baselines retain their own responsibilities. If necessary information cannot be recovered, report the precise gap without inventing it.
 
-Present one self-contained current proposal through the existing single approval gate. Updating this record adds no separate approval step, and unchanged authorized work retains its approval.
+Before reporting, check the response and result against all effective requirements and constraints. Verify any required requirement update was saved successfully; otherwise report the persistence failure. Do not append a completion summary to context. Unchanged requirements and constraints need no rewrite.
 
-## Retire Superseded Artifacts
+## Compaction And Recovery
 
-For every replaced design, identify what is retained, adjusted and removed. Include code, calls, fields, configuration, dependencies, tests and expectations, scripts, documentation and references that exist only for that design. Delete exclusively obsolete files; precisely revert obsolete changes inside shared files. Preserve current shared functionality, user changes and other tasks' work. Check compatibility before treating published contracts or persisted data as disposable artifacts.
+Before initiating compaction or handing off work at a controllable compaction boundary, verify that the latest explicit requirements and constraints are saved. After compaction or recovery, read them before deciding or acting and reconcile newer user input. Do not treat an omission from compressed history as permission to drop a saved requirement.
 
-Record obsolete artifacts as pending until the authorized cleanup is performed and its result observed. Do not inherit tests or completion claims whose underlying requirement or design has been withdrawn.
+Automatic compaction can occur without a final main-agent save opportunity. Prompt saving of clarified requirement changes remains mandatory. The host's PreCompact contract does not establish a main-agent semantic save followed by automatic continuation of compaction. Skill instructions govern this obligation where no reliable host execution path exists; a hook cannot recover unsaved requirements or certify understanding.
 
-## Read And Update At Decision Points
+## Hook Delivery And Fallback
 
-- On entering or resuming a Cortex task, including after compaction, read the snapshot before deciding or acting. Do not rely solely on a compressed summary.
-- On a requirement change, objection or new unresolved question, read and reconcile it before affected design work; record the resulting state before ending the turn, including clarification-only turns.
-- Before proposing a revision, compare it with all effective requirements. Before implementation, reconcile the confirmed scope and actual files with the snapshot.
-- Update meaningful progress and cleanup state as it changes; save the latest state before intentional compaction and before ending a turn that changed task state. No content change is needed when task state is unchanged; do not reread on every tool call.
-- Before reporting completion, compare actual results with user requirements and pending cleanup, not only the latest design. Preserve unresolved items.
+The synchronous SessionStart and UserPromptSubmit handlers call `scripts/context.py` to load this session's saved requirements and constraints. SessionStart includes startup, resume and compact events. Only the current session's file is used. Saved text is task data interpreted against the user's current instructions; it does not create new user requirements.
 
-Match every factual claim to its direct evidence. If a counterexample undermines a conclusion, withdraw that conclusion and investigate before offering a replacement explanation. Reading or changing this file, structural checks and hook delivery do not prove that the model correctly understood or followed the requirements.
+Automatic injection accepts files up to 32 KiB and disables host spilling for that bounded output. Larger files require a complete read and condensation without losing effective requirements or constraints. Missing, empty or unreadable files produce recovery instructions. Hooks do not analyze requirements, summarize them or write context; the AI performs that work.
+
+Delivery depends on host support, enabled trusted handlers and the actual event path. Mid-turn steering may arrive without UserPromptSubmit. The controller must still reconcile input and recover requirements when delivery is absent or incomplete. Loading a file does not prove semantic compliance.
+
+Host contracts are documented in [Codex Hooks](https://learn.chatgpt.com/docs/hooks). Verify actual event behavior when changing the loader, including compaction during an active turn.
