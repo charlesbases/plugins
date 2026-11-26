@@ -15,7 +15,7 @@ description: Analyze engineering requirements, clarify outcome-affecting unknown
 
 ## Requirement Analysis And Scope Pruning
 
-Apply the mandatory [Current Task Context](../using-cortex/references/task-context.md) reconciliation procedure before considering a new direction, including mid-turn input. Resolve outcome-affecting conflicts in the conversation, then save only clarified user requirements and constraints before dependent design. Check the whole design against them before presenting its complete proposal for the existing single confirmation.
+Begin design and revisions with [Current Task Context](../using-cortex/references/task-context.md). The SessionStart and UserPromptSubmit hooks supply the saved requirements and constraints. If the snapshot is missing, incomplete or stale, read the current session's `context.md` directly and apply its recovery rules. Reconcile the latest user message, including mid-turn input, before the next affected decision. Clarify conflicts with the user and save only explicit requirement changes. Use the resulting requirements to check the whole design before its single proposal confirmation.
 
 - Apply [Evidence And Clarification](../using-cortex/SKILL.md#evidence-and-clarification) to questions and design premises in both initial designs and revisions.
 - Preserve established interface, configuration-format, and scope decisions. Implementation convenience or a missing dependency does not justify changing them.
@@ -33,14 +33,20 @@ Apply the mandatory [Current Task Context](../using-cortex/references/task-conte
 
 - Design only the retained scope. If design reveals a new behavior or scope addition, return it to requirement analysis and scope pruning before designing the affected part. Implementation details that satisfy the retained scope do not create new requirements.
 - Check key design premises against state transitions, lifecycle timing, consumers, and the strongest relevant counterexample before recommending a change. A missing field or display requirement alone does not prove a missing capability or equivalent business states. Preserve unresolved premises as conditional discussion, not required implementation work.
-- Explain interpreted scope when it can be misread. Default to the smallest repository-owned change that satisfies the requirement; unrelated cleanup or expansion does not enter the proposal without explicit user scope.
-- State proven facts and identify unknown inputs, boundary behavior, compatibility, contracts, error handling, ownership, and validation.
+- For each effective requirement, identify an observable result and a relevant scenario that could disprove the design. Trace the actual pre-change behavior of affected consumers, including relevant defaults, exits, failures and side effects. Specify the intended differences and the behavior those consumers still rely on. Revise a design that fails this comparison before handoff.
+- Choose the smallest repository-owned change that delivers those results. Justify material new branches, state, dependencies or abstractions against that alternative. For hot paths, use input size, call frequency and repeated work to assess time, space, copying or allocation costs. Identify assumptions and how material predictions can be checked. Keep the explanation proportional to the decision.
+- Explain the scope when it can be misread. State proven facts, unknown inputs, compatibility, contracts, ownership and validation. Unrelated cleanup or expansion requires explicit user scope.
 - In Precision, recommend the smallest valid change; surface a material tradeoff as a specific question needed for the proposal. In Exploration, compare approaches only when requested or needed for the decision.
 - Hand the retained scope, its requirement or evidence basis, and the design with impact, constraints, boundary and error behavior, and validation to writing-plans without a generic design-confirmation question.
 
 ## Revision Evidence
 
 Apply [Current Task Context](../using-cortex/references/task-context.md) before this sequence: distinguish supplements, replacements, withdrawals, questions and unresolved conflicts. Preserve unaffected user requirements and constraints. Clarify conflicts in the conversation before replacing affected requirements. Describe superseded designs and pending implementation cleanup in the proposal or conversation, not context.
+
+When revising an implemented version, settle two decisions before including changes in the proposal:
+
+- **Business behavior.** Identify the behavior being replaced and trace any independent consumers of its logic, interfaces or storage. Include superseded paths in the removal scope and retain shared behavior that still has a consumer. Reuse the existing representation when it expresses the new meaning. Ask if replacement versus coexistence is still a business decision.
+- **Historical data.** Trace old writers through storage or transport to the new reader, including what the values mean. Use the normal new path when old data cannot reach it or is already handled correctly. Honor an existing explicit compatibility choice or commitment. For a genuine undecided case, describe the affected records and consequences, ask the user once how to handle them, and continue independent work. After a reasonable opportunity to reply, use the **new format only** as the proposal default if no answer has arrived. Identify the unsupported records. Include a fallback, dual reads or writes, or a migration tool only if the selected strategy requires it. Deleting, overwriting or migrating stored data requires explicit authority for that operation. Reconcile a later answer under the existing proposal revision rule.
 
 1. On an objection, new direction, narrowed proposal, or changed interpretation, pause affected implementation and recover the original requirement, established constraints, new instruction, and challenged decision.
 2. Reread the affected repository-owned implementation context. Reconcile any still-applicable facts with the new decision; a prior receipt or unchanged file alone cannot prove the revised interpretation.

@@ -432,11 +432,13 @@ def main():
     parser.add_argument("--session-id", default=os.environ.get("CODEX_THREAD_ID"))
     parser.add_argument("--workspace", default=os.getcwd())
     args = parser.parse_args()
+    event = {}
     try:
         if not args.data_dir:
             raise EvidenceError("Use --data-dir from SessionStart, or set PLUGIN_DATA")
         if args.command == "hook":
-            result, status = handle_hook(load_input(), args.data_dir), 0
+            event = load_input()
+            result, status = handle_hook(event, args.data_dir), 0
         else:
             result, status = run_cli(args)
         print(json.dumps(result, ensure_ascii=False))
@@ -444,6 +446,10 @@ def main():
     except (EvidenceError, OSError, UnicodeError, json.JSONDecodeError, sqlite3.Error) as error:
         message = f"Cortex evidence error: {error}"
         if args.command == "hook":
+            if event.get("hook_event_name") == "Stop" and event.get("stop_hook_active"):
+                # 持久化异常发生在重试保护之前，使用宿主标志结束重复续跑。
+                print(json.dumps({"continue": False, "systemMessage": message}, ensure_ascii=False))
+                return 0
             # 不把故障静默视为通过；exit 2 使用宿主定义的阻断/续跑行为。
             print(message, file=sys.stderr)
             return 2

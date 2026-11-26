@@ -42,6 +42,12 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
    Confirm validation-owned processes have stopped and temporary artifacts are removed. For isolation, verify protected daily resources were unchanged; for local validation, compare affected resources with their original state and verify all validation-induced changes were restored. Preserve approved implementation edits and unrelated user work. Report restoration failures or residue even if functional checks passed.
 6. Reconcile requirements, implementation, validation results, and unresolved items before reporting.
 
+When the controller is delivering an approved implementation, perform the following checks before its first delivery, including after resuming a task. Use the latest user instructions and the current requirements from the context hook, reading `context.md` directly if the injection is absent, incomplete or stale. Recover the approved proposal and approving instruction separately. If a new requirement conflicts with an approved decision, route the affected work through Proposal Revision. Use evidence from direct execution or the existing SDD final review that still applies to the final change.
+
+- **Requirements.** Map each effective requirement to the delivered result and its evidence. Identify it as satisfied, unmet or insufficiently evidenced.
+- **Complexity.** Compare actual branches, state, dependencies and relevant hot-path work with the design assessment. Check material changes in scaling, copies or allocations. Distinguish source-based estimates from measurements and use comparable workloads and output semantics for measured claims.
+- **Existing business behavior.** Compare the final change attributable to this task with the actual state before implementation, including pre-existing user edits. Trace affected consumers through relevant branches, exits, failures and side effects. Check that the implemented replacements, retained consumers and historical-data handling match the selected strategy. Report intended changes, unintended regressions and gaps, including an unavailable baseline.
+
 ## Claim Evidence
 
 - Requirement satisfied: Map every confirmed requirement to the delivered artifact or behavior and required validation evidence.
@@ -69,9 +75,9 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 
 ## Incomplete Verification
 
-- Use `cortex:systematic-debugging` when required validation fails and the root cause is not proven.
-- Resume the approved execution workflow for incomplete implementation, formatting, generated-code review, or proven in-scope corrections when key decisions and scope remain valid. Pass the incomplete step, reason, applicable approval, and active testing baseline; do not restart confirmation.
-- Changed decisions follow [Proposal Revision](../using-cortex/SKILL.md#proposal-revision), including affected context reread and necessary chain, feasibility, and semantic rechecks. Present one revised complete proposal before changed implementation or validation.
+- When a check fails and the cause or impact is unclear, use `cortex:systematic-debugging` for read-only diagnosis within the existing authority. Identify the reachable failure and its effect. If evidence is still missing, report the gap and pause the dependent correction.
+- Return incomplete implementation, formatting or generated-code review to its approved execution workflow. For an implementation deviation, first establish that the fix restores the confirmed result within the approved files, key decisions, business contracts, side effects and validation scope. Return the proven correction and any active testing baseline to the original execution mode without another confirmation. Rerun the failed and affected approved checks and reassess the final diff. A standalone read-only review returns findings.
+- If the implementation follows the design but misses the requirement, or a remedy would change an approved decision or scope, pause affected work. Explain which assumption failed and its impact, then follow [Proposal Revision](../using-cortex/SKILL.md#proposal-revision) for one revised complete proposal before changed implementation or validation.
 - State incomplete validation, failed checks, blocked commands, and residual risk directly.
 
 ## Output
@@ -79,6 +85,8 @@ description: Verify fresh evidence before claiming work is complete, fixed, vali
 Before reporting, verify context contains only the user's explicit current requirements and constraints. Save clarified requirement changes when necessary; unchanged requirements need no rewrite. Do not add completion status, results, remaining work, approval records or testing baseline references. Verify required saves succeeded and report persistence or recovery gaps in the response.
 
 Report only completed or changed work, verification performed and its result, whether the approved complete proposal was satisfied, and uncompleted work, failed checks, blocked validation, or residual risk. Distinguish `passed`, `not run`, `failed`, and `insufficient evidence`. Do not paste large logs, source files, diffs, or command output.
+
+For an implementation delivery, state requirement coverage, actual complexity and impact on existing business behavior in the initial response. Combine supported conclusions when useful, name specific deviations or gaps, and respect the user's requested output format.
 
 ## Scope
 
